@@ -855,6 +855,8 @@ def document( *,
         f'<html lang="en" data-accent="{accent}" class="{classes}">', "<head>",
         '<meta charset="utf-8">', '<meta name="viewport" content="width=device-width,initial-scale=1">',
         '<meta name="color-scheme" content="dark light">', f"<title>{text(title)}</title>",
+        # without this the phone paints a white status bar above a near-black page
+        '<meta name="theme-color" content="#131516">',
         f'<meta name="description" content="{attr(description)}">',
         f'<link rel="icon" href="{attr(prefix)}favicon.svg" type="image/svg+xml">',
         f'<link rel="apple-touch-icon" href="{attr(prefix)}favicon.svg">',
