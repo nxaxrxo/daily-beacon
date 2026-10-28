@@ -807,7 +807,7 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .layout-hero-stacked .lead > .source-line   { grid-area: source; justify-content: center; }
   /* width drives the box; the inline aspect-ratio sets the height, so a wide
      picture fills the column instead of being clamped into a letterbox strip */
-  .layout-hero-stacked .media--lead { max-width: 62rem; }
+  .layout-hero-stacked .media--lead { max-width: 62rem; margin-inline: auto; }
   .layout-hero-stacked .media--lead .media__box { min-height: 0; max-height: none; }
 
   .story__headline { font-size: var(--story-size-lg); }

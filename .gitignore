@@ -28,3 +28,4 @@ desktop.ini
 # sqlite sidecar files (state churn, never tracked)
 state/*.sqlite-wal
 state/*.sqlite-shm
+_run_detached.py
