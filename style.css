@@ -817,13 +817,17 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .pullquote::before { margin-left: -0.06em; }
 }
 
-/* 1180px: the stacked layout earns a right-hand rail */
+/* 1180px: a reserved rail column only when the rail actually comes first.
+   With order-lead the rail is the last thing on the page, so reserving a
+   column for it leaves every story above sitting beside empty space. In that
+   case the stories keep the plain two-column run and the rail closes the
+   page full-width (the 760px rule already spans .quick-hits across both). */
 @media (min-width: 1180px) {
-  .layout-hero-stacked .paper { grid-template-columns: minmax(0, 1fr) 19rem; }
-  .layout-hero-stacked .paper > .lead { grid-column: 1 / -1; }
-  .layout-hero-stacked .paper > .story,
-  .layout-hero-stacked .paper > .pullquote { grid-column: 1; }
-  .layout-hero-stacked .paper > .quick-hits {
+  .layout-hero-stacked.order-rail .paper { grid-template-columns: minmax(0, 1fr) 19rem; }
+  .layout-hero-stacked.order-rail .paper > .lead { grid-column: 1 / -1; }
+  .layout-hero-stacked.order-rail .paper > .story,
+  .layout-hero-stacked.order-rail .paper > .pullquote { grid-column: 1; }
+  .layout-hero-stacked.order-rail .paper > .quick-hits {
     grid-column: 2;
     position: sticky;
     top: 4.5rem;
