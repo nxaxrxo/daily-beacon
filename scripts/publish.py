@@ -2,13 +2,12 @@
 """publish.py - commit the built site and push it so GitHub Pages serves it.
 
 Modes:
-  (default)       --check, then "git add -A", commit "edition: <date>", push, print the live URL
-  --check         report working tree, site build state, branch, remote, live URL; change nothing
-  --url           print only the live URL (config/settings.json -> site_base_url)
-  --verify        HTTP GET the live URL, require 200 + the masthead "THE DAILY BEACON"
-  --wait N        with --verify: poll every 20s up to N seconds total (wall-clock deadline,
-                  max 12 polls), stop at the first success
-  --set-url URL   write site_base_url into config/settings.json (all other keys preserved)
+  (default)      git add -A, commit "edition: <date>", push, print the live URL
+  --check        report branch, remote, tree, build state and live URL; change nothing
+  --url          print only the live URL (config/settings.json -> site_base_url)
+  --verify       GET the live URL, require 200 + the masthead "THE DAILY BEACON"
+  --wait N       with --verify: poll every 20s for up to N seconds, stop on first success
+  --set-url URL  write site_base_url into config/settings.json, all other keys preserved
 
 Exit codes: 0 success, 1 failure, 2 usage error.
 Never force-pushes. Refuses to commit a staged file that looks like a secret.
@@ -44,8 +43,7 @@ MASTHEAD = b"THE DAILY BEACON"
 HTTP_TIMEOUT = 25
 POLL_SECONDS = 20
 MAX_POLLS = 12
-# Built from fragments so this file never matches its own guard.
-GH_PREFIX = "gh" + "p_"
+GH_PREFIX = "gh" + "p_"  # fragments: this file must never match its own guard
 PAT_PREFIX = "git" + "hub_pat_"
 SK_PREFIX = "sk" + "-"
 AIZA_PREFIX = "AI" + "za"
@@ -64,8 +62,7 @@ REDACT = re.compile(
     "|" + AIZA_PREFIX + r"[0-9A-Za-z_-]{8,}" +
     "|" + XOX_PREFIX + r"[A-Za-z0-9-]{4,})")
 
-
-# ---------------------------------------------------------------- small helpers
+# - small helpers
 
 def git(*args: str) -> subprocess.CompletedProcess:
     """Run git in the project root; never raises."""
@@ -81,10 +78,8 @@ def git_lines(*args: str) -> list:
 
 
 def first_line(text: str) -> str:
-    for ln in (text or "").splitlines():
-        if ln.strip():
-            return REDACT.sub("<redacted>", ln.strip())
-    return "(no output)"
+    lines = [ln.strip() for ln in (text or "").splitlines() if ln.strip()]
+    return REDACT.sub("<redacted>", lines[0]) if lines else "(no output)"
 
 
 def warn(msg: str) -> None:
@@ -101,7 +96,9 @@ def load_settings() -> dict:
     except (OSError, json.JSONDecodeError) as exc:
         warn(f"publish: cannot read config/settings.json ({exc})")
         return {}
-    return data if isinstance(data, dict) else {}
+    if not isinstance(data, dict):
+        return {}
+    return data
 
 
 def save_settings(data: dict) -> None:
@@ -141,10 +138,10 @@ def derived_pages_url() -> str:
     m = re.search(r"github\.com[:/]+([^/]+)/([^/]+?)(?:\.git)?/*$", remote_url())
     if not m:
         return ""
-    owner, repo = m.group(1), m.group(2)
-    if repo.lower() == f"{owner.lower()}.github.io":
-        return f"https://{owner.lower()}.github.io/"
-    return f"https://{owner.lower()}.github.io/{repo}/"
+    owner, repo = m.group(1).lower(), m.group(2).lower()
+    if repo == f"{owner}.github.io":
+        return f"https://{owner}.github.io/"
+    return f"https://{owner}.github.io/{repo}/"
 
 
 def live_url() -> str:
@@ -152,19 +149,18 @@ def live_url() -> str:
 
 
 def newest_edition_date() -> str:
+    """Newest editions/YYYY-MM-DD.json stem, falling back to today."""
     best = None
-    if EDITIONS.is_dir():
-        for path in EDITIONS.glob("*.json"):
-            try:
-                value = date.fromisoformat(path.stem)
-            except ValueError:
-                continue
-            if best is None or value > best:
-                best = value
+    for path in sorted(EDITIONS.glob("*.json")) if EDITIONS.is_dir() else []:
+        try:
+            value = date.fromisoformat(path.stem)
+        except ValueError:
+            continue
+        if best is None or value > best:
+            best = value
     return (best or date.today()).isoformat()
 
-
-# ------------------------------------------------------------------ secret guard
+# - secret guard
 
 def staged_files() -> list:
     return git_lines("diff", "--cached", "--name-only")
@@ -195,14 +191,13 @@ def unstage(name: str) -> None:
     if git("restore", "--staged", "--", name).returncode != 0:
         git("rm", "--cached", "-q", "--", name)
 
-
-# ----------------------------------------------------------------------- --check
+# - --check
 
 def cmd_check() -> int:
-    """Report state. Exits 0 unless this is not a git repository at all.
+    """Report state; exit 0 unless this is not a git repository at all.
 
-    "The site is not built yet" is a legitimate pre-first-build state, so it is reported
-    as a check line, never as an error - the publish path refuses on its own.
+    "Not built yet" is legitimate before the first build, so it is a check line and
+    never an error - cmd_publish refuses on its own.
     """
     print(f"check: root {ROOT}")
     if not in_git_repo():
@@ -217,10 +212,10 @@ def cmd_check() -> int:
         print("check: working tree clean (0 entries)")
     else:
         print(f"check: working tree dirty ({len(status)} entries)")
-        for line in status[:40]:
+        for line in status[:25]:
             print(f"    {line}")
-        if len(status) > 40:
-            print(f"    ... {len(status) - 40} more")
+        if len(status) > 25:
+            print(f"    ... {len(status) - 25} more")
 
     if not SITE_INDEX.is_file():
         print("check: site/index.html MISSING - not built yet")
@@ -243,8 +238,7 @@ def cmd_check() -> int:
     print("check: verdict would publish" if status else "check: verdict up to date")
     return 0
 
-
-# ------------------------------------------------------------------- publishing
+# - publishing
 
 def git_failure(what: str, res: subprocess.CompletedProcess) -> int:
     warn(f"publish: {what} failed")
@@ -298,11 +292,9 @@ def cmd_publish() -> int:
               "(run: publish.py --set-url <url>)")
     return 0
 
-
-# ----------------------------------------------------------------------- --verify
+# - --verify
 
 def probe(url: str):
-    """Return (ok, bytes_or_reason)."""
     request = Request(url, headers={"User-Agent": UA, "Cache-Control": "no-cache",
                                     "Pragma": "no-cache"})
     try:
@@ -344,8 +336,7 @@ def cmd_verify(wait: int) -> int:
         print(f"verify: attempt {attempt}/{MAX_POLLS} {detail} - retrying in {POLL_SECONDS}s")
         time.sleep(POLL_SECONDS)
 
-
-# ------------------------------------------------------------------------ misc
+# - misc
 
 def cmd_url() -> int:
     url = settings_url()
@@ -380,10 +371,8 @@ def build_parser() -> argparse.ArgumentParser:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true", help="report state and change nothing")
     mode.add_argument("--url", action="store_true", help="print the live URL only")
-    mode.add_argument("--verify", action="store_true",
-                      help="HTTP GET the live URL and require 200 + the masthead")
-    mode.add_argument("--set-url", metavar="URL", dest="set_url",
-                      help="write site_base_url into config/settings.json")
+    mode.add_argument("--verify", action="store_true", help="GET the live URL, require 200 + masthead")
+    mode.add_argument("--set-url", metavar="URL", dest="set_url", help="write site_base_url to settings")
     parser.add_argument("--wait", type=int, default=0, metavar="N",
                         help="with --verify: poll every 20s for up to N seconds (max 12 polls)")
     return parser
