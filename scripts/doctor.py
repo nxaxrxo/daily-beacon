@@ -109,13 +109,11 @@ class Doctor:
             return self.failed(name, error)
         if not isinstance(data, dict):
             return self.failed(name, "top level must be a JSON object")
-        kind = {int: lambda v: is_int(v), bool: lambda v: isinstance(v, bool),
-                str: lambda v: isinstance(v, str)}
         bad, extra = [], set(data) - set(key for key, _ in SETTINGS_TYPES)
         for key, want in SETTINGS_TYPES:
             if key not in data:
                 bad.append("missing '%s'" % key)
-            elif not kind[want](data[key]):
+            elif not (is_int(data[key]) if want is int else isinstance(data[key], want)):
                 bad.append("'%s' must be %s" % (key, want.__name__))
         if bad:
             return self._fail_many(name, bad)
@@ -144,18 +142,18 @@ class Doctor:
             bad.extend("%s missing '%s'" % (where, key) for key in required if key not in entry)
             if not str(entry.get("name") or "").strip():
                 bad.append(where + " name is empty")
-            if not isinstance(entry.get("enabled", False), bool):
+            if not isinstance(entry.get("enabled"), bool):
                 bad.append(where + " enabled must be a boolean")
             else:
-                enabled += 1 if entry.get("enabled") else 0
+                enabled += 1 if entry["enabled"] else 0
             if kind == "channel":
-                if "id" in entry and not (isinstance(entry["id"], str)
-                                          and CHANNEL_ID_RE.match(entry["id"])):
+                if not (isinstance(entry.get("id"), str)
+                        and CHANNEL_ID_RE.match(entry["id"])):
                     bad.append(where + " id is not a UC... channel id")
-                if not (is_int(entry.get("tier")) and entry.get("tier") in (1, 2, 3)):
-                    bad.append(where + " tier must be 1, 2 or 3")
-                else:
+                if is_int(entry.get("tier")) and entry["tier"] in (1, 2, 3):
                     tiers[entry["tier"]] += 1
+                else:
+                    bad.append(where + " tier must be 1, 2 or 3")
                 continue
             url = entry.get("url")
             if not isinstance(url, str) or not url.strip():
@@ -201,29 +199,29 @@ class Doctor:
 
     def check_dirs(self):
         """6. The four output directories exist and accept a temp file."""
-        name, bad, writable = "writable directories", [], 0
+        name, bad = "writable directories", []
         for rel in ("editions", "site", "site/assets", "state"):
-            folder, temp_path = self.root / rel, None
+            folder = self.root / rel
             if not folder.is_dir():
                 bad.append(rel + " missing")
-                continue
-            try:
-                handle, temp_path = tempfile.mkstemp(prefix=".doctor-", suffix=".tmp",
-                                                     dir=str(folder))
-                with open(handle, "w", encoding="utf-8") as stream:
-                    stream.write("ok\n")
-                Path(temp_path).unlink()
-                writable += 1
-            except OSError as exc:
-                bad.append("%s not writable (%s)" % (rel, exc.__class__.__name__))
-                if temp_path:
-                    try:
-                        Path(temp_path).unlink()
-                    except OSError:
-                        pass
+            elif not self._writable(folder):
+                bad.append(rel + " does not accept a temp file")
         if bad:
             return self._fail_many(name, bad)
-        return self.passed(name, "%d/4 directories exist and accept a temp file" % writable)
+        return self.passed(name, "4/4 directories exist and accept a temp file")
+
+    @staticmethod
+    def _writable(folder):
+        """Create and remove one temp file, so a read-only mount is caught."""
+        try:
+            handle, temp_path = tempfile.mkstemp(prefix=".doctor-", suffix=".tmp",
+                                                 dir=str(folder))
+            with open(handle, "w", encoding="utf-8") as stream:
+                stream.write("ok\n")
+            Path(temp_path).unlink()
+            return True
+        except OSError:
+            return False
 
     def check_runtime(self):
         name, version = "runtime", "%d.%d.%d" % sys.version_info[:3]
@@ -448,10 +446,8 @@ def check_html(path):
                         % ", ".join("#" + item for item in missing[:5]))
     for index, match in enumerate(IMG_RE.finditer(cleaned)):
         alt = attribute(match.group(1), "alt")
-        if alt is None:
-            problems.append("img[%d] has no alt attribute" % index)
-        elif not alt.strip():
-            problems.append("img[%d] has an empty alt attribute" % index)
+        if alt is None or not alt.strip():
+            problems.append("img[%d] has no usable alt attribute" % index)
         if len(problems) >= 8:
             break
     return problems

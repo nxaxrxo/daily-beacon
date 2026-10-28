@@ -1,5 +1,15 @@
 [
   {
+    "name": "Eurogamer",
+    "url": "https://www.eurogamer.net/feed",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 3
+  },
+  {
     "name": "PC Gamer",
     "url": "https://www.pcgamer.com/rss/",
     "tags": [
@@ -20,87 +30,6 @@
     "weight": 3
   },
   {
-    "name": "Eurogamer",
-    "url": "https://www.eurogamer.net/feed",
-    "tags": [
-      "gaming",
-      "news"
-    ],
-    "enabled": true,
-    "weight": 3
-  },
-  {
-    "name": "GamesIndustry.biz",
-    "url": "https://www.gamesindustry.biz/feed",
-    "tags": [
-      "gaming",
-      "news"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "VGC",
-    "url": "https://www.videogameschronicle.com/feed/",
-    "tags": [
-      "gaming",
-      "news"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "GameSpot",
-    "url": "https://www.gamespot.com/feeds/mashup/",
-    "tags": [
-      "gaming",
-      "news"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "IGN Games",
-    "url": "https://feeds.ign.com/ign/games-all",
-    "tags": [
-      "gaming",
-      "news"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "Digital Foundry",
-    "url": "https://feeds.feedburner.com/digitalfoundry",
-    "tags": [
-      "gaming",
-      "hardware",
-      "tech"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "Tom's Hardware",
-    "url": "https://www.tomshardware.com/feeds/all",
-    "tags": [
-      "hardware",
-      "tech"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "The Verge AI",
-    "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-    "tags": [
-      "ai",
-      "tech"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
     "name": "Ars Technica",
     "url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
     "tags": [
@@ -111,28 +40,8 @@
     "weight": 2
   },
   {
-    "name": "TechCrunch AI",
-    "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
-    "tags": [
-      "ai",
-      "tech"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "MIT Technology Review",
-    "url": "https://www.technologyreview.com/feed/",
-    "tags": [
-      "tech",
-      "science"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "Game Developer",
-    "url": "https://www.gamedeveloper.com/rss.xml",
+    "name": "Ars Technica Gaming",
+    "url": "https://feeds.arstechnica.com/arstechnica/gaming",
     "tags": [
       "gaming",
       "tech"
@@ -141,47 +50,18 @@
     "weight": 2
   },
   {
-    "name": "Kyiv Independent",
-    "url": "https://kyivindependent.com/feed/rss/",
+    "name": "Dexerto",
+    "url": "https://www.dexerto.com/feed/",
     "tags": [
-      "news"
-    ],
-    "enabled": true,
-    "weight": 1
-  },
-  {
-    "name": "PCGamesN",
-    "url": "https://www.pcgamesn.com/mainrss.xml",
-    "tags": [
-      "gaming",
-      "news"
+      "drama",
+      "gaming"
     ],
     "enabled": true,
     "weight": 2
   },
   {
-    "name": "GamesRadar",
-    "url": "https://www.gamesradar.com/rss/",
-    "tags": [
-      "gaming",
-      "news"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "Nintendo Life",
-    "url": "https://www.nintendolife.com/feeds/latest",
-    "tags": [
-      "gaming",
-      "news"
-    ],
-    "enabled": true,
-    "weight": 2
-  },
-  {
-    "name": "Wccftech",
-    "url": "https://wccftech.com/feed/",
+    "name": "Digital Foundry",
+    "url": "https://feeds.feedburner.com/digitalfoundry",
     "tags": [
       "gaming",
       "hardware",
@@ -201,13 +81,302 @@
     "weight": 2
   },
   {
-    "name": "Ars Technica Gaming",
-    "url": "https://feeds.arstechnica.com/arstechnica/gaming",
+    "name": "Game Developer",
+    "url": "https://www.gamedeveloper.com/rss.xml",
     "tags": [
       "gaming",
       "tech"
     ],
     "enabled": true,
     "weight": 2
+  },
+  {
+    "name": "GameSpot",
+    "url": "https://www.gamespot.com/feeds/mashup/",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "GamesIndustry.biz",
+    "url": "https://www.gamesindustry.biz/feed",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "GamesRadar",
+    "url": "https://www.gamesradar.com/rss/",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Google AI Blog",
+    "url": "https://blog.google/technology/ai/rss/",
+    "tags": [
+      "ai",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "IGN Games",
+    "url": "https://feeds.ign.com/ign/games-all",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Kotaku",
+    "url": "https://kotaku.com/rss",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "MIT Technology Review",
+    "url": "https://www.technologyreview.com/feed/",
+    "tags": [
+      "tech",
+      "science"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Nintendo Life",
+    "url": "https://www.nintendolife.com/feeds/latest",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "OpenAI Blog",
+    "url": "https://openai.com/news/rss.xml",
+    "tags": [
+      "ai",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "PCGamesN",
+    "url": "https://www.pcgamesn.com/mainrss.xml",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "TechCrunch AI",
+    "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "The Verge AI",
+    "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Tom's Hardware",
+    "url": "https://www.tomshardware.com/feeds/all",
+    "tags": [
+      "hardware",
+      "tech"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "VGC",
+    "url": "https://www.videogameschronicle.com/feed/",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Variety Gaming",
+    "url": "https://variety.com/v/gaming/feed/",
+    "tags": [
+      "gaming",
+      "business"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Wccftech",
+    "url": "https://wccftech.com/feed/",
+    "tags": [
+      "gaming",
+      "hardware",
+      "tech"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "80.lv",
+    "url": "https://80.lv/feed/",
+    "tags": [
+      "dev",
+      "art"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Anime News Network",
+    "url": "https://www.animenewsnetwork.com/all/rss.xml",
+    "tags": [
+      "anime"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Godot Blog",
+    "url": "https://godotengine.org/rss.xml",
+    "tags": [
+      "dev",
+      "godot"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Hacker News",
+    "url": "https://hnrss.org/frontpage?points=150",
+    "tags": [
+      "tech",
+      "dev"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Hugging Face",
+    "url": "https://huggingface.co/blog/feed.xml",
+    "tags": [
+      "ai",
+      "dev"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Indie Games Plus",
+    "url": "https://indiegamesplus.com/feed",
+    "tags": [
+      "gaming",
+      "indie"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Kyiv Independent",
+    "url": "https://kyivindependent.com/feed/rss/",
+    "tags": [
+      "news"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "PlayStation Blog",
+    "url": "https://blog.playstation.com/feed/",
+    "tags": [
+      "gaming",
+      "ps"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Siliconera",
+    "url": "https://www.siliconera.com/feed/",
+    "tags": [
+      "gaming",
+      "japan"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Steam News",
+    "url": "https://store.steampowered.com/feeds/news.xml",
+    "tags": [
+      "gaming",
+      "steam"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Ukrinform",
+    "url": "https://www.ukrinform.net/rss/block-lastnews",
+    "tags": [
+      "world",
+      "ukraine"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Unreal Engine",
+    "url": "https://www.unrealengine.com/rss/news",
+    "tags": [
+      "dev",
+      "unreal"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Xbox Wire",
+    "url": "https://news.xbox.com/en-us/feed/",
+    "tags": [
+      "gaming",
+      "xbox"
+    ],
+    "enabled": true,
+    "weight": 1
   }
 ]
