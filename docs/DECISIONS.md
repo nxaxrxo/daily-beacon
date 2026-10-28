@@ -323,3 +323,17 @@ its friction report exposed defects that would have bitten the first unattended 
 Docs also corrected where they were stricter than the code (`--check --edition` was never in the
 pre-flight table; the documented `id` regex was looser than the enforced one, so the error message
 told an agent its invalid id was valid).
+
+
+## 2026-10-28 - resume path was a policy hole
+
+`--reuse-source` exists because collection is long, and the runbook tells the 03:00 agent to use it
+when a run dies partway. It read `yt.json` **verbatim**, so the gameplay filter in `yt_source` was
+bypassed on exactly the path most likely to be used: a resumed run reintroduced the 15.7-hour
+"FULL GAME" stream. `merge_candidates()` now re-applies `looks_like_gameplay()` to whatever is on
+disk. Proved against the real contaminated `yt.json`: 23 videos -> 22, zero "FULL GAME" survivors.
+
+Also corrected the LOVES list, which still priced MrBeast / Anatoly / Dr Insanity / Naked Criminal
+at +8 while `channels.json` disables them - three documents were giving three answers. The row now
+points at CHANNEL POLICY, and the Papa Meat / Flashgitz / Viva La Dirt League row is struck out.
+A channel being loved is not a licence to report its product.

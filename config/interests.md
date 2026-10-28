@@ -10,7 +10,9 @@ cited to the owner's own memory file (`~/.config/opencode/home/_mem/memory.md`, 
 - **penguinz0 / Charlie (MoistCr1TiKaL)** — followed 10+ years (memory.md L1745).
 - **Angry Joe** — "always", i.e. a permanent fixture rather than a phase (memory.md L1745).
 - **videogamedunkey** — on the current watch list (memory.md L1745).
-- **Papa Meat / MeatCanyon**, **Flashgitz** (animation), **Viva La Dirt League** skits (memory.md L1745).
+- ~~Papa Meat / MeatCanyon, Flashgitz (animation), Viva La Dirt League skits~~ - named on the
+  old watch list (memory.md L1745) but **explicitly ruled out by the owner's brief**. Watch
+  them, do not report them. CHANNEL POLICY wins.
 - **High-effort documentary channels with few uploads** — Fern, Visual Venture, POI, Cryton; explicitly
   listed under "Respect for" (memory.md L1745-1747). This is the single strongest quality signal in memory.
 - **Warframe** — active account, MR5, Wisp, own research folder (memory.md L1848-1869).
@@ -26,8 +28,11 @@ cited to the owner's own memory file (`~/.config/opencode/home/_mem/memory.md`, 
 
 - **Gaming news / commentary as a daily habit** — his own account of his viewing evolution is let's plays ->
   politics / gaming news / YouTube drama / commentary (memory.md L1743). The edition is this, in text.
-- **MrBeast, Vsauce, Anatoly, Dr Insanity, Naked Criminal, Tech Tone, Joss Drive Hayes, Fillion, Holo
-  (gameplay)** — all named on the watch list (memory.md L1745).
+- **Vsauce, Tech Tone, Fillion, Holo** - named on the watch list (memory.md L1745), and all still
+  hittable subjects. **MrBeast, Anatoly, Dr Insanity, Naked Criminal** are also named there, but they
+  are branded entertainment and are DISABLED in `config/channels.json` by the owner's brief - read
+  CHANNEL POLICY below, never the +8 in the LOVES tier. Naming a channel as loved is not a licence
+  to report its product.
 - **Cozy, management/sim, roguelite, atmospheric horror, fishing, Celeste-style platformers, co-op games,
   streamer-friendly clip-engine games** (memory.md L1477).
 - **Roguelite RPG design, vibes-horror over jumpscares, incremental/idle, minimal survival, store

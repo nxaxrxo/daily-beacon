@@ -323,7 +323,23 @@ def cap_articles(items: list[dict], settings: dict) -> list[dict]:
 
 
 def merge_candidates(yt_raw: list, news_raw: list, settings: dict) -> list[dict]:
+    # The gameplay filter also lives in yt_source, but --reuse-source reads an existing yt.json
+    # verbatim - the resume path the runbook recommends. Without this second gate a resumed run
+    # would reintroduce exactly the uploads the channel policy excludes.
     videos = [canon_video(r) for r in yt_raw if isinstance(r, dict)]
+    try:
+        import importlib.util as _ilu
+        _spec = _ilu.spec_from_file_location("yt_source", Path(__file__).resolve().parent / "yt_source.py")
+        _yt = _ilu.module_from_spec(_spec)
+        _spec.loader.exec_module(_yt)
+        before = len(videos)
+        videos = [v for v in videos
+                  if not _yt.looks_like_gameplay(v.get("title", ""), v.get("lengthSeconds"))]
+        dropped = before - len(videos)
+        if dropped:
+            print("merge: %d gameplay upload(s) dropped by channel policy" % dropped)
+    except Exception:
+        pass  # never let the policy filter break a run
     articles = [canon_article(r) for r in news_raw if isinstance(r, dict)]
     videos = cap_videos([v for v in videos if v["key"]], settings)
     articles = cap_articles([a for a in articles if a["key"] and a["url"]], settings)
