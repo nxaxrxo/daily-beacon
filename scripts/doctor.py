@@ -3,7 +3,7 @@
 
     python scripts/doctor.py [--offline] [--quick] [--keep] [--root PATH] [--json]
 
-Twelve checks, one PASS/FAIL/WARN line each: settings keys and types; channels and feeds shape;
+Thirteen checks, one PASS/FAIL/WARN line each: settings keys and types; channels and feeds shape;
 interests.md and AGENTS.md size; writable output dirs; Python plus requests/feedparser/bs4/PIL;
 seen.sqlite tables; three network endpoints; static assets; a fixture build whose HTML is audited;
 the summary line and exit code. Only `state/doctor-fixture` is written, removed unless --keep.
@@ -218,6 +218,27 @@ class Doctor:
                                % (", ".join(missing), ", ".join(tables) or "none"))
         return self.passed(name, "read-only open ok, tables: %s" % ", ".join(tables))
 
+    def check_channel_policy(self):
+        """The owner's brief, checked mechanically instead of trusted to the agent."""
+        name = "channel policy"
+        data, problem = load_json(self.root / "config" / "channels.json")
+        if problem:
+            return self.failed(name, problem)
+        rows = data if isinstance(data, list) else data.get("channels") or []
+        on = [c for c in rows if c.get("enabled") is True]
+        notes_missing = [c.get("name", "?") for c in rows
+                         if c.get("enabled") is not True and not (c.get("note") or "").strip()]
+        # namings that are unambiguous violations of the brief if they are ever switched on
+        banned = {"mrbeast", "jt music", "teminite", "skeler.", "asmongold clips",
+                  "asmongold shorts", "viva la dirt league", "meatcanyon", "flashgitz"}
+        leaked = sorted(c.get("name", "?") for c in on if c.get("name", "").lower() in banned)
+        detail = "%d enabled of %d" % (len(on), len(rows))
+        if leaked:
+            return self.failed(name, detail + "; entertainment channels are enabled: " + ", ".join(leaked))
+        if notes_missing:
+            return self.warned(name, detail + "; disabled without a reason: " + ", ".join(notes_missing[:4]))
+        return self.passed(name, detail + ", every disabled channel carries a reason")
+
     def _endpoints(self):
         """Exactly three probes: one feed, one channel RSS, github.com."""
         found = []
@@ -333,6 +354,7 @@ class Doctor:
                                                  ("id", "name", "tier", "enabled"), "channel")),
             ("feeds", lambda: self._check_list("config/feeds.json", "config/feeds.json",
                                               ("name", "url", "tags", "enabled"), "feed")),
+            ("policy", self.check_channel_policy),
             ("interests", lambda: self._text_file("config/interests.md",
                                                  "config/interests.md", 40)),
             ("agents.md", lambda: self._text_file("docs/AGENTS.md", "docs/AGENTS.md", 60)),

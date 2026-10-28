@@ -80,6 +80,7 @@ The live schedule is `days:2@03:00`. Supported formats: `once:2026-10-30T09:00`,
 | script | job |
 |---|---|
 | `yt_source.py` | channels -> new videos in the window |
+| `test_channel_policy.py` | the owner's brief as tests: gameplay dropped, entertainment channels off, window >= 48h |
 | `news_source.py` | feeds -> deduped articles with images |
 | `transcripts.py` | batch transcript fetch (cache-first, sequential) |
 | `memory.py` | the anti-repeat store; `filter`, `mark`, `query`, `stats`, `digest`, `prune`, `selftest` |

@@ -173,7 +173,10 @@ Five real defects found by testing the system against itself, not just building 
    The cooldown therefore never fired for real. Kickers are now split on their separators and each
    segment is slugged whole (\masseffect\, not \mass\ + \effect\), with a stopword list so
    "THE BIG ONE" does not become a topic either.
-2. **Category words muted the whole paper.** Tags like \eview\, \elease\, \esearch\ appear on
+2. **Category words muted the whole paper.** Tags like \
+eview\, \
+elease\, \
+esearch\ appear on
    half of everything; as cooldown topics each one would suppress a section for three weeks. A
    \GENERIC_TOPICS\ gate keeps them on the item record but out of the topic index.
    Proof of the fix: re-filtering today's candidates reports 15 seen and 34 cooling topics.
@@ -216,7 +219,8 @@ let's-play uploads, music artists, meme/shorts farms, clip channels or podcasts.
    freshness and the lower half of the window became unselectable. Now < 30h = 5, < 50h = 3: a
    two-day-old story still scores, it is just worth less than this morning's.
 5. **Fallback defaults aligned to 50** in yt_source.py, 
-ews_source.py and un_daily.py. Live
+ews_source.py and 
+un_daily.py. Live
    runs read settings.json and were already correct; a fresh clone missing that file would have
    fallen back to 26 and quietly reproduced bug 3.
 6. **Schedule replaced**: sch_mvrykw11eot (daily:03:00) removed, sch_mvs3tk2f0cb
@@ -225,3 +229,30 @@ ews_source.py and un_daily.py. Live
 The scheduler needed a new format for this (days:N@HH:MM), verified by
 
 ode scripts/test_scheduler_formats.mjs -> 71/71 ALL FORMATS PASS.
+
+
+## 2026-10-28 - the brief becomes mechanical, not aspirational
+
+Testing the real 50-hour collect showed the policy was only being *asked for*, not *enforced*: a
+**15.7-hour "Castlevania Belmont's Curse True Ending (FULL GAME)"** stream from a kept channel
+reached the candidates and depended on the 03:00 agent catching it by eye. A rule that needs
+re-judging every night is not a rule.
+
+1. **`yt_source.looks_like_gameplay()`** drops unambiguous raw footage at collection time: "full
+   game", "playthrough", "walkthrough", "part N", "no commentary", "live stream", plus long
+   session-shaped uploads. Conservative by design - and with an explicit **trailer/reveal
+   exemption**, because the rubric prices a reveal at 22 and "Gameplay Trailer" must survive.
+   Verified on a live run: 1 upload dropped, 22 kept, 48/48 channels, 0 failures.
+2. **`scripts/test_channel_policy.py`** (17 assertions) pins the behaviour: four titles that must
+   drop, seven that must survive, 48 enabled, every disabled channel carrying a reason, and the
+   window still >= 48h. A future refactor cannot quietly undo the brief.
+3. **`doctor.py` grew a `channel policy` check** (13 checks now). Proved it can fail: enabling
+   MrBeast by hand flips it to `[FAIL] entertainment channels are enabled: MrBeast`, and it
+   returns to PASS once restored. A check that has never failed is not evidence of anything.
+4. **`docs/AGENTS.md` now opens with `## CHANNEL POLICY`** as the first thing the judging agent
+   reads, with the explicit note that it outranks the older LOVES list.
+
+Six channels were proposed and staged **disabled** rather than added: Bellular News, Skill Up,
+Force Gaming, Preach Gaming, Rhykker, MrLlamaSC. All six verified live (RSS returns 15 entries
+each) because the IDs I had written from memory were fabricated placeholders that 404'd - a
+reminder that a plausible-looking channel ID is not a channel.

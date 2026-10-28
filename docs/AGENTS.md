@@ -27,7 +27,16 @@ summaries is worse than a short page.
 
 The taste document is binding: **`config/interests.md`** (LOVES / LIKES / NEUTRAL / DISLIKES / NEVER,
 the numeric rubric, tone rules, cooldown, "what the edition is not"). Read it in full before judging;
-it outranks your taste. Reference contracts: `docs/SPEC.md` (sections 1, 6, 7, 8),
+it outranks your taste.
+
+**Read `## CHANNEL POLICY` in that file first.** It is the owner's direct instruction and it
+**outranks the LOVES list**. In scope: gaming news, AI, MMORPGs, documentaries and long-form
+essays. Out: pure branded entertainment, gameplay / let's-play uploads of any kind, music
+artists, meme and shorts farms, clip channels, podcasts, art channels. The LOVES list still
+names comedy channels from an older memory - ignore that, the policy wins. If a disabled
+creator covers something genuinely huge, run the STORY from an outlet, never as "a video from X".
+
+Reference contracts: `docs/SPEC.md` (sections 1, 6, 7, 8),
 `docs/CONTRACTS.md` (CLI + `packet.md`), `docs/SITE-CONTRACT.md`, `docs/DECISIONS.md`.
 
 ## 2. Collect

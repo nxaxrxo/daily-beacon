@@ -48,6 +48,40 @@ TIMEOUT = 20
 DEFAULT_HOURS = 50
 DEFAULT_SHORT_MAX = 90
 
+# The owner's brief rules gameplay and let's-play uploads out entirely ("gameplay uploads of any
+# kind, including from creators he likes"). Relying on the 03:00 agent's judgement meant a
+# "Castlevania True Ending (FULL GAME)" upload still reached the candidates, so the obvious cases
+# are dropped here, deterministically. Deliberately conservative: only unambiguous signals, and
+# reviews / takes / trailers / essays are never touched.
+GAMEPLAY_TITLE_RE = re.compile(
+    r"(\bfull game\b|\bfull playthrough\b|\bplaythrough\b|\bwalkthrough\b|\blet'?s play\b|"
+    r"\bpart \d+\b|\bgameplay\b|\bblind run\b|\bno commentary\b|\blive ?stream\b|"
+    r"\b\d+ ?hours? of\b|\bday \d+ of\b)", re.I)
+# A long upload with a vague title is almost always unedited footage. 75 minutes is well past any
+# review or essay in his list and well short of a three-hour VOD.
+GAMEPLAY_LONG_SECONDS = 75 * 60
+
+
+# A trailer is not raw gameplay: the rubric prices a reveal/reveal-reaction at 22, so an
+# announcement must never be dropped just because it contains the word "gameplay".
+TRAILER_RE = re.compile(
+    r"\b(trailer|teaser|reveal|announcement|announced|first look|premiere|cinematic|"
+    r"launch date|release date|official)\b", re.I)
+
+
+def looks_like_gameplay(title, length):
+    """True when an upload is unambiguously raw gameplay rather than a take on the game."""
+    title = title or ""
+    if TRAILER_RE.search(title):
+        return False
+    if GAMEPLAY_TITLE_RE.search(title):
+        return True
+    if length and int(length) >= GAMEPLAY_LONG_SECONDS:
+        # a long upload is only suspicious if it also reads like a session, not an essay
+        if re.search(r"\b(ep\.? ?\d+|episode \d+|stream|vod|grind|speedrun)\b", title or "", re.I):
+            return True
+    return False
+
 
 def now_local() -> datetime:
     return datetime.now().astimezone()
@@ -179,7 +213,8 @@ def parse_published(text: str) -> datetime | None:
         return None
 
 
-def collect(root: Path, hours: int, only_channel: str | None, no_shorts: bool, limit: int | None):
+def collect(root: Path, hours: int, only_channel: str | None, no_shorts: bool, limit: int | None,
+            drop_gameplay: bool = True):
     channels = read_json(root / "config" / "channels.json", [])
     if not isinstance(channels, list) or not channels:
         print("yt_source: config/channels.json missing or empty", file=sys.stderr)
@@ -194,6 +229,7 @@ def collect(root: Path, hours: int, only_channel: str | None, no_shorts: bool, l
     ok = 0
     failed = 0
     skipped = 0
+    gameplay_skipped = 0
 
     for ch in channels:
         if not isinstance(ch, dict):
@@ -241,6 +277,9 @@ def collect(root: Path, hours: int, only_channel: str | None, no_shorts: bool, l
                 continue
             if count >= max_per:
                 break
+            if drop_gameplay and looks_like_gameplay(html_unescape(v["title"]), length):
+                gameplay_skipped += 1
+                continue
             count += 1
             vid = v["videoId"]
             picked.append(
@@ -270,6 +309,8 @@ def collect(root: Path, hours: int, only_channel: str | None, no_shorts: bool, l
     if limit and limit > 0:
         picked = picked[:limit]
 
+    if gameplay_skipped:
+        print("yt_source: %d gameplay upload(s) dropped by channel policy" % gameplay_skipped)
     return picked, ok, failed, skipped
 
 
@@ -279,6 +320,8 @@ def main(argv=None) -> int:
     ap.add_argument("--hours", type=int, default=DEFAULT_HOURS, help="lookback window in hours")
     ap.add_argument("--channel", default=None, help="single channelId, for testing")
     ap.add_argument("--no-shorts", action="store_true", help="drop videos at or under short_max_seconds")
+    ap.add_argument("--keep-gameplay", action="store_true",
+                    help="do NOT drop gameplay uploads (channel policy normally drops them)")
     ap.add_argument("--limit", type=int, default=0, help="cap the result (0 = no cap)")
     ap.add_argument("--root", default=None, help="project root (default: parent of scripts/)")
     args = ap.parse_args(argv)
@@ -288,7 +331,8 @@ def main(argv=None) -> int:
     if not args.hours:
         args.hours = int(settings.get("lookback_hours") or DEFAULT_HOURS)
 
-    picked, ok, failed, skipped = collect(root, args.hours, args.channel, args.no_shorts, args.limit or None)
+    picked, ok, failed, skipped = collect(root, args.hours, args.channel, args.no_shorts,
+                                      args.limit or None, not args.keep_gameplay)
 
     out = Path(args.out)
     if not out.is_absolute():
