@@ -1,6 +1,6 @@
 # U1 - scheduler recurring formats
 
-DONE. `node scripts/test_scheduler_formats.mjs` exits 0, ends `ALL FORMATS PASS` (84 assertions).
+DONE. `node scripts/test_scheduler_formats.mjs` exits 0 and ends `ALL FORMATS PASS` (83 PASS lines + the final ALL FORMATS PASS, re-run after every edit).
 Backup left in place: `~\.config\opencode\plugins\scheduler\index.ts.bak-20261028-104050`
 (39749 bytes, matched the original before the first edit).
 

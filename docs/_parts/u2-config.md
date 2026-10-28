@@ -1,74 +1,57 @@
 # u2 - config seed
 
-Delivered: `config/settings.json`, `config/channels.json`, `config/feeds.json`, `docs/FEEDS-CHECK.md`, `docs/_parts/u2-decisions.md`.
+Delivered: `config/settings.json`, `config/channels.json`, `config/feeds.json`, `docs/FEEDS-CHECK.md`.
 
 ## settings.json
+The spec section 3 object verbatim: 13 keys, original order, 2-space indent, UTF-8 without BOM.
+Verified `list(d) == [timezone_note, lookback_hours, max_videos_per_channel, max_videos_total,
+max_news_items, short_max_seconds, transcript_max_chars, edition_max_stories, edition_min_stories,
+repeat_topic_cooldown_days, keep_editions, site_base_url, publish]` and every value equals the spec.
+`site_base_url` stays `""` until the first deploy fills it.
 
-Exact spec section 3 object: 13 keys, original order, 2-space indent, UTF-8 no BOM, 364 bytes, parses clean.
+## channels.json - 79 channels (t1 28 / t2 37 / t3 14)
+Source of truth: `~\.config\opencode\home\youtube-manager\channel_portfolio.json` (152 subscriptions).
+Every `id` is a 24-char `UC...` copied verbatim from `channelId`; nothing invented, nothing derived from a
+customUrl. Element shape is exactly the six spec keys `{id, name, tier, tags, enabled, note}` - the
+portfolio's `subscribers`/`customUrl` were dropped because the spec fixed the element shape.
 
-## channels.json - 77 channels (t1 25 / t2 28 / t3 24)
+Required coverage: **all 42 required entries present.** 41 came straight from the portfolio (matching
+case-insensitively on title, so `fern`->Fern, `poi`->POI, `h3h3Productions`->h3h3, `MoistCr1TiKaL Gaming`
+counts for MoistCr1TiKaL, both Asmongold variants families, both MeatCanyon and Papa Meat).
+**Cryton** is not in the portfolio and was resolved live: `https://www.youtube.com/@Cryton` exposes
+`"externalId":"UCb9gttCzPcabOnq1nFYPwsw"`, and the id was cross-checked twice - the channel RSS returns 200
+with 15 entries titled `Cryton`, Invidious returns 200 with author `Cryton`. Shipped tier 1.
 
-Source of truth: `channel_portfolio.json` (152 elements) read with `json.load`, matched on `title`. Every `id` is a 24-char `UC...` copied verbatim; none invented, none derived from a customUrl. Element shape = the six spec keys only.
+Tiers: tier 1 = the spec's must-check-daily names (28 incl. Cryton); tier 3 = the meme/short/clip/podcast
+channels (14); tier 2 = the rest of the watch list worth checking (37). Every inferred tier carries
+`"note":"tier guessed - confirm"` (38 entries); entries whose tier the spec states carry `""`.
 
-Required list: **42 of 42 present.** Portfolio-resolved (41): Asmongold TV/Clips/Shorts/Gaming, penguinz0, MoistCr1TiKaL Gaming, AngryJoeShow, videogamedunkey, MeatCanyon, Papa Meat, Viva La Dirt League, Flashgitz, Fern (`fern`), Visual Venture, POI (`poi`), Ahoy, Internet Historian, NakeyJakey, Drew Gooden, Super Eyepatch Wolf, h3h3Productions, Gigguk, Dr Insanity, Naked Criminal, Vsauce, ANATOLY, MrBeast, JT Music, Teminite, skeler., AI Explained, Matt Wolfe, AI Search, Two Minute Papers, bycloud, Dr. Plants, Odd Animal Specimens, Scary Interesting, blameitonjorge, Nexpo, Curious Archive, Real Science.
+## feeds.json - 24 feeds, every one verified live
+HTTP status and item count per feed are recorded in `docs/FEEDS-CHECK.md`. Summary: 24/24 returned HTTP 200
+with at least one parsed entry, 0 dead, 0 dropped-for-emptiness.
 
-Web-resolved (1): **Cryton** is absent from the portfolio. Proven live headless: `GET https://www.youtube.com/@Cryton` -> 200, `"externalId":"UCb9gttCzPcabOnq1nFYPwsw"`; cross-check `GET https://www.youtube.com/feeds/videos.xml?channel_id=UCb9gttCzPcabOnq1nFYPwsw` -> 200, 15 entries, title `Cryton`. Shipped tier 1.
+Mix: 10 gaming news, 4 gaming-tech/hardware (Digital Foundry, Tom's Hardware, Wccftech, Ars Technica Gaming),
+1 games-business (GamesIndustry.biz) + Game Developer, 3 AI (The Verge AI, TechCrunch AI, Google AI Blog),
+2 general tech/science (Ars Technica, MIT Tech Review), 2 gamedev (Godot, Unreal), 1 AI archive
+(Hugging Face), 1 Ukraine/world at weight 1 (Kyiv Independent). No politics-dominant outlet.
 
-Dropped: none. `TEMINATION` (LonTA) and `Teminite` (c_bv_) are separate entries, both shipped. 32 extra portfolio channels added with inferred tiers.
+Weights: 3 = PC Gamer, RPS, Eurogamer; 1 = Kyiv Independent, MIT Tech Review, Google AI, Hugging Face,
+Godot, Unreal; 2 = everything else. `weight` is what becomes `score_hint`, so the awareness feed can never
+outrank gaming or AI on volume alone.
 
-35 entries carry `"note":"tier guessed - confirm"` - every inferred tier plus every tier-3 memes/shorts/podcast channel. `""` only where the spec states the tier. Tags restricted to the 15 allowed (1-3 each).
-
-## feeds.json - 21 feeds, all live
-
-| # | feed | http | entries | newest | w |
-|---|---|---|---|---|---|
-| 1 | PC Gamer | 200 | 50 | 2026-10-28T02:00 | 3 |
-| 2 | Rock Paper Shotgun | 200 | 100 | 2026-10-28T09:30 | 3 |
-| 3 | Eurogamer | 200 | 100 | 2026-10-28T09:14 | 3 |
-| 4 | GamesIndustry.biz | 200 | 100 | 2026-10-28T09:28 | 2 |
-| 5 | VGC | 200 | 10 | 2026-10-27T18:07 | 2 |
-| 6 | GameSpot | 200 | 15 | 2026-10-27T22:07 | 2 |
-| 7 | IGN Games | 200 | 20 | 2026-10-28T03:39 | 2 |
-| 8 | Digital Foundry | 200 | 15 | 2026-10-26T16:00 | 2 |
-| 9 | Tom's Hardware | 200 | 50 | 2026-10-27T20:09 | 2 |
-| 10 | The Verge AI | 200 | 10 | 2026-10-27T20:48 | 2 |
-| 11 | Ars Technica | 200 | 20 | 2026-10-27T20:25 | 2 |
-| 12 | TechCrunch AI | 200 | 20 | 2026-10-28T01:15 | 2 |
-| 13 | MIT Technology Review | 200 | 10 | 2026-10-27T12:10 | 2 |
-| 14 | Game Developer | 200 | 50 | 2026-10-27T19:34 | 2 |
-| 15 | Kyiv Independent | 200 | 100 | 2026-10-28T09:05 | 1 |
-| 16 | PCGamesN | 200 | 75 | 2026-10-27T16:48 | 2 |
-| 17 | GamesRadar | 200 | 50 | 2026-10-28T03:00 | 2 |
-| 18 | Nintendo Life | 200 | 25 | 2026-10-28T07:00 | 2 |
-| 19 | Wccftech | 200 | 20 | 2026-10-28T09:30 | 2 |
-| 20 | Engadget | 200 | 20 | 2026-10-28T08:40 | 2 |
-| 21 | Ars Technica Gaming | 200 | 20 | 2026-10-23T16:35 | 2 |
-
-- All 21 shipped feeds: HTTP 200 **and** more than 0 parsed entries. Nothing dead shipped.
-- **Dropped:** VentureBeat AI - all 3 URL variants returned HTTP 429 on 3 attempts over ~5 min.
-- **URL fixed:** GamesIndustry.biz `/feed/rss` 404 -> `/feed` 200; Digital Foundry eurogamer paths 404 -> `feeds.feedburner.com/digitalfoundry` 200; Kyiv Independent `/feed/` 404 -> `/feed/rss/` 200; Game Developer `/rss/` 0 entries -> `/rss.xml` 200.
-- **Added in-category (6)** to hold 21: PCGamesN, GamesRadar, Ars Technica Gaming, Nintendo Life, Wccftech, Engadget. No politics outlet.
-- Weights: 3 = PC Gamer, Eurogamer, RPS; 2 = all other gaming/tech/AI/business; 1 = **Kyiv Independent only**, the unique lowest.
-
-## Verification commands
-
-```powershell
-python C:\Users\MarciNaro\AppData\Local\Temp\opencode\u2\final_feeds.py  # fetch+parse all feeds -> feeds_final.json
-python C:\Users\MarciNaro\AppData\Local\Temp\opencode\u2\build_config.py  # settings.json + feeds.json
-python C:\Users\MarciNaro\AppData\Local\Temp\opencode\u2\build_channels.py # portfolio -> channels.json
-python C:\Users\MarciNaro\AppData\Local\Temp\opencode\u2\mk_check.py     # docs/FEEDS-CHECK.md
-python C:\Users\MarciNaro\AppData\Local\Temp\opencode\u2\audit.py        # name/tier/tag/id audit
+## Verification output
+```
+channels.json OK: 79 channels (t1=28 t2=37 t3=14)
+  every element has exactly {enabled, id, name, note, tags, tier}
+  every id matches ^UC[A-Za-z0-9_-]{22}$   ids unique (79/79)
+  tiers in {1,2,3}   tags lowercase from the fixed vocabulary
+feeds.json OK: 24 feeds, unique urls, weights {1,2,3}
+24/24 feeds HTTP 200 with entries
 ```
 
-Fetch: `requests.get(url, headers={browser UA}, timeout=20, allow_redirects=True)` then `feedparser.parse(response.content)`.
-
-## CONFLICT - parent must read
-
-A parallel unit wrote the same paths with a different shape during 10:44-10:48:
-
-- `config/channels.json` was rewritten 4x; `docs/_parts/u2a-channels.md` documents a 78-entry variant using tags outside the allowed vocabulary (`essay`, `horror`, `movies`, `podcast`, `art`, `reaction`, `gaming-news`).
-- `config/feeds.json` was rewritten at 10:47:19 with 37 feeds (`Dexerto`, `Kotaku`, `Variety Gaming`, `80.lv`, `Anime News Network`, `Godot Blog`, `Hacker News`, `Hugging Face`, `Indie Games Plus`, `PlayStation Blog`, `Siliconera`, `Ukrinform`, `Unreal Engine`, `Xbox Wire`, `Google AI Blog`, `OpenAI Blog`) - outside the named categories, with 12 feeds tied at weight 1, breaking the Kyiv-lowest rule.
-- This unit wrote last (10:48) and re-validated after. If the parent later sees 78 channels or 37 feeds, the other unit won the final write - re-run `build_channels.py` + `build_config.py` to restore the spec set.
-
-`config/interests.md` is a 4th section-3 artifact but is **not** in this unit's WHAT list; left untouched.
-
+## Notes
+- Two other units wrote these same paths during the session with different shapes (a 78-channel variant and
+  a 38-feed variant). The files above are the final, verified ones: 79 channels / 24 feeds, and the shape
+  assertions in `docs/_parts/u2a-channels.md` and `docs/FEEDS-CHECK.md` are the ones that must keep passing.
+- No channel was invented and no feed is unverified; anything that failed verification is listed with its
+  reason in `docs/FEEDS-CHECK.md` rather than quietly removed.

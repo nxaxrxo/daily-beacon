@@ -110,7 +110,7 @@ One line each. Newest decisions at the bottom of their section.
 - `prune` never touches rows referenced by a kept edition, even past the cutoff.
 
 ### Sources (U4/U5)
-- `yt_source.py` prefers Invidious (it returns `lengthSeconds` + views in one call) and falls back to channel RSS; a channel that fails both is counted failed and never fatal. Live run: 34 videos from 77/77 channels, 0 failed.
+- `yt_source.py` prefers Invidious (it returns `lengthSeconds` + views in one call) and falls back to channel RSS; a channel that fails both is counted failed and never fatal. Live run: 34 videos from 79/79 channels, 0 failed (then 29 videos in the final 26h run once the edition had been marked and repeats were suppressed).
 - Invidious reports `viewCount` as 0 for very fresh uploads; the value is stored as-is (0 is a real reading there, not "unknown"), while a genuinely absent field stays `null`.
 - `yt_source.py` applies `max_videos_per_channel` from settings (3) as the per-channel cap, and `short_max_seconds` for the shorts classification.
 - An RSS entry with no `<published>` is kept with `publishedAt: null` rather than dropped - hiding real content because of missing metadata is worse than an unsortable row.
@@ -119,9 +119,11 @@ One line each. Newest decisions at the bottom of their section.
 - Trimming is head+tail with a literal `[... trimmed N chars ...]` marker so the 03:00 agent can read the argument and the conclusion without the filler.
 - `run_daily.py collect` degrades: a failed producer, filter or transcript batch is a WARN and the run continues to `packet.md`; only an unwritable `candidates.json` exits non-zero.
 - `run_daily.py` keeps `candidates.json` immutable after the caps and writes the image map to `images.json`, patching `thumb_local` into `filtered.json` only.
+- `run_daily.py` parses the producers' summary lines through one tolerant helper (`parse_producer_stats`) and falls back to the file's own item count when a line is missing, so a producer whose output was reformatted can never make the packet report `0/0 ok` while real data sits on disk.
+- Transcripts default to `min(12, max_videos_total)`; `--limit-transcripts` overrides it, and a cached hit still counts toward the packet's `transcript:yes` flag because the file exists either way.
 
 ### Verification (all four runs executed, output captured)
-- `node scripts/test_scheduler_formats.mjs` -> 71 assertions, `ALL FORMATS PASS`, exit 0 (old and new kinds: valid parse, invalid rejection, catch-up maths).
+- `node scripts/test_scheduler_formats.mjs` -> 83 PASS lines, `ALL FORMATS PASS`, exit 0 (old and new kinds: valid parse, invalid rejection, catch-up maths).
 - `python scripts/memory.py selftest` -> `SELFTEST PASS`; separate fixture round trip proved mark is idempotent (`marked: 5 new items` then `marked: 0 new items, 0 topics`) and filter returns `2 seen / 1 fresh` with `reasons video + url`.
 - `python scripts/yt_source.py` live -> `yt_source done: 34 videos from 79/79 channels (0 failed)`.
 - `python scripts/news_source.py` live -> `news_source done: 60 articles from 24/24 feeds (0 failed)` (281 items inside the 26h window, 181 dropped by the 4-per-source cap, 40 by the overall 60 cap).

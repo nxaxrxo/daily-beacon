@@ -310,6 +310,8 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
 > an argparse error; build and verify headlessly (exit code, file size, `--check`), never by opening a
 > browser. `site_base_url` is already set on this checkout, so the `live url not set` variant means the
 > settings file was replaced, not that the run failed - fix it with `--set-url` and continue.
+> `pages_branch` in `config/settings.json` names the branch Pages is served from (`gh-pages`); an empty
+> value turns the mirror off. Do not edit it without checking `gh api repos/<owner>/<repo>/pages`.
 
 ## 6. When something fails
 

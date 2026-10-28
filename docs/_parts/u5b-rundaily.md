@@ -41,23 +41,23 @@ EXIT=0
 `--reuse-source` run (after the real edition was marked, so memory now suppresses):
 ```
 transcripts done: 0 fetched, 12 cached, 0 failed
-collect done: 29 videos, 60 articles, 20 transcripts, 17 repeats suppressed
+collect done: 29 videos, 60 articles, 20 transcripts, 16 repeats suppressed
 EXIT=0
 ```
-Memory correctly reports `89 total, 17 seen, 72 fresh` - the 17 are the stories the edition already
+Memory correctly reports `89 total, 16 seen, 73 fresh` - those 16 are the stories the edition already
 covered, which is the whole point of the anti-repeat store.
 
 packet.md head:
 ```
 # DAILY BEACON - workpack 2026-10-28
-generated 2026-10-28T11:27:58+01:00 | lookback 26h | 29 videos, 60 articles | 17 repeats suppressed
+generated 2026-10-28T11:43:48+01:00 | lookback 26h | 29 videos, 60 articles | 16 repeats suppressed
 
 ## counts
 - youtube: 29 videos | reused from disk (--reuse-source)
 - news: 60 articles | reused from disk (--reuse-source)
 - candidates after caps: 29 videos, 60 articles (89 total)
-- memory filter: 89 total, 17 seen, 72 fresh
-- repeats suppressed: 17
+- memory filter: 89 total, 16 seen, 73 fresh
+- repeats suppressed: 16
 - transcripts: 0 fetched, 12 cached, 0 failed (20 files on disk)
 - images downloaded: 24
 - warnings: none
