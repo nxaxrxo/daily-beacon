@@ -356,3 +356,97 @@ The rule, stated plainly: **a topic may gate only if it names a THING, not a KIN
 Measured after the change: the topic index is **24 specific subjects**, and a literal reading of the
 cooling list now suppresses **0 of 113** candidates instead of 110 of 113, while \`filter\` still
 correctly reports 8 items already seen.
+
+
+## 2026-10-28 - the owner read edition one and told us what was wrong
+
+He liked it, then named four defects. Recorded here because three of them were judgement failures, not
+bugs, and the fix has to be structural or they come back.
+
+### 1. The header ate the screen, and the Dense button did nothing
+
+His words: "the header that scrolls down with you is problematic. It's just massive and it's taking up
+most of the screen… just remove that button and make it so that the shit from the top doesn't scroll
+down with you."
+
+Cause: from `min-width: 760px`, `.toc` had `flex-wrap: wrap` **and** `position: sticky; top: 0`. Fourteen
+sections with full labels wrapped into a multi-row block pinned over the viewport. The Dense toggle was
+worse than broken - `body.dense` only redefined two spacing variables, so it *looked* broken because
+there was almost nothing to toggle.
+
+Fix: `.toc` is `position: static`, one row at every width, horizontally scrolling, never wrapped. The
+density toggle is deleted from the markup, the CSS, the JS, the print block and SITE-CONTRACT. Measured
+after: at 1440px scrolled 900px, masthead `top: -900`, toc `top: -701`, and the element at the top of the
+viewport is page content.
+
+The only surviving `position: sticky` is the Quick Hits rail inside its own grid column at >= 1180px -
+it pins a column, not a header, and is unrelated to the complaint.
+
+### 2. "You had a lot of stories but only took a specific selected amount"
+
+His instruction: "as long as it's even somewhat interesting, you can keep it in the news feed… When you
+waste tokens. You already wasted tokens by reading the news, might as well write about it."
+
+The policy inverts: **include by default, exclude only the worthless.** Measured cause, and the reason
+raising the caps alone would have changed nothing: `build_packet` printed only `TOP_LINES = 20` videos
+and 20 articles. Items 21-N were collected, paid for, and never shown to the only reader. On the
+2026-10-28 packet that was 32 videos and 60 articles collected, 40 lines printed, **52 items invisible**.
+The packet now lists every kept item, bounded by the collector's own caps so the two cannot disagree.
+
+Caps: videos 55 -> 80, news 90 -> 140, per-feed news cap 4 -> 6 (it was the real binding constraint: 41
+feeds x 4 = 164 against a 90 total), editions 14 -> 24 sections, archive 30 -> 60. The per-feed cap had
+also drifted between `news_source.MAX_PER_SOURCE` and `run_daily.NEWS_PER_SOURCE_CAP`; both now 6.
+
+### 3. "How come you didn't mention that BioWare got shut down?"
+
+Because the packet had it three times and the writing pass missed it. Not a collection failure: the
+2026-10-28 packet contained **"AJSN WK44A- … EA CLOSES BIOWARE & MASS EFFECT"** from AngryJoeShow - a
+channel he named by name - plus a Mass Effect composer piece and a Sonic-RPG retrospective. The edition
+shipped "Dunkey spent a Call of Duty 24 match narrating a bag of chips" instead.
+
+The runbook already said to look for closures. Prose did not survive a 03:00 unattended run, so detection
+is now mechanical: `run_daily.business_event()` tags closures, layoffs, acquisitions, cancellations,
+delistings and bankruptcy, sorts flagged items to the front of the merge, and `packet.md` prints a
+`## business events` block above everything else with `**BUSINESS EVENT**` on each line.
+`scripts/test_business_events.py` pins it at 19/19, including the real headline above.
+
+Two calibration notes worth keeping:
+- The regex needed `re.IGNORECASE` with a scoped `(?-i:[A-Z])` for the object: "closes **BioWare**" is an
+  event, "closes at five" is not. Case-sensitivity had to be *inside* the pattern, not on it.
+- The veto was narrowed to the literal word "rumour". "reportedly", "could", "may" must NOT veto - a
+  reported closure is still a closure, and a false negative is the failure this exists to prevent.
+
+### 4. Missing lanes: anime, Godot, drama, active games, creator takes
+
+He supplied, in his own words: an anime list (100 titles, all rated 9-10) via `config/anime.json`; Godot
+engine updates "in a way that a layman could understand"; YouTube drama as a genuine interest; indie
+breakouts ("Vampire Survivors came and broke records"); and his actively-played games, verified
+independently from `appmanifest_*.acf` LastPlayed timestamps rather than self-report - Warframe played
+that same day, Helldivers 2, AION 2, DragonSword: Awakening, No Man's Sky, Palworld.
+
+Also captured as a HARD anti-interest: **RuneScape is never reported**, with one exception (industry-level
+drama a non-player would hear about). And his rated-games list, which is the authority on "is this game
+news relevant to him" - BioWare matters because Dragon Age Inquisition is on it at 7/10.
+
+### 5. New tool: `scripts/creator_search.py`
+
+His ask: "a tool that would allow you to search a particular term, like Helldivers 2, and the only videos
+that pop up are from YouTubers that I follow."
+
+Two modes, because the difference is real. `--scope global` is one popularity-ranked query filtered to
+followed channels - fast, but Invidious ranks by views, so a small followed channel simply does not
+appear. `--scope channel` (default) queries each channel's own search index - complete, ~1-2 min, and it
+is the mode that can answer "did Asmongold cover the BioWare shutdown" with a reliable **no**.
+
+Verified live: "BioWare" returns AngryJoeShow's "EA SHUTS DOWN BIOWARE!" and two Asmongold videos;
+"RuneScape" correctly returns zero. Channels the instance throttles are retried once (21 unreachable ->
+2 on the first version) and anything still unreachable is *listed*, because an unreachable channel is not
+the same answer as "no coverage". Rows matched only on the description are marked `title_match: false`.
+
+### 6. Archive growth is not a cost problem
+
+Measured: 1.00 MB of images per edition, ~60 KB of HTML. At 60 editions that is ~60 MB, at 120 editions
+~120 MB, against a GitHub Pages soft limit of 1 GB for the site and a 1 GB repo recommendation. At the
+current two-day cadence that is roughly two and a half years before the archive is even a rounding error.
+The IE11-style advice to "keep archives small" does not apply. `keep_editions` raised to 60 accordingly,
+and the colophon text is already derived from that setting rather than hard-coded.

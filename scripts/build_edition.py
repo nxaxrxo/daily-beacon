@@ -59,7 +59,7 @@ MAX_HTML_BYTES, TOC_LABEL_MAX, ARCHIVE_HEAD_MAX, REQUEST_TIMEOUT = 3 * 1024 * 10
 USER_AGENT = ( "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
-DEFAULT_SETTINGS = {"edition_min_stories": 5, "edition_max_stories": 14, "keep_editions": 30}
+DEFAULT_SETTINGS = {"edition_min_stories": 5, "edition_max_stories": 24, "keep_editions": 60}
 
 _LINK_RE = re.compile(r"\[([^\[\]\n]+)\]\(([^()\s]+)\)")
 _BOLD_RE = re.compile(r"\*\*([^\n]+?)\*\*")
@@ -642,8 +642,7 @@ def render_toc(ordered: Sequence[dict[str, Any]]) -> str:
         )
     return ( '<nav class="toc" aria-label="In this edition">\n<ul class="toc__list">\n'
         + "\n".join(items)
-        + "\n</ul>\n"
-        '<button class="density-toggle" type="button" aria-pressed="false">Dense</button>\n</nav>'
+        + "\n</ul>\n</nav>"
     )
 
 def render_media(ctx: Context, section: dict[str, Any], lead: bool = False) -> str:

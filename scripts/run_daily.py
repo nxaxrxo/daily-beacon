@@ -55,14 +55,19 @@ HEADERS = {"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9"}
 
 DEFAULTS = {
     "lookback_hours": 50,
-    "max_videos_per_channel": 3,
-    "max_videos_total": 40,
-    "max_news_items": 60,
+    "max_videos_per_channel": 4,
+    "max_videos_total": 80,
+    "max_news_items": 140,
     "transcript_max_chars": 24000,
     "repeat_topic_cooldown_days": 21,
 }
-NEWS_PER_SOURCE_CAP = 4
-MAX_IMAGES = 24
+# kept in step with news_source.MAX_PER_SOURCE - the collector and the merge must agree, or a
+# resumed run silently re-caps what the producer already allowed through
+NEWS_PER_SOURCE_CAP = 6
+# Was 24, which silently starved the page: up to 220 candidates with a thumbnail each meant the
+# images ran out after the first dozen items, so most sections shipped as text with no figure.
+# The owner asked for images; an edition can carry up to 24 sections, so allow ~2 per section.
+MAX_IMAGES = 60
 IMG_MAX_BYTES = 8 * 1024 * 1024
 IMG_TIMEOUT = 10
 IMG_WORKERS = 4
@@ -322,6 +327,59 @@ def cap_articles(items: list[dict], settings: dict) -> list[dict]:
     return out[: int(settings["max_news_items"])]
 
 
+# Business-changing events outrank every scoring rule: a studio closing is not a "tier-2 item".
+# On 2026-10-28 the packet contained "EA CLOSES BIOWARE" from AngryJoeShow and the edition still shipped
+# a Dunkey bag-of-chips video instead. Prose telling the writer to look for closures did not survive a
+# 03:00 run, so detection is mechanical here and the packet labels the item.
+BUSINESS_EVENT_RE = re.compile(
+    r"\b(?:"
+    r"shuts?\s+down|shutting\s+down|shut\s+down|shuttered|"
+    r"studio\s+closure|closing\s+down|"
+    r"ceases?\s+operations|closes?\s+(?:its|their|the)\s+doors|"
+    r"lays?\s+off|laid\s+off|layoffs?|mass\s+layoffs?|redundancies|"
+    r"acquires?|acquired\s+by|acquisition|buys?\s+out|bought\s+out|"
+    r"cancels?|cancelled|canceled|"
+    r"delists?|delisted|delisting|"
+    r"files?\s+for\s+bankruptcy|bankruptcy|insolvency|"
+    r"resigns?|steps?\s+down|removed\s+as\s+(?:ceo|director)"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# "closes <Name>" is the one stem that needs its object capitalised: "the shop closes at five" is not
+# a business event, but "EA CLOSES BIOWARE" and "closes BioWare" both are. Case-sensitive on purpose.
+BUSINESS_EVENT_CLOSES_RE = re.compile(
+    r"\b(?:closes|closed|closing)\s+(?:its|their|the)?\s*(?-i:[A-Z])",
+    re.IGNORECASE,
+)
+
+# A delay is not in the class on its own - only a cancellation is. Neither is "layoffs rumoured".
+# Deliberately narrow. "reportedly" or "could" must NOT veto: a reported closure is still a closure, and
+# a false negative here is the exact failure this detector exists to prevent. Only an outright rumour
+# label drops it, and even then the writer still sees the item - it just is not promoted.
+BUSINESS_EVENT_VETO_RE = re.compile(r"\b(?:rumou?rs?)\b", re.IGNORECASE)
+
+
+def business_event(item: dict) -> bool:
+    """True when a headline describes something that changes a company, not just a game's content."""
+    title = str(item.get("title") or "")
+    if not title:
+        return False
+    if not (BUSINESS_EVENT_RE.search(title) or BUSINESS_EVENT_CLOSES_RE.search(title)):
+        return False
+    return not BUSINESS_EVENT_VETO_RE.search(title)
+
+
+def tag_business_events(items: list[dict]) -> int:
+    hits = 0
+    for item in items:
+        flag = business_event(item)
+        item["business_event"] = flag
+        if flag:
+            hits += 1
+    return hits
+
+
 def merge_candidates(yt_raw: list, news_raw: list, settings: dict) -> list[dict]:
     # The gameplay filter also lives in yt_source, but --reuse-source reads an existing yt.json
     # verbatim - the resume path the runbook recommends. Without this second gate a resumed run
@@ -363,6 +421,11 @@ def merge_candidates(yt_raw: list, news_raw: list, settings: dict) -> list[dict]
                 seen_titles.add(ntitle)
         seen.add(key)
         merged.append(item)
+
+    flagged = tag_business_events(merged)
+    if flagged:
+        # stable: flagged items first, original order preserved inside each group
+        merged.sort(key=lambda i: 0 if i.get("business_event") else 1)
     return merged
 
 
@@ -427,10 +490,10 @@ def fetch_image(url: str, img_dir: Path) -> str | None:
         return None
 
 
-def download_images(items: list[dict], root: Path, img_dir: Path) -> dict[str, str]:
+def download_images(items: list[dict], root: Path, img_dir: Path, settings: dict | None = None) -> dict[str, str]:
     targets = []
     for item in items:
-        if len(targets) >= MAX_IMAGES:
+        if len(targets) >= int((settings or {}).get("max_images") or MAX_IMAGES):
             break
         url = item.get("thumbnail") if item.get("source") == "youtube" else item.get("image")
         if url:
@@ -476,12 +539,16 @@ def item_line(item: dict, workpack: Path) -> str:
         source = str(item.get("sourceName") or "?")
         has_tx = "no"
     tag = "T%d|w%d" % (number, number)
-    return "- [%s] %s | %s | %s | %s | transcript:%s" % (
-        tag, title, ascii_safe(source, 60), packet_published(item), str(item.get("url") or ""), has_tx)
+    # A flagged business event is marked in the packet itself, so the writer cannot miss it even if it
+    # never reads the runbook section that explains why the mark exists.
+    mark = " **BUSINESS EVENT**" if item.get("business_event") else ""
+    return "- [%s] %s | %s | %s | %s | transcript:%s%s" % (
+        tag, title, ascii_safe(source, 60), packet_published(item), str(item.get("url") or ""),
+        has_tx, mark)
 
 
 def build_packet(date: str, hours: int, counts: dict, videos: list, articles: list,
-                 recent_topics: list, cooldown_days: int) -> str:
+                 recent_topics: list, cooldown_days: int, settings: dict | None = None) -> str:
     now = iso(datetime.now().astimezone())
     lines = [
         "# DAILY BEACON - workpack " + date,
@@ -491,14 +558,34 @@ def build_packet(date: str, hours: int, counts: dict, videos: list, articles: li
         "## counts",
     ]
     lines.extend(counts["lines"])
-    lines.extend(["", "## top videos"])
+    # The packet is the agent's whole view of the night. Capping it at TOP_LINES while the collector
+    # keeps 80 videos and 140 articles meant the raise was invisible: everything past line 20 was
+    # collected, paid for, and then never seen by the only reader. Show every kept item instead, with
+    # the collector's own caps as the bound so the two can never disagree.
+    settings = settings or {}
+    video_lines = int(settings.get("max_videos_total") or TOP_LINES)
+    article_lines = int(settings.get("max_news_items") or TOP_LINES)
+    # Business-changing events first, in their own block, before the ranked run. On 2026-10-28 the
+    # closure of BioWare sat in the packet alphabetically and the edition never touched it.
+    # Deduplicated on the item key: the same story often arrives from two feeds and the block is a
+    # "read this first" list, so a repeated line is noise.
+    flagged, seen_keys = [], set()
+    for item in (videos + articles):
+        if item.get("business_event") and item.get("key") not in seen_keys:
+            seen_keys.add(item.get("key"))
+            flagged.append(item)
+    if flagged:
+        lines.extend(["", "## business events (%d) - these outrank everything below" % len(flagged)])
+        lines.extend(item_line(i, counts["workpack"]) for i in flagged)
+
+    lines.extend(["", "## videos (%d kept, all listed)" % len(videos)])
     if videos:
-        lines.extend(item_line(i, counts["workpack"]) for i in videos[:TOP_LINES])
+        lines.extend(item_line(i, counts["workpack"]) for i in videos[:video_lines])
     else:
         lines.append("- none")
-    lines.extend(["", "## top articles"])
+    lines.extend(["", "## articles (%d kept, all listed)" % len(articles)])
     if articles:
-        lines.extend(item_line(i, counts["workpack"]) for i in articles[:TOP_LINES])
+        lines.extend(item_line(i, counts["workpack"]) for i in articles[:article_lines])
     else:
         lines.append("- none")
     lines.extend(["", "## cooling down"])
@@ -733,7 +820,7 @@ def cmd_collect(args) -> int:
     }
     try:
         packet = build_packet(date, hours, counts, fresh_videos, fresh_articles,
-                              filtered.get("recent_topics") or [], cooldown_days)
+                              filtered.get("recent_topics") or [], cooldown_days, settings)
         write_text(workpack / "packet.md", packet)
         log("step5 packet: %s" % (workpack / "packet.md").relative_to(root).as_posix())
     except Exception as exc:  # noqa: BLE001

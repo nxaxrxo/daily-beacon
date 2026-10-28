@@ -34,3 +34,5 @@ _run_detached.py
 state/_dryrun-site/
 state/checklist*.json
 
+# collect logs are per-run diagnostics, not history - they churned every night
+state/logs/

@@ -92,15 +92,15 @@ for every kind including the old ones. It must run and pass: `node scripts/test_
 {
   "timezone_note": "all times local",
   "lookback_hours": 26,
-  "max_videos_per_channel": 3,
-  "max_videos_total": 40,
-  "max_news_items": 60,
+  "max_videos_per_channel": 4,
+  "max_videos_total": 80,
+  "max_news_items": 140,
   "short_max_seconds": 90,
   "transcript_max_chars": 24000,
-  "edition_max_stories": 14,
+  "edition_max_stories": 24,
   "edition_min_stories": 5,
   "repeat_topic_cooldown_days": 21,
-  "keep_editions": 30,
+  "keep_editions": 60,
   "site_base_url": "",
   "publish": true
 }

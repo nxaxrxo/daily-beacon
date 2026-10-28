@@ -29,6 +29,7 @@ import hashlib
 import json
 import re
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
@@ -61,7 +62,18 @@ OG_TIMEOUT = 8
 OG_BUDGET = 10
 DEFAULT_HOURS = 50
 DEFAULT_MAX_NEWS = 60
-MAX_PER_SOURCE = 4
+# 6, not 4: the owner's brief is include-by-default, and a 4-per-feed cap was the binding
+# constraint on total volume long before max_news_items was. At 41 feeds and a 140 overall
+# cap, no single outlet can flood the packet - six slots out of 140 is 4%.
+MAX_PER_SOURCE = 6
+
+# Reddit rate-limits hard: /r/X/top.json is 403 from this machine, .rss works, but back-to-back
+# .rss requests return 429 within a second or two. These three feeds are therefore paced, and a
+# 429 is retried with backoff, then degrades to "this feed returned nothing this run".
+REDDIT_MIN_INTERVAL = 6.0
+REDDIT_BACKOFF = 20.0
+REDDIT_MAX_ATTEMPTS = 3
+_reddit_gate = {"at": 0.0}
 SUMMARY_MAX = 600
 MAX_TOPIC_TAGS = 3
 JACCARD_MIN = 0.8
@@ -300,6 +312,44 @@ def topic_tags(title: str, already) -> list:
     return out
 
 
+def is_reddit(url: str) -> bool:
+    try:
+        return "reddit.com" in urlsplit(str(url)).netloc.lower()
+    except Exception:
+        return False
+
+
+def reddit_wait() -> None:
+    """Sleep so at least REDDIT_MIN_INTERVAL seconds separate two reddit requests."""
+    if _reddit_gate["at"]:
+        gap = time.monotonic() - _reddit_gate["at"]
+        if gap < REDDIT_MIN_INTERVAL:
+            time.sleep(REDDIT_MIN_INTERVAL - gap)
+    _reddit_gate["at"] = time.monotonic()
+
+
+def fetch_resp(url: str):
+    """One GET, with pacing + backoff for reddit. Returns (response|None, note)."""
+    paced = is_reddit(url)
+    attempts = REDDIT_MAX_ATTEMPTS if paced else 1
+    note = ""
+    for attempt in range(attempts):
+        if paced:
+            reddit_wait()
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=FEED_TIMEOUT, allow_redirects=True)
+        except Exception as exc:
+            return None, "request failed: " + exc.__class__.__name__
+        if resp.status_code == 429:
+            note = "http 429 (rate limited)"
+            if attempt + 1 < attempts:
+                _reddit_gate["at"] = 0.0
+                time.sleep(REDDIT_BACKOFF * (attempt + 1))
+                continue
+        return resp, note
+    return None, note or "request failed"
+
+
 def fetch_feed(feed: dict, window_start: datetime):
     """Return (items, entries_seen, note). Never raises: a dead feed is [] plus a note."""
     name = str(feed.get("name") or "?")
@@ -312,12 +362,11 @@ def fetch_feed(feed: dict, window_start: datetime):
     if not url:
         return [], 0, "no url"
 
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=FEED_TIMEOUT, allow_redirects=True)
-    except Exception as exc:
-        return [], 0, "request failed: " + exc.__class__.__name__
+    resp, retry_note = fetch_resp(url)
+    if resp is None:
+        return [], 0, retry_note or "request failed"
     if resp.status_code != 200:
-        return [], 0, "http %d" % resp.status_code
+        return [], 0, retry_note or ("http %d" % resp.status_code)
 
     try:
         parsed = feedparser.parse(resp.content)
@@ -515,7 +564,7 @@ def main(argv=None) -> int:
 
     keepers.sort(key=sort_key, reverse=True)
     kept, dropped_source, dropped_total = apply_caps(keepers, limit)
-    print("  caps: 4/source dropped %d, overall cap %d dropped %d" % (dropped_source, limit, dropped_total))
+    print("  caps: %d/source dropped %d, overall cap %d dropped %d" % (MAX_PER_SOURCE, dropped_source, limit, dropped_total))
 
     og_used = 0
     for it in kept:

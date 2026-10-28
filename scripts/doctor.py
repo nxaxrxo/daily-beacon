@@ -347,6 +347,29 @@ class Doctor:
                 shutil.rmtree(out_dir, ignore_errors=True)
                 self.kept_fixture = False
 
+    def check_business_events(self):
+        """The detector that exists because the 2026-10-28 edition missed EA closing BioWare."""
+        import subprocess
+        script = self.root / "scripts" / "test_business_events.py"
+        if not script.is_file():
+            self.failed("business events", "scripts/test_business_events.py missing")
+            return
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(script)],
+                capture_output=True, text=True, timeout=120,
+                cwd=str(self.root), encoding="utf-8", errors="replace",
+            )
+        except Exception as exc:
+            self.failed("business events", "%s: %s" % (exc.__class__.__name__, ascii_text(exc, 90)))
+            return
+        if proc.returncode == 0:
+            last = [ln for ln in (proc.stdout or "").splitlines() if "PASS" in ln or "FAIL" in ln]
+            self.passed("business events", last[-1].strip() if last else "detector ok")
+        else:
+            tail = [ln.strip() for ln in (proc.stdout or "").splitlines() if "FAIL" in ln]
+            self.failed("business events", (tail[0] if tail else "detector test failed"))
+
     def run(self):
         checks = (
             ("settings", self.check_settings),
@@ -355,6 +378,7 @@ class Doctor:
             ("feeds", lambda: self._check_list("config/feeds.json", "config/feeds.json",
                                               ("name", "url", "tags", "enabled"), "feed")),
             ("policy", self.check_channel_policy),
+            ("business events", self.check_business_events),
             ("interests", lambda: self._text_file("config/interests.md",
                                                  "config/interests.md", 40)),
             ("agents.md", lambda: self._text_file("docs/AGENTS.md", "docs/AGENTS.md", 60)),

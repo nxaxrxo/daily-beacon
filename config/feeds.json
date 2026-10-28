@@ -378,5 +378,35 @@
     ],
     "enabled": true,
     "weight": 1
+  },
+  {
+    "name": "r/Games",
+    "url": "https://www.reddit.com/r/Games/top/.rss?t=day",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "r/gamingnews",
+    "url": "https://www.reddit.com/r/gamingnews/top/.rss?t=day",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "r/GamingLeaksAndRumours",
+    "url": "https://www.reddit.com/r/GamingLeaksAndRumours/top/.rss?t=day",
+    "tags": [
+      "gaming",
+      "rumours"
+    ],
+    "enabled": true,
+    "weight": 1
   }
 ]

@@ -51,6 +51,49 @@ second day - the window must cover the off day or half of the news is silently l
 resuming a run that died after fetching sources. Expected last line:
 `collect done: <v> videos, <a> articles, <t> transcripts, <r> repeats suppressed`.
 
+**Volume is the point now.** The caps are `max_videos_total` 80, `max_news_items` 140,
+`max_videos_per_channel` 4, 6 per feed: high enough that a normal two-day window arrives almost whole
+(measured 2026-10-28: 140 articles from 41 feeds, 726 in-window items before the cap), and per-source
+caps low enough that one prolific channel or one aggregator cannot flood the packet. `--limit-transcripts`
+stays at its default `min(12, max_videos_total)` - transcripts are for the handful of items you will
+actually write from, not for everything you will mention.
+
+Three of the feeds are Reddit aggregators (`r/Games`, `r/gamingnews`, `r/GamingLeaksAndRumours`, top of
+the last 24h) and Reddit rate-limits hard. `news_source.py` uses the `.rss` endpoint with a browser UA,
+paces Reddit requests 6s apart and retries a 429 with 20s/40s backoff before giving up on that feed for
+the run. A `FAIL r/Games  http 429` line in the collect log is expected occasionally and is **not** a
+failed run - it means that subreddit contributed nothing this time. Never retry the whole collect step
+because of it. The `.rss` feed carries title, link, author and date but no score, so upvote count is not
+available; judge those items on the title like any other headline.
+
+**What the 41 feeds in `config/feeds.json` actually give you.** `r/Games`, `r/gamingnews` and
+`r/GamingLeaksAndRumours` are three of them, at the top of the last 24h. A `429` from one of them comes
+back as an empty list, not an error - `http 429` / `[]` in the log is the expected shape on a bad Reddit
+day and the run is still healthy. Feeds worth knowing by name, because they map onto a taste lane:
+`Godot Blog` and `Unreal Engine` (engine news), `Anime News Network` and `Siliconera` anime wires
+(see `config/anime.json` below), `GamesIndustry.biz` and `Game Developer` (business events, section 3.2.1),
+`Steam News` (patch notes for games on his list), `Indie Games Plus` and `80.lv` (indie breakouts).
+
+**`config/anime.json` is a judging input, not a feed.** It is the owner's own MAL export: 100 titles, each
+with `title`, `score`, `status`, `type`, `eps`, `genres`, and every entry scored 9 or 10 - so presence in
+the file means "he loved it", full stop. Use it whenever an anime item is in the packet:
+
+- Match the item's subject against `titles[].title`. A new season, sequel, finale, adaptation or studio
+  problem for a listed title is a real subject and scores M = +15 (`config/interests.md`, LOVES).
+- An anime item about a title that is NOT in the file is generic anime news and does not get the lane.
+- `status: "dropped"` means he rated it and still stopped watching - Fullmetal Alchemist Brotherhood,
+  Sakamoto desu ga?, Tonari no Kaibutsu-kun. Interest exists, execution lost him, so a remake or sequel
+  there is a story but not an automatic lead.
+- Read it with `python -c "import json;d=json.load(open('config/anime.json',encoding='utf-8'));..."` or just
+  open it; it is 100 short records and greps cleanly by title. Do not edit it.
+
+**Two lanes need a style rule at write time, so they are stated here as well.** Godot engine news is
+plain language: say what a change means for someone making a game ("your 3D scenes should stutter less on
+an 8GB card", "renaming a file now updates every reference"), never the changelog heading or the internal
+API name - the owner's words, "everything should be written in a way that a layman could understand."
+Actively-played games (Helldivers 2, Crimson Desert, Hytale, Warframe, Aion 2, DragonSword: Awakening,
+No Man's Sky) are always relevant from any source; a followed creator's take is the preferred version.
+
 It writes, under `state/workpack/<date>/`:
 
 | File | What it is |
@@ -64,8 +107,9 @@ It writes, under `state/workpack/<date>/`:
 
 Then:
 
-1. **Read `state/workpack/<date>/packet.md` in full.** Counts, top videos, top articles, what is
-   cooling down, next commands. Trust its ordering, not its judgement - you judge.
+1. **Read `state/workpack/<date>/packet.md` in full.** Counts, every kept video, every kept article
+   (up to 80 and 140 - nothing is truncated past the collection cap), what is cooling down, next
+   commands. Trust its ordering, not its judgement - you judge.
 2. **Read 3-8 transcripts, in slices.** Each `transcripts/<videoId>.txt` is trimmed head+tail, so the
    argument and conclusion sit at the ends and the middle is filler. **These files are effectively
    ONE LINE** - the prose arrives with almost no newlines (measured: 24,032 characters, 1-3 newlines),
@@ -84,7 +128,7 @@ Then:
 
 > NOTE: a healthy run can still print `youtube: 0 videos | producer did not report a summary` and
 > `warnings: yt_source exit 4294967295` - that is the producer's summary channel failing on Windows
-> while `yt.json` itself is complete. Trust the candidate counts and top-videos list, not that line.
+> while `yt.json` itself is complete. Trust the candidate counts and the videos list, not that line.
 
 **If collection fails, or the packet is thin:** run the command once more (with `--reuse-source` and
 without) - a single feed timeout is normal. If it still fails, or there are fewer than five usable
@@ -93,6 +137,16 @@ know, plus one clearly labelled note naming the source that failed. Never a blan
 
 ## 3. Judge
 
+**The edition is include-by-default. You are not curating a short list - you are reporting everything
+of any substance and dropping only what is worthless.** The owner's instruction, verbatim: "as long as
+it's even somewhat interesting, you can keep it in the news feed. Because you know what's sad? When you
+waste tokens. You already wasted tokens by reading the news, might as well write about it."
+
+That inverts the old bar. The packet is already paid for. An item that survived collection and the
+channel policy has cost real tokens; a dropped-but-interesting story is a wasted night. So the question
+per candidate is never "is this good enough for the front page" - it is **"is this worthless?"** and the
+answer is usually no.
+
 Score every candidate with the rubric in `config/interests.md` - one pass, no second looks - then sort:
 
 ```
@@ -100,43 +154,90 @@ score = T (tier/source 0-30) + F (freshness 0-15) + N (novelty vs memory -25..15
       + V (format value 0-25) + M (personal multiplier -15..15), then penalties, clamp 0-100
 ```
 
-Thresholds: **>= 80** lead candidate (highest wins, exactly one lead) · **60-79** full story ·
-**45-59** quick hit or a short `quick` section · **< 45** drop.
+The score now decides **placement, not survival**:
 
-### 3.1 Worked ranking, six candidates
+| Score | Slot |
+|---|---|
+| >= 80 | lead candidate (highest wins, exactly one lead) |
+| 45-79 | a section - `story` if the body is worth two or more paragraphs, `video` for a video, `quick` for one paragraph |
+| 30-44 | `quick` section or a `quickHits` line - **still shipped** |
+| < 30 | only if the item is *worthless* by the test below; a low score alone is not a reason to drop |
+
+**The only legitimate drop is worthless.** Worthless means the item contains nothing a reader could
+learn or enjoy. Concrete, and this is the whole list:
+
+- an Nth episode of a routine let's play or a series ("PewDiePie played Resident Evil again, episode
+  147"). Nobody cares, and the format is out of scope anyway (CHANNEL POLICY).
+- a livestream or premier announcement with no content behind it ("going live in an hour").
+- a screenshot or meme post that carries no news, no number and no claim.
+- a re-upload, a mirror, or the same video from a second channel.
+- a rumour with no named source and no document behind it.
+
+Everything else ships. A 40-minute devlog on a shader seam ships. A patch note for a game he does not
+play ships as one line in `quickHits`. A studio's quarterly number ships. Two stories about the same
+subject from different angles are two `quickHits`, not one - unless the cooldown rule kills the second,
+which is a separate gate and still applies.
+
+**`seen` and cooldown still remove items entirely** - that gate is unchanged and sits above this
+section. Include-by-default is about taste, not about repeats.
+
+### 3.1 Worked ranking, eight candidates
 
 One real-shaped morning, components in rubric order, penalties applied once each.
 
 | # | Candidate | T | F | N | V | M | Pen | Total | Slot |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Asmongold TV, 14 min take on a studio's botched reveal, 4h old, never covered | 30 | 15 | 15 | 25 | +15 | 0 | **100** | **lead** |
-| 2 | Tier-2 devlog, smooth voxel terrain in GDScript, 9h old, never covered | 20 | 12 | 15 | 25 | +15 | 0 | **87** | story (hero alt) |
-| 3 | Skill Up, review of a game he was already following, 8h old, never covered | 30 | 12 | 15 | 20 | +8 | 0 | **85** | story, strong |
+| 1 | AngryJoeShow, "EA closes BioWare and Mass Effect", 20h old, never covered | 30 | 5 | 15 | 25 | +8 | 0 | **83** | **lead** |
+| 2 | Asmongold TV, 14 min take on a studio's botched reveal, 4h old, never covered | 30 | 15 | 15 | 25 | +15 | 0 | **100** | story |
+| 3 | Tier-2 devlog, smooth voxel terrain in GDScript, 9h old, never covered | 20 | 12 | 15 | 25 | +15 | 0 | **87** | story (hero alt) |
 | 4 | Eurogamer, GTA 6 is a 210GB download, 1h old, never covered | 16 | 15 | 15 | 15 | 0 | 0 | **61** | story |
 | 5 | PC Gamer, Warframe rifle buff in the new patch, 20h old, topic last covered 40d ago | 16 | 5 | 6 | 20 | +8 | 0 | **55** | quick section |
 | 6 | PC Gamer, Rockstar union vote over the GTA 6 launch, 26h old, never covered | 16 | 5 | 15 | 15 | 0 | 0 | **51** | quick hit |
+| 7 | r/Games, Austin recommends The Wolf Among Us Remastered, 6h old, never covered | 16 | 12 | 15 | 20 | 0 | 0 | **63** | story |
+| 8 | videogamedunkey, "Dunky narrated a bag of chips", 12h old, never covered | 30 | 12 | 15 | 5 | +15 | 0 | **77** | quick (not a lead) |
 | - | Same #3 review, but it shipped yesterday | 30 | 12 | -25 | 20 | +8 | -45 | **0** | suppressed |
 
 Read the table as the rules, not as an example:
 
-- **#1 wins the lead** on 100. #2 clears 80 too, but there is one lead - highest takes it and #2 becomes
-  the strongest story with its own image. Two leads fails validation; zero makes the builder promote #1.
+- **The lead is not simply the highest score - a business-changing event outranks everything.** #2
+  scores 100 and #1 scores 83, yet #1 leads, because EA closing BioWare is a permanent change to the
+  industry and #2 is a reaction to a marketing rollout. Rule 3.2 carries the full statement; the rubric
+  number orders the page, the event class sets the top of it. If the top-scoring item is routine (#8, a
+  creator narrating a snack) and a lower-scoring item is a closure, the closure leads and #8 becomes a
+  `quick`. This is not a suggestion - edition 2026-10-28 shipped #8 as a `video` section while BioWare
+  sat in the packet from AngryJoe. That was the bug this rule exists to prevent.
+- **#2 and #3 are both 80+, and both ship** - one as a story, one as the second story with an image.
+  There is exactly one `lead`; the next-best does not get dropped, it gets a different slot. Two leads
+  fails validation; zero makes the builder promote #1.
 - **Format value is why #3 sits under #2** despite double the source weight: a routine let's play is
   worth 5, a documentary-grade explainer 25. Commentary outranks gameplay because he respects it.
+  A 5 in V is a *placement* signal, not a drop signal - #8 still ships.
 - **#5 is an honest topic return** at 40 days out; inside 21 it would be -25 and -45, i.e. dead, so it
   ships as a `quick` brief and not a comeback. **The suppressed row is arithmetic**, not a judgement:
   `seen` set, -45, however good the item is.
-- **Six candidates gave six usable slots plus one suppression.** A normal night. If the best item
-  scores under 60, publish five thin honest stories anyway.
+- **Eight candidates gave eight slots plus one suppression.** With `edition_max_stories` at 24 and the
+  collection caps at 80 videos / 140 articles, a normal night produces far more than the old six - and
+  the old six-candidate habit is exactly the over-selection the owner complained about. If the packet
+  has 30 usable items and the edition carries 12, you dropped eighteen stories you already paid to read.
+  The failure mode is now under-reporting, not over-reporting.
+- **Scoring does not have to be exhaustive arithmetic at 2am.** Score the head of the list carefully,
+  then batch the tail: anything that is not worthless goes in a `quickHits` line. A `quickHits` line
+  costs one sentence and one URL and it is not a lesser story.
 
 ### 3.2 What earns the front page
 
+- **Everything of substance earns a slot.** The default is inclusion. Work down the judged list and
+  place each item; a story is only absent because it is worthless (the list in section 3), because
+  `seen` already shipped it, or because the cooldown covers the subject. "Not front-page material" is
+  not a reason - that is what `quick` and `quickHits` are for.
 - A big thing from the last 24h in his lanes: a creator he watches with a real take on a real event; a
   game/platform/business move; an AI or hardware change touching his work or his 8GB laptop; a
   game-dev technique that touches Godot, Hytale or Roblox.
 - **Creator take vs routine let's play:** a take on a big event beats a routine let's play, a trailer
   reaction beats a podcast clip, a long-form documentary beats nearly everything on quality, and a
-  3-hour stream VOD is last. The rubric encodes this - do not re-litigate it.
+  3-hour stream VOD is last. The rubric encodes this - do not re-litigate it. It is an ordering, not a
+  filter: the 3-hour VOD still gets a `quickHits` line unless it is worthless.
+
 - **Cooldown is 21 days** (`repeat_topic_cooldown_days`). Nothing returns inside that window unless the
   comeback exception in `config/interests.md` holds on all three counts, and then you say in one clause
   that the earlier beat was covered. **Never repeat what memory says was covered**: `packet.md`,
@@ -165,10 +266,96 @@ Read the table as the rules, not as an example:
 - **Tone:** funny, warm, optimistic even on bad news, never cruel, no filler - enforced by
   `config/interests.md` section TONE RULES (one em dash per paragraph max, zero exclamation marks in
   body copy, sentence-case headlines, no full stop).
-- **Length discipline:** 5-14 sections (`edition_min_stories` / `edition_max_stories`), **exactly one
-  lead**, four to seven `quickHits`, at most one `quote`. If you write 14, all 14 must be real.
+- **Length discipline:** 5-24 sections (`edition_min_stories` / `edition_max_stories`), **exactly one
+  lead**, four to fourteen `quickHits`, at most one `quote`. Aim high: an edition that fits 20 real
+  stories should carry 20. Never pad to reach a number, and never drop a real story to keep the count
+  tidy - if you write 24, all 24 must be real.
 - **Ties** break: (1) does it change something for him, (2) does it have an image, (3) is it a creator
   he actually watches.
+
+#### 3.2.1 Business-changing events outrank everything
+
+**A closure, an acquisition, a mass layoff, or the cancellation of a major title is top-tier news
+regardless of which source carried it.** It is not a "story weight" question and it is not subject to
+the tier ordering: a tier-3 feed reporting a studio closure outranks a tier-1 channel's snack video.
+
+- **Source weight does not gate it.** If the only item in the packet is a small outlet or a low-weight
+  aggregator reporting that a studio is closing, that is the lead. Two independent low-weight sources
+  reporting the same closure is confirmation, and `also_on` already records it.
+- **A creator's opinion video on such an event is a lead candidate**, even when the video is long, even
+  when the creator is normally a commentary channel. The video is the take; the event is the story.
+  Lead with the event and cite the creator, rather than filing it as "a video from X".
+- **The whole class counts, not just closures:** studio shutdown, acquired-and-absorbed, mass layoff
+  (anything reported as a mass or studio-wide cut), a major title cancelled, a flagship studio's
+  leadership removed, a platform delisting a whole catalogue. A game being delayed is *not* in this
+  class unless it is cancelled.
+- **Never let a routine item from the same channel displace it.** One channel can produce both a
+  "we played X for episode 147" upload and a "the studio is gone" video in the same window. The second
+  is the lead; the first is worthless and gets dropped. Ranking them on T+F+V alone is how the
+  2026-10-28 edition missed **EA closing BioWare** - present in the packet from AngryJoeShow, a channel
+  the owner named - while shipping a Dunkey video about a bag of chips. That was a real defect, and it
+  is the reason this subsection exists.
+
+- **Detection is mechanical now, so you do not have to remember to look.** `scripts/run_daily.py` tags
+  every candidate whose headline describes one of these events and, at the top of `packet.md`, prints a
+  block headed `## business events (n) - these outrank everything below`. Each flagged line also ends in
+  `**BUSINESS EVENT**`. Two consequences for you:
+
+  1. **If that block is non-empty, you must cover it.** Not a quick hit at the bottom - a real section,
+     usually near the top. Deciding it is "not that big" is the exact judgement that failed on
+     2026-10-28; the detector exists because that judgement was wrong.
+  2. **The detector is deliberately generous and the last word is still yours on nuance, not on
+     omission.** It matches closures, layoffs, acquisitions, cancellations, delistings and bankruptcy.
+     A false positive (say, a headline using "cancels" about a stream) still has to be *mentioned*; it
+     just becomes a quick hit. A false negative is the dangerous direction - if you notice a
+     business-changing story the detector missed, cover it and say so in the edition's notes.
+
+  `python scripts\test_business_events.py` pins the detector at 19/19 including the real
+  "EA CLOSES BIOWARE" headline; run it if you doubt the block.
+- **Framing:** report the event plainly and attribute the claim ("EA confirmed", "the studio said"), then
+  give the creator's take. Do not soften a closure into a rumour to keep the tone light - the TONE RULES
+  ask for optimism about the *mechanism* (what happens to the people, where they go next), never about
+  the fact.
+
+### 3.3 Before you write: did anyone I follow cover this?
+
+For a story that is big - a business-changing event per 3.2.1, a game on his actively-played list, or a
+studio he has invested in - run the creator search **before** writing the section, not after:
+
+```
+python scripts/creator_search.py "Helldivers 2" --hours 72 --tier 1
+python scripts/creator_search.py "BioWare" --hours 72 --tier 1
+python scripts/creator_search.py "Godot" --hours 72 --tier 1
+```
+
+Swap the term for the story's key noun ("Warframe", "Crimson Desert", "studio closure" is too vague - use
+the studio or game name). `--hours 72` is wider than the 50-hour collect window on purpose: a creator's
+take often lands a day after the news, and a 60-hour-old take still strengthens today's section.
+`--tier 1` keeps it to the channels he actually watches; drop the flag when the story is big enough that
+a tier-2 take is worth having.
+
+**If a followed creator covered it, the edition carries their take** - attributed by name, with a link,
+inside the section that already covers the event. Not a separate "a video from X" section: lead with the
+event, then give the take (3.2.1 says the same thing for lead selection). Their opinion is the point -
+"especially if it comes from any of the YouTubers that I actively follow, because their opinions matter
+the most."
+
+**Honest limits, so a null result is not read as proof.** Default `--scope channel` asks each of the 48
+enabled channels' own search index, which is complete but slow: roughly one to two minutes, and the
+public Invidious instances throttle bursts, so a few channels can come back `unreachable` after the built-in
+retry. That means **"no coverage found" only for the channels it actually reached** - it is not a statement
+about YouTube as a whole. If the run matters and the list of unreachable channels is long, re-run it once;
+do not conclude "nobody covered this" from one throttled pass. A row marked `(desc match)` / `title_match:
+false` has the term only in the description - a passing mention, not a take worth quoting.
+
+`--scope global` is the fast alternative (one query, then filtered to followed channels) but it ranks by
+popularity, so a small channel's video about the topic can simply not appear - use it for a broad read,
+never as the answer to "did he cover it".
+
+**It is read-only.** It fetches, prints a table, and exits; `--json <path>` writes the payload for a
+workpack and touches nothing else. Safe to run at 03:00, no browser, no window, no writes to editions or
+memory. It also drops let's-play uploads by default, consistent with CHANNEL POLICY - so a hit it returns
+is already a take, not gameplay.
 
 ## 4. Write the edition
 

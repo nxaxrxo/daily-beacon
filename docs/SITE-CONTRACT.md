@@ -48,8 +48,10 @@ never reads or writes `editions/` or `state/`.
       <li><a class="toc__link" href="#{section id}"><span class="toc__kicker">{kicker}</span>
               <span class="toc__label">{headline, <= 42 chars, plain text}</span></a></li>   (one per section)
     </ul>
-    <button class="density-toggle" type="button" aria-pressed="false">Dense</button>
   </nav>
+  <!-- the TOC is a static, single-row, horizontally scrolling jump strip. It must never be
+       position:sticky and must never wrap onto a second row: a wrapped sticky strip is what made
+       the top of the page eat most of the viewport on a 1440px screen. -->
 
   <main class="paper" id="paper">
 
@@ -147,10 +149,10 @@ gold #dcc36e | clay #de9670
 2. Smooth anchor scroll for `a[href^="#"]` honouring `prefers-reduced-motion`.
 3. Image fallback: on `error`, replace with `figure.media--failed` (builder also emits
    `onerror`-free markup - JS is the only fallback path) and hide the credit line.
-4. Density toggle: toggles `body.dense`, persists `localStorage["beacon.density"]`, updates
-   `aria-pressed`; on load restores state. Must be a no-op if localStorage throws.
-5. Sticky-masthead condensing: add `body.is-scrolled` past 80px (purely a class toggle; CSS decides).
-6. Nothing else. No analytics, no fetches, no external URLs.
+4. `body.is-scrolled` past 80px (a class toggle only; CSS decides what it does - today it reveals the
+   back-to-top control). The masthead and TOC are NOT pinned: they scroll away with the page. There is
+   deliberately no density/comfy toggle and no localStorage dependency left.
+5. Nothing else. No analytics, no fetches, no external URLs.
 
 ## 6. Hard design constraints (both sides)
 
@@ -159,5 +161,5 @@ gold #dcc36e | clay #de9670
   no glow shadows, no gradient text, no animated gradients, no gradient orbs).
 - Mobile first: single column below 760px, no horizontal scroll at 320px, tap targets >= 44px,
   fluid type via clamp() only.
-- Print: `@media print` -> white paper, black ink, hide `#progress`, `.toc`, `.to-top`,
-  `.density-toggle`; show link URLs for `.source` in `::after`.
+- Print: `@media print` -> white paper, black ink, hide `#progress`, `.toc`, `.to-top`;
+  show link URLs for `.source` in `::after`.

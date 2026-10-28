@@ -89,17 +89,21 @@ Unknown/absent numeric fields are null, never 0-means-unknown.
 generated <iso> | lookback <h>h | <v> videos, <a> articles | <r> repeats suppressed
 
 ## counts
-## top videos
-## top articles
+## videos (<n> kept, all listed)
+## articles (<n> kept, all listed)
 ## cooling down
 ## next commands
 ```
+Every kept item is listed, bounded only by `max_videos_total` / `max_news_items` - the packet is the
+agent's entire view of the night, so capping it below the collection cap silently discards items that
+were already fetched (the bug fixed 2026-10-28: 20 of 32 videos and 20 of 60 articles were never shown).
 Each candidate line, one line per item, newlines collapsed:
 `- [T<tier>|w<weight>] <title> | <source> | <published> | <url> | transcript:<yes|no>`
 
 ## Ordering / caps (mechanical, spec-driven)
 - youtube: sort by (tier asc, publishedAt desc), cap max_videos_per_channel then max_videos_total.
-- news: sort by (weight desc, publishedAt desc), cap max_news_items, cap 4 per source.
+- news: sort by (weight desc, publishedAt desc), cap max_news_items, cap 6 per source
+  (`news_source.MAX_PER_SOURCE` and `run_daily.NEWS_PER_SOURCE_CAP` must match).
 - transcripts: only kind == "video", unseen, sorted (tier asc, publishedAt desc), capped by --limit-transcripts
   (run_daily default: min(12, max_videos_total)).
 

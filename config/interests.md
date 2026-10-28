@@ -3,6 +3,8 @@
 How to use this file: it is the taste contract for the 03:00 edition. Read LOVES through NEVER before you
 judge anything, score candidates with SCORING RUBRIC, then obey TONE RULES and COOLDOWN. Every claim is
 cited to the owner's own memory file (`~/.config/opencode/home/_mem/memory.md`, cited as `memory.md`).
+Where a lane comes from the owner's brief of **2026-10-28** rather than from memory.md, the citation
+says `owner's brief, 2026-10-28` so a later reader can tell the two sources apart.
 
 ## LOVES
 
@@ -19,6 +21,40 @@ cited to the owner's own memory file (`~/.config/opencode/home/_mem/memory.md`, 
 - **Hytale modding** — Summonstone waifu mod, avatar-to-NPC pipeline (memory.md L1444-1460).
 - **Godot 4 / procedural generation** — voxel terrain, Transvoxel, dungeon generation research
   (memory.md L1154-1178).
+- **Godot the engine — releases and what the team is building next** — LOVES-level, not a dev-curiosity
+  side note. Owner's brief, 2026-10-28: "I very much care about the Godot engine and updates that they
+  release, and what they're working on." **The plain-language rule rides with the lane:** "everything should
+  be written in a way that a layman could understand, because I'm not technically inclined enough to hear
+  about features that I might not necessarily be familiar with. Stuff like that should be translated into
+  English that I can understand." So a renderer change, a performance pass, a workflow change or a new
+  editor feature is reported as **what it means for someone making a game** ("your 3D scene will run faster
+  on a normal graphics card", "you can now undo a rename across the whole project"), never as the changelog
+  heading, the PR title or the internal API name. He is a Godot developer (memory.md L37-40, L1496) *and*
+  wants the layman version — the apparent contradiction is the instruction, not a mistake to correct. A
+  Godot release is a real subject; the same release pasted in engine vocabulary is a wasted slot.
+- **Anime — the titles in `config/anime.json`, not the category** — LOVES-level. Owner's brief,
+  2026-10-28: "I very much care about anime," and he singled out the Bleach anime-conclusion item in the
+  2026-10-28 edition as something he really appreciated (memory.md L1998-2002). The authority is
+  **`config/anime.json`** — his own MAL export, 100 titles, every one scored 9 or 10, which is the entire
+  signal: he does not finish what he dislikes. **Qualifies:** a series finale or ending (proven — Bleach),
+  a new season or sequel for a title in that file, a studio collapse or production crisis affecting a
+  listed title, an adaptation announcement for something he rated, a well-regarded original. **Does not
+  qualify:** seasonal chart posts, "top 10 anime of the season" listicles, merchandising, a dub-cast note
+  for a series he has not rated (memory.md L2032-2037). Three titles are marked `dropped` despite a 9-10
+  score — Fullmetal Alchemist Brotherhood, Sakamoto desu ga?, Tonari no Kaibutsu-kun — so a remake or
+  sequel for those does not land automatically (memory.md L2028-2030). This bullet replaces an old NEUTRAL
+  line that read "no memory hits"; that line predated the MAL export, was false, and the export is why.
+- **Actively-played games — always a subject, any source** — LOVES-level. The named high-attention
+  set: **Helldivers 2, Crimson Desert, Hytale, Warframe, Aion 2, DragonSword: Awakening, No Man's Sky**
+  (memory.md L1981-1984), plus the install-verified play set (Palworld, Deep Rock Galactic, R.E.P.O.,
+  GRAIN ROT, Aniimo, Far Far West — memory.md L1962-1979). Owner's brief, 2026-10-28: "stuff like patches,
+  updates and news in general in regards to games on my actively played list is very good to fetch from
+  any source, really, but especially if it comes from any of the YouTubers that I actively follow, because
+  their opinions matter the most" (memory.md L2071-2073). A patch note for one of these is never routine,
+  even from a weight-1 aggregator; a followed creator's take on it outranks a bare article about it. Two
+  carve-outs: Overwatch is played but is PvP, which collides with "co-op only" — a tolerated exception
+  that never licenses general PvP coverage (memory.md L1968-1969); and spoiler dumps still do not ship
+  (see NEVER).
 - **Indie game economics** — Steam power-law, base rates, wishlists; he adopted the frameworks from Ross's
   16-minute video and kept them (memory.md L1131).
 - **Fantasy RPGs and MMOs with action combat** — Black Desert Online 3000+ hours, Guild Wars 2 800+,
@@ -28,6 +64,16 @@ cited to the owner's own memory file (`~/.config/opencode/home/_mem/memory.md`, 
 
 - **Gaming news / commentary as a daily habit** — his own account of his viewing evolution is let's plays ->
   politics / gaming news / YouTube drama / commentary (memory.md L1743). The edition is this, in text.
+- **YouTube drama, when a creator he follows is covering it** — LIKES-level. Owner's brief, 2026-10-28:
+  "I also like YouTube drama," with the example "when Asmongold is talking about some YouTuber" (memory.md
+  L2047). A lane, not a guilty pleasure to be quietly dropped; it sits on the recorded viewing progression
+  let's plays -> politics / gaming news / YouTube drama / commentary (memory.md L1743, L2048-2049). **All
+  three boundaries hold at once:** no cruelty and no humiliation as the joke; no dogpiling a private
+  individual; no feud invented from one tweet — if the only evidence is a single post, it is not a story.
+  The NEVER list outranks this lane, and CHANNEL POLICY still excludes gameplay uploads, clip channels,
+  branded entertainment and music, so drama is never a licence to ship a let's-play or a reaction-farm
+  clip. A followed creator's take on a real, sourced event is what the lane is for; who is winning the
+  internet today is not.
 - **Vsauce, Tech Tone, Fillion, Holo** - named on the watch list (memory.md L1745), and all still
   hittable subjects. **MrBeast, Anatoly, Dr Insanity, Naked Criminal** are also named there, but they
   are branded entertainment and are DISABLED in `config/channels.json` by the owner's brief - read
@@ -52,11 +98,15 @@ cited to the owner's own memory file (`~/.config/opencode/home/_mem/memory.md`, 
 - **The unicorn formula he measures games against** — anime aesthetics, third-person action
   combat, instanced dungeons with trash mobs, physics combat, endless grind, no time gates
   (memory.md L614-625).
+- **Indie breakout hits — the first day, not the retrospective** — LIKES-level. Owner's brief,
+  2026-10-28: "when a new indie game drops and becomes a massive hit, I want to be the first one to know
+  about it. For example, stuff like Vampire Survivors came and broke records." Report the number that
+  proves it (concurrent players, copies sold, revenue, review count) and what the game is in one line; a
+  breakout with no number is a rumour. The Steam power-law framework he already holds (memory.md L1131)
+  is the lens: a single unknown studio taking the top of the chart is the exact event this lane exists for.
+  A postmortem of a hit is welcome later; the value here is speed.
 
 ## NEUTRAL
-
-- **Anime** — no memory hits - treated as NEUTRAL. (Gigguk sits in the channel seed list in
-  docs/SPEC.md §3, which is a build instruction, not evidence of taste.)
 - **Music** — no memory hits - treated as NEUTRAL. Audio in memory is game-audio labour (dad does audio,
   memory.md L39, L974), not listening taste.
 - **Ukraine / world awareness** — no memory hits - treated as NEUTRAL. The Kyiv Independent feed exists
@@ -102,6 +152,12 @@ cited to the owner's own memory file (`~/.config/opencode/home/_mem/memory.md`, 
 - **No loot-box, gacha or gambling promotion**, not even as a neutral product note (memory.md L1644-1648).
 - **No uncredited images and no image that is not from the linked source.** Credit is mandatory.
 - **No 3-hour VOD as the lead.** See format values below.
+- **RuneScape / OSRS — never report, with exactly one exception.** His words: "you should never tell me
+  what's happening in RuneScape, because I couldn't care less about that game" (memory.md L1988-1992). The
+  exception: it becomes general gaming/industry drama a non-player would hear about — the company
+  shutting down, a mass layoff, a lawsuit, an industry-shaking event. Judge by "would a non-RuneScape
+  player hear about this", never by "RuneScape patch X". This is an anti-interest at NEVER level: a patch,
+  a new skill, a content drop or a player-count record does not ship, not even as a `quickHits` line.
 
 ## SCORING RUBRIC
 
@@ -116,6 +172,13 @@ two penalties. Nothing here needs a second look at the item.
 | **V — format value** | 0-25 | See format table below. |
 | **M — personal multiplier** | -15..15 | LOVES topic = +15, LIKES = +8, NEUTRAL = 0, DISLIKES = -15, NEVER = excluded entirely. |
 
+**Lane to M, because the lanes above are what M is for.** A title in `config/anime.json`, Godot engine news,
+an actively-played game and a LOVES creator are M = +15; YouTube drama and an indie breakout are M = +8;
+RuneScape is NEVER and never reaches the table. A lane does not raise T — T is the source, M is the
+subject — which is how a weight-1 aggregator's patch note for a game on his list still lands in the 45-79
+band instead of the tail. Nothing here changes the ranges: five components plus two penalties still sum
+to 0-100 after the clamp.
+
 Format value table (V): a creator's take on a big event = 25; a trailer / reveal / first-look reaction = 22;
 a documentary or long-form essay = 25; a review or analysis = 20; a plain news article = 15; a podcast or
 interview clip = 10. **Gameplay and let's-play uploads are not scored at all** - CHANNEL POLICY
@@ -129,9 +192,33 @@ nothing in memory says he dislikes long gameplay, so it is ranked last rather th
 Penalties: **-45** if this exact item already shipped in any edition (memory says seen); **-45** if the same
 topic shipped inside the cooldown window and there is no comeback exception. Apply each once.
 
-Thresholds: **>= 80** lead candidate (highest wins, exactly one lead). **60-79** full story slot.
-**45-59** quick hit or a short `quick` section. **< 45** drop. If the best item scores under 60, publish a
-short honest edition anyway - five thin stories beat a blank page.
+Thresholds decide **placement, not survival** - the edition is include-by-default:
+
+| Score | Slot |
+|---|---|
+| >= 80 | lead candidate (highest wins, exactly one lead) |
+| 45-79 | a section: `story` if there is a body in it, `video` for a video, `quick` for one paragraph |
+| 30-44 | `quick` section or a `quickHits` line - still shipped |
+| < 30 | dropped only if it is worthless by the test below |
+
+**A low score is not a drop.** The owner's instruction: "as long as it's even somewhat interesting, you
+can keep it in the news feed ... you already wasted tokens by reading the news, might as well write
+about it." The packet is already paid for; a story collected and then dropped on taste is a wasted night.
+
+**Worthless - the only legitimate drop.** This list is exhaustive:
+
+- an Nth episode of a routine let's play or series ("PewDiePie played Resident Evil again, episode 147").
+- a livestream or premier announcement with nothing behind it.
+- a screenshot or meme post with no news, no number and no claim.
+- a re-upload, a mirror, or the same video from a second channel.
+- a rumour with no named source and no document.
+
+`seen: true` and the 21-day cooldown are a separate gate above taste and still remove items entirely.
+
+**Business-changing events are top-tier whatever the score says.** A studio closure, an acquisition, a
+mass layoff or a cancelled major title outranks a routine item from the same channel and is a lead
+candidate even from a weight-1 aggregator. A creator's opinion video about such an event is a lead
+candidate too. See `docs/AGENTS.md` §3.2.1 - this is a real historical defect, not a hypothetical.
 
 Worked example, so the numbers calibrate:
 
@@ -139,11 +226,12 @@ Worked example, so the numbers calibrate:
 |---|---|---|---|---|---|---|---|
 | Asmongold reacts to a studio closure, 4h old, never covered | 30 (tier 1) | 15 | 15 | 25 (creator take on big event) | +15 (LOVES) | 0 | **100** (clamped) |
 | PC Gamer, weight 2, Warframe update, 20h old, topic last covered 40d ago | 16 | 5 | 6 | 15 (article) | +8 (LIKES) | 0 | **50** |
-| Tier-3 meme channel, 3h let's play of a game he does not play, 10h old | 10 | 12 | 15 | 0 (3h+ VOD) | 0 | 0 | **37** -> drop |
+| Tier-3 meme channel, 3h let's play of a game he does not play, 10h old | 10 | 12 | 15 | 0 (3h+ VOD) | 0 | 0 | **37** -> ships as a `quickHits` line |
 | Same routine let's play, but it shipped yesterday | 10 | 12 | -25 | 5 | 0 | -45 | **0** -> suppressed |
 
-Read the table top to bottom: the 100 leads, the 50 becomes a story or quick hit, the 37 is dropped, and
-the repeat is dead regardless of how good it is.
+Read the table top to bottom: the 100 leads, the 50 becomes a story or quick hit, the same routine let's
+play at 37 now ships as a short `quick` line or a `quickHits` entry - only a *worthless* item drops, not
+a merely ordinary one - and the repeat is dead regardless of how good it is.
 
 ## TONE RULES
 
@@ -188,11 +276,14 @@ the repeat is dead regardless of how good it is.
 
 ## WHAT THE EDITION IS NOT
 
-- Not a news wire. It is a selection with a point of view, and 5 well-chosen stories beat 14 scraped ones.
+- Not a news wire, but not a tight edit either. It is everything of substance from the window, ordered
+  by what matters - 20 real stories beat 8 chosen ones, and a dropped story is a wasted read.
 - Not a reaction compilation. A creator's take is valuable when it adds analysis, worthless when it is
   just a face over the same headline.
 - Not a hype sheet. A trailer is evidence of a trailer, not of a good game.
-- Not a drama digest. No feuds, no callout threads, no "who is winning the internet today".
+- Not a drama digest. No feuds, no callout threads, no "who is winning the internet today". YouTube
+  drama is a LIKES lane when a creator he follows covers a real, sourced event (see LIKES) — the lane
+  does not make a callout thread or a one-tweet feud reportable.
 - Not a politics page. World news appears only when it materially changes his money, his work or his
   safety (docs/SPEC.md §9).
 - Not an AI-hype letter. Model news is reported with the benchmark, the price and the catch.
@@ -210,6 +301,8 @@ conflicts with LOVES, this section wins.**
 - AI models and the AI industry.
 - MMORPGs - real changes to games he plays, not content updates.
 - Documentaries and long-form video essays on real subjects.
+- YouTube drama and creator takes, only when a followed creator covers a real, sourced event — still
+  bounded by the out-of-scope list below: no gameplay uploads, no clip channels, no branded entertainment.
 
 **Out of scope - do not report, even from a creator he likes:**
 - Pure branded entertainment: spectacle, memes, shorts, clip channels, sketches, animation, podcasts.
