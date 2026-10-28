@@ -18,7 +18,8 @@ An OpenCode session fires and works through `docs/AGENTS.md`:
    `config/interests.md` as the rubric.
 3. It writes `editions/<date>.json` - plain content, no HTML.
 4. `build_edition.py` renders it into a dark-mode newspaper that looks different every day.
-5. `publish.py` pushes it; GitHub Pages redeploys.
+5. `publish.py` pushes it and mirrors `site/` onto the `gh-pages` branch, which is what Pages
+   actually serves - a push to `main` alone would leave the live page unchanged.
 6. `memory.py mark` records every story so tomorrow cannot repeat it.
 
 If the PC was off at 3am, the scheduler's catch-up fires the run as soon as OpenCode next loads.
