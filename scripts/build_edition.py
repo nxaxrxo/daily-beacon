@@ -1031,6 +1031,16 @@ def resolve_targets(args: argparse.Namespace) -> tuple[Path, Path, str] | None:
     else:
         edition_path = Path(args.edition) if args.edition else root / "editions" / f"{date_str}.json"
         out_dir = Path(args.out_dir) if args.out_dir else root / "site"
+        if args.edition and not args.date:
+            # "--edition path/to/2026-10-20.json" is the documented way to rebuild an older edition
+            # by hand. Comparing it against TODAY made every re-build of a past edition fail
+            # validation, so the file's own date wins when no --date was passed.
+            if not edition_path.is_absolute():
+                edition_path = (Path.cwd() / edition_path).resolve()
+            payload, problem = load_edition(edition_path)
+            declared = payload.get("date") if problem is None and payload else None
+            if parse_date(declared):
+                date_str = str(declared)
 
     if not edition_path.is_absolute():
         edition_path = (Path.cwd() / edition_path).resolve()

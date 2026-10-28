@@ -125,6 +125,10 @@ Read the table as the rules, not as an example:
   that the earlier beat was covered. **Never repeat what memory says was covered**: `packet.md`,
   `filtered.json` and `suppressed.json` carry the evidence, and `python scripts/memory.py query --topic
   <slug>` answers "when did we last run this". A `seen: true` item is out.
+  `python scripts/memory.py digest` is the wide view: most-covered topics, everything
+  currently cooling down, and what has been quiet 30+ days. Anything on that last list may
+  come back - but only with a genuinely new development, written as a follow-up, never as
+  fresh news.
 - **Never lead with** a rumour, a benchmark chart with no product behind it, a 3-hour VOD, an
   unverifiable story, or anything in the NEVER list of `config/interests.md`.
 - **Tone:** funny, warm, optimistic even on bad news, never cruel, no filler - enforced by

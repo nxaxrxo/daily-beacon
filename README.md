@@ -32,6 +32,17 @@ canonical URL key and a title key, so the same story from a different outlet is 
 get a 21-day cooldown: after that a subject can return, but only with a genuinely new development,
 and framed as a follow-up rather than fresh news.
 
+### The month-later check
+
+```powershell
+python scripts\memory.py digest
+```
+
+Prints what the Beacon has covered: edition count, most-covered topics, what is cooling down
+(and therefore must not be re-reported as news), and which topics have been quiet 30+ days and
+are ripe for a genuine follow-up. Nothing here is automatable into a story - it is a reminder
+that the subject exists, not a licence to write about it again without something new.
+
 ## Editing by hand
 
 The content is just JSON. Open `editions/<today>.json`, change the words, rebuild:
@@ -71,7 +82,7 @@ The live schedule is `daily:03:00`. Supported formats: `once:2026-10-30T09:00`, 
 | `yt_source.py` | channels -> new videos in the window |
 | `news_source.py` | feeds -> deduped articles with images |
 | `transcripts.py` | batch transcript fetch (cache-first, sequential) |
-| `memory.py` | the anti-repeat store; `filter`, `mark`, `query`, `stats`, `prune`, `selftest` |
+| `memory.py` | the anti-repeat store; `filter`, `mark`, `query`, `stats`, `digest`, `prune`, `selftest` |
 | `run_daily.py` | the orchestrator that produces `packet.md` |
 | `build_edition.py` | edition JSON -> the site |
 | `publish.py` | commit, push, verify the live URL |

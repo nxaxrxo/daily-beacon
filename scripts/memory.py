@@ -839,7 +839,11 @@ def build_parser():
     # write "memory.py filter ... --root X". argparse would reject that, so every subparser gets
     # its own copy with SUPPRESS, which leaves the parent default untouched when it is absent.
     def add_root(sp):
+        # Both --root and --db are accepted before OR after the verb: people (and scripts) write
+        # "memory.py digest --db X" as naturally as "memory.py --db X digest". SUPPRESS keeps the
+        # parent default intact when the flag is absent from the subcommand.
         sp.add_argument("--root", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+        sp.add_argument("--db", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
         return sp
 
     f = add_root(sub.add_parser("filter", help="annotate candidates with seen/seen_reason/topic_hits"))
