@@ -183,6 +183,12 @@ which is a separate gate and still applies.
 **`seen` and cooldown still remove items entirely** - that gate is unchanged and sits above this
 section. Include-by-default is about taste, not about repeats.
 
+**Owner taste-bans live in this list too.** When the owner says a class of story should never appear
+again, it goes into `## NEVER` in `config/interests.md` *and* gets one concrete line here, in his words
+
+- that is what makes the ban actually bite, because nothing in the collector filters by keyword. A NEVER
+  item and a worthless item are both dropped before scoring.
+
 ### 3.1 Worked ranking, eight candidates
 
 One real-shaped morning, components in rubric order, penalties applied once each.
