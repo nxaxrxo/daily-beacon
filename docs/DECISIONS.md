@@ -24,10 +24,14 @@ One line each. Newest decisions at the bottom of their section.
 - Fonts: system-stack serif display + Georgia body serif + system sans for labels + mono for numerals.
   No webfont at all, not even with a Google-Fonts link — a runtime CDN dependency is a failure mode at 03:00.
 - Print stylesheet prints the URL only after `.byline__link` (source links), never after every anchor.
-- Density toggle persists in `localStorage["beacon.density"]` under `data-density="dense"`; default is comfy.
+- ~~Density toggle persists in `localStorage["beacon.density"]` under `data-density="dense"`; default is
+  comfy.~~ **SUPERSEDED 2026-10-28**: the toggle is deleted (markup, CSS, JS, print). Why: it only
+  redefined `--gap`/`--gap-s`, so it looked broken, and the owner asked for it gone. See the
+  2026-10-28 entry.
 - Section anchor ids are the edition `id` verbatim; the validator enforces `[a-z0-9-]+` so anchors are stable
   across rebuilds and citable in the archive.
-- Reading progress, masthead compaction, image fallback and density are the only JS. No analytics, no fetch.
+- Reading progress, `body.is-scrolled`, image fallback are the only JS (density removed 2026-10-28, and
+  "masthead compaction" goes with it - nothing is pinned to compact). No analytics, no fetch.
 
 - The colophon's "suppressed today" counts the items in `state/workpack/<date>/suppressed.json`, not
   the number of editions in the memory DB. The earlier query counted `editions` rows and printed `1

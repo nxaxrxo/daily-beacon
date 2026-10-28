@@ -91,18 +91,20 @@ for every kind including the old ones. It must run and pass: `node scripts/test_
 ```json
 {
   "timezone_note": "all times local",
-  "lookback_hours": 26,
+  "lookback_hours": 50,
   "max_videos_per_channel": 4,
   "max_videos_total": 80,
   "max_news_items": 140,
   "short_max_seconds": 90,
   "transcript_max_chars": 24000,
+  "max_images": 60,
   "edition_max_stories": 24,
   "edition_min_stories": 5,
   "repeat_topic_cooldown_days": 21,
   "keep_editions": 60,
-  "site_base_url": "",
-  "publish": true
+  "site_base_url": "https://nxaxrxo.github.io/daily-beacon/",
+  "publish": true,
+  "pages_branch": "gh-pages"
 }
 ```
 
@@ -277,9 +279,11 @@ Design requirements (non-negotiable):
 - **Navigation**: a top index of the day's sections (anchor links) + a "back to top" pill; video
   cards link straight to the video (new tab). Every section has a stable `#id`.
 - **Small print**: edition number, generated timestamp, "what was covered and suppressed" count
-  from memory.py stats, link to archive.html, a line stating the previous 30 editions are archived.
+  from memory.py stats, link to archive.html, a line stating the previous N editions are archived (`keep_editions`, 60 today).
 - Zero external JS libraries. Inline `app.js` only for: smooth anchor scroll, reading progress bar,
-  image error fallback, and a "compact/dense" density toggle persisted in localStorage.
+  image error fallback, and a `body.is-scrolled` class past 80px. There is no density/compact toggle:
+  it was removed on 2026-10-28 because it only restyled two spacing variables and the owner called it
+  broken (see DECISIONS). The masthead and TOC scroll away with the page - nothing is pinned.
 - Output must be a single HTML file + one CSS + one JS + images (no bundler, no build step).
 - Print stylesheet: white background, ink text, no nav (one `@media print` block).
 - Also write `site/edition-YYYY-MM-DD.html` copies? NO — keep one index.html plus archive links to
