@@ -42,6 +42,7 @@ topic_seen(topic, edition) whose only job is making mark() idempotent.
 import argparse
 from contextlib import contextmanager
 import hashlib
+import io
 import json
 import re
 import shutil
@@ -627,7 +628,35 @@ def resurface_candidates(conn, after_days, limit):
 
 
 def cmd_digest(args, root):
-    """Coverage analytics + the month-later resurface list."""
+    """Coverage analytics + the month-later resurface list, optionally saved as markdown."""
+    if not args.write:
+        return _digest_body(args, root)
+
+    buf = io.StringIO()
+    saved = sys.stdout
+    sys.stdout = buf
+    try:
+        result = _digest_body(args, root)
+    finally:
+        sys.stdout = saved
+    text = buf.getvalue()
+    sys.stdout.write(text)
+
+    target = args.write
+    if target is True:
+        target = root / "docs" / "coverage" / ("%s.md" % today_str())
+    else:
+        target = Path(str(target))
+        if not target.is_absolute():
+            target = root / target
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("# Coverage report - %s\n\n```text\n%s```\n" % (today_str(), text),
+                      encoding="utf-8")
+    print("digest written: %s" % target)
+    return result
+
+
+def _digest_body(args, root):
     if args.cooldown is None:
         settings = load_settings(root)
         args.cooldown = settings.get("repeat_topic_cooldown_days", DEFAULT_COOLDOWN_DAYS)
@@ -879,6 +908,8 @@ def build_parser():
     dg.add_argument("--after", type=int, default=30,
                     help="a topic quiet this many days is ripe for a follow-up (default: 30)")
     dg.add_argument("--top", type=int, default=12, help="rows per list (default: 12)")
+    dg.add_argument("--write", nargs="?", const=True, default=False, metavar="PATH",
+                    help="also save the digest as markdown (default docs/coverage/<today>.md)")
     dg.add_argument("--cooldown", type=int, default=None,
                     help="cooldown window to report against (default: settings.json)")
     dg.set_defaults(func=cmd_digest)

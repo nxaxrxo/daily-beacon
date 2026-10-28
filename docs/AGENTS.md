@@ -139,6 +139,9 @@ Read the table as the rules, not as an example:
   currently cooling down, and what has been quiet 30+ days. Anything on that last list may
   come back - but only with a genuinely new development, written as a follow-up, never as
   fresh news.
+  After marking memory, run `python scripts\memory.py digest --write` - it saves a dated
+  coverage report to `docs/coverage/<date>.md` and commits with the edition. That file is the
+  owner's month-later reminder; it is not optional decoration.
 - **Never lead with** a rumour, a benchmark chart with no product behind it, a 3-hour VOD, an
   unverifiable story, or anything in the NEVER list of `config/interests.md`.
 - **Tone:** funny, warm, optimistic even on bad news, never cruel, no filler - enforced by

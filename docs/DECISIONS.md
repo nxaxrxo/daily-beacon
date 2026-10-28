@@ -274,3 +274,19 @@ archive would have grown unbounded and the claim would have quietly become a lie
   make the paper repeat itself sooner. At ~61 KB per edition this is not a growth problem.
 - **`prune` was tested, not assumed**: `prune --days 400` and even `--days 0` delete nothing at one
   edition, which is correct behaviour, not a bug. Left alone deliberately.
+
+## 2026-10-28 - the month-later reminder now actually happens
+
+The owner asked for anti-repeat memory "and a month-later reminder or analytics". The cooldown and
+the \digest\ command both existed, but nothing ever ran the digest - a command nobody invokes is
+not a reminder.
+
+\memory.py digest --write\ now saves a dated report to \docs/coverage/<date>.md\, and the runbook
+tells the 03:00 agent to run it right after marking memory so it commits with the edition. The
+report carries: edition count and date span, most-covered topics, everything currently cooling
+down, and the topics quiet 30+ days that are ripe for a genuine follow-up.
+
+Implementation note: the first attempt shadowed \print\ inside \cmd_digest\, which raised
+\UnboundLocalError\ - the wrapper printed nothing at all. Capturing \sys.stdout\ instead keeps the
+human-readable output on screen and gives the file the exact same text, so there is no second
+rendering path to drift.
