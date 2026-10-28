@@ -27,8 +27,22 @@ One line each. Newest decisions at the bottom of their section.
 ## Publishing (U7)
 
 - Repo `nxaxrxo/daily-beacon`, public, default branch `main`.
-- Pages source = GitHub Actions (`build_type=workflow`), artifact path `site`, because Jekyll would mangle
-  `site/assets/` filenames and `.nojekyll` alone still runs the default build step.
+- Pages is served from the `gh-pages` **branch** (`build_type=legacy`), not the Actions artifact: the
+  fine-grained PAT is repo admin but carries no Pages permission, so both `POST` and `PUT /pages -f
+  build_type=workflow` return 403 and enabling artifact publishing needs the owner's token. Pushing
+  `gh-pages` was the only path that worked - GitHub detected it and built the site with no further call.
+- `publish.py` pushes `main` and then mirrors `site/` onto `origin/gh-pages` in a throwaway worktree:
+  fast-forward only, `.nojekyll` written, and a no-op print when the tree already matches. Pushing `main`
+  alone updated the repo but not the live page - the one failure that would have gone unnoticed at 03:00.
+- The mirror target is the `pages_branch` setting (`""` disables it) rather than a constant, so switching
+  back to artifact publishing is a settings change, not a code change.
+- `.nojekyll` travels with the mirror so `site/assets/<date>/` filenames survive; Jekyll would mangle them.
+- `enablement: true` was removed from `actions/configure-pages`: the workflow token cannot create a Pages
+  site either (`Resource not accessible by integration`), so every run failed and buried real failures
+  under a red X.
+- `pages.yml` now probes `build_type` first and skips build/deploy unless it is `workflow`; with a branch
+  source a successful skip beats a failing deploy, and flipping Pages to "GitHub Actions" in repo settings
+  re-arms the workflow with no file edit.
 - `publish.py` refuses to commit anything matching a secret pattern and unstages it; the gh token is never
   written to disk.
 - `site_base_url` is only written by an explicit `--set-url`, never guessed from a poll that has not seen 200.
@@ -39,9 +53,26 @@ One line each. Newest decisions at the bottom of their section.
   tastes, no flattery.
 - `AGENTS.md` is written for a fresh agent with zero session context and no ability to ask questions.
 
+## Fact-check pass on the first edition (U9)
+
+- Four sections of the first draft overstated their sources and were rewritten before publish: the lead
+  said Rockstar staff *had voted* (the ballot is 12-26 November), Resident Evil was said to be ending
+  within ten years (Wccftech explicitly reads the quote as one chapter, not the franchise), Dunkey's clip
+  was called a review (it is a gameplay video), and Waddle World was described as launched (Philippines
+  only, late September).
+- Rule applied: a headline may not assert more than the fetched article states. Where an outlet's own
+  follow-up walks back the framing, the Beacon carries the correction rather than the louder version.
+- `memory.py mark` was re-run after the edits; it is idempotent on key+edition, so the corrected titles
+  are what the 21-day cooldown now keys on.
+
 ## Runs (U9)
 
-- (recorded when the first real edition is built)
+- First real edition shipped 2026-10-28: edition no. 1, 14 sections, 6 quick hits, live at
+  `https://nxaxrxo.github.io/daily-beacon/`; run note is `docs/runs/2026-10-28.md`.
+- All 20 source URLs in that edition were re-checked live (HTTP 200) before publishing, so nothing on the
+  front page is a claim we did not fetch.
+- `doctor.py` is the pre-flight self-check: config, imports, feed list, memory db, fixture build and a
+  network probe; it exits non-zero on any failure so a bad morning is caught before anything is published.
 
 ## Backend (U1-U5, spec sections 2-5)
 

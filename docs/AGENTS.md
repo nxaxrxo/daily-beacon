@@ -296,18 +296,20 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
 - **`--date`** writes `site/index.html`, `site/archive/<date>.html`, `site/archive.html` and
   `site/assets/<date>/`. Success is exit 0 **plus** a rewritten `site/index.html`; a build can exit 0
   with one remote image skipped (`WARN: image skipped <id>: http 404`), which is fine if it still reads.
-- **`publish.py`** commits, pushes, prints the live URL. Variants: `publish: nothing to commit`,
+- **`publish.py`** commits, pushes `main`, then mirrors `site/` onto `origin/gh-pages` (which is what
+  Pages actually serves) and prints the live URL. Variants: `publish: nothing to commit`,
   `publish: no site built - run build_edition.py first`, `publish: BLOCKED - possible secret in
-  <file>`, `... live url not set ...`. It never force-pushes.
+  <file>`, `publish: origin/gh-pages already up to date`, `... live url not set ...`. It never
+  force-pushes. A push to `main` that does not mirror is a live-page no-op, so treat a non-zero exit
+  from `publish.py` as "the site did not update", whatever the earlier lines said.
 - **`--verify`** GETs the live URL and requires HTTP 200 plus the masthead. Only after a push.
 - **`memory.py mark`** is idempotent: twice prints the same shape of line and adds nothing. Skipping it
   is what makes tomorrow repeat today.
 
 > NOTE: SPEC section 7 still shows `--open`, but the current builder has no such flag - passing it is
 > an argparse error; build and verify headlessly (exit code, file size, `--check`), never by opening a
-> browser. And `site_base_url` is still empty on this checkout, so `publish.py` prints the `live url not
-> set` variant until `python scripts/publish.py --set-url <url>` runs once. That is not a failed run;
-> record it in the run note (section 8).
+> browser. `site_base_url` is already set on this checkout, so the `live url not set` variant means the
+> settings file was replaced, not that the run failed - fix it with `--set-url` and continue.
 
 ## 6. When something fails
 
@@ -320,6 +322,7 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
 | `--check` fails, or `--date` exits 1 | Read the message - it names the JSON path (`sections[2]: missing required key 'source'`) - fix the JSON, re-run. After two failed passes, stop editing today and leave yesterday's built site untouched | Edit or hand-patch `site/*.html`, `style.css`, `app.js` to make it pass |
 | `publish.py` fails (git error, secret block, no network) | Leave the built site exactly as it is; write the first error line into the run note; the page is complete but not live | `git push --force`; rewrite history; delete the commit |
 | Pages returns 404 after a push | Re-run `python scripts/publish.py --verify --wait 300`; if it still fails, record the 404 in the run note | Rebuild into a different directory; re-push in a loop |
+| `publish: mirrored site/ to origin/gh-pages` is missing from the output, or `publish.py` exits 1 after pushing main | The live page did not update: re-run `python scripts/publish.py` once, then `--verify --wait 300`. If the mirror still refuses, publish `site/` to `gh-pages` by hand in a temp clone and note it | Leave it - a green commit on main looks published and is not |
 | `state/seen.sqlite` locked or corrupt | Skip `mark`, note it in the run note; the edition still ships | Delete the database; recreate it by hand |
 | Collection failed entirely | Still publish: a three-section edition whose lead says plainly which part failed and what it means | A blank page, silence, or a "sorry" page with no content |
 
