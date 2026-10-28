@@ -256,3 +256,21 @@ Six channels were proposed and staged **disabled** rather than added: Bellular N
 Force Gaming, Preach Gaming, Rhykker, MrLlamaSC. All six verified live (RSS returns 15 entries
 each) because the IDs I had written from memory were fabricated placeholders that 404'd - a
 reminder that a plausible-looking channel ID is not a channel.
+
+
+## 2026-10-28 - retention: the colophon was making a promise nothing kept
+
+The footer has always read "Previous 30 editions are archived", and `keep_editions` was read in
+exactly one place - to print that sentence. Nothing rotated the folder, so at 48-hour cadence the
+archive would have grown unbounded and the claim would have quietly become a lie.
+
+- **`prune_archive()`** now deletes the oldest snapshots past `keep_editions` and returns the
+  trimmed list. Scoped strictly to `site/archive/*.html`; `editions/*.json` is the source of truth
+  and is never touched. Verified: 35 synthetic snapshots -> 30 files, exactly the oldest 5 deleted,
+  the current edition and newest snapshot surviving.
+- **`state/seen.sqlite` is deliberately NOT capped.** `prune` exists and is conservative by design
+  (it refuses to delete rows a kept edition references). More importantly, old rows are *useful*:
+  the rubric scores a 60-day-old topic higher than a 21-day-old one, so deleting history would
+  make the paper repeat itself sooner. At ~61 KB per edition this is not a growth problem.
+- **`prune` was tested, not assumed**: `prune --days 400` and even `--days 0` delete nothing at one
+  edition, which is correct behaviour, not a bug. Left alone deliberately.

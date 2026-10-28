@@ -903,6 +903,27 @@ def lead_headline_of(markup: str) -> str:
     flat = re.sub(r"\s+", " ", htmllib.unescape(_TAGS_ONLY.sub(" ", match.group(1)))).strip()
     return truncate(flat, ARCHIVE_HEAD_MAX) or "Edition"
 
+def prune_archive(out_dir: Path, entries: list, keep: int, current: str) -> list:
+    """Drop the oldest snapshots past `keep`, and delete their files.
+
+    The colophon has always claimed "previous N editions are archived" but nothing ever rotated,
+    so the folder grew forever and the claim quietly became false. Deleting is scoped to
+    site/archive/*.html only - never an edition file in editions/, which is the source of truth.
+    """
+    if keep <= 0 or len(entries) <= keep:
+        return entries
+    keep_dates = {str(e.get("date")) for e in entries[:keep]} | {current}
+    folder = out_dir / "archive"
+    if folder.is_dir():
+        for path in folder.glob("*.html"):
+            if path.stem not in keep_dates:
+                try:
+                    path.unlink()
+                except OSError:
+                    pass
+    return entries[:keep]
+
+
 def collect_archive(out_dir: Path, current: str, current_html: str) -> list[tuple[str, str]]:
     seen: dict[str, str] = {}
     folder = out_dir / "archive"
@@ -1134,6 +1155,7 @@ def build_site(args: argparse.Namespace) -> int:
             return fail(f"{label} self-check failed: {problem}")
 
     entries = collect_archive(out_dir, date_str, live_html)
+    entries = prune_archive(out_dir, entries, int(ctx.settings.get("keep_editions") or 30), date_str)
     archive_html = render_archive_page(ctx, entries, prefix="")
     problem = check_tag_balance(archive_html)
     if problem:
