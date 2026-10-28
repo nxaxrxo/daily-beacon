@@ -311,9 +311,22 @@ button { font: inherit; color: inherit; }
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* a jump bar, not a table of contents: on a phone a 14-item strip with
+     full headlines is four screens of swiping, so labels are dropped here
+     and the kicker becomes the whole chip. Desktop restores the labels. */
 }
 .toc__list::-webkit-scrollbar { display: none; }
 .toc__list > li { flex: 0 0 auto; }
+
+/* phone: kicker-only chips, capped width, still a 44px tap target.
+   display:block is required or text-overflow cannot clip cleanly. */
+.toc__label { display: none; }
+.toc__kicker {
+  display: block;
+  max-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .toc__link {
   display: flex;
@@ -341,6 +354,9 @@ button { font: inherit; color: inherit; }
   line-height: 1.2;
   color: var(--ink);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 18rem;
 }
 
 .density-toggle {
@@ -698,6 +714,7 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .story__headline { font-size: var(--story-size-lg); }
 
   .toc__list { flex-wrap: wrap; justify-content: center; overflow: visible; }
+  .toc__label { display: block; }
   .toc__label { font-size: 0.95rem; }
 
   .colophon__meta { font-size: 0.78rem; }
@@ -761,15 +778,17 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   }
   .layout-hero-centre .lead > .source-line { justify-content: center; }
 
-  /* hero-stacked: picture first, nameplate under it */
+  /* hero-stacked: words first, then the full-width picture, then the body.
+     The headline has to be inside the fold on the owner's phone and desktop;
+     a photo above it would push the story off the first screen. */
   .layout-hero-stacked .lead {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "fig"
       "kicker"
       "headline"
       "deck"
+      "fig"
       "body"
       "why"
       "aside"
@@ -786,7 +805,10 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .layout-hero-stacked .lead > .whymatters    { grid-area: why; }
   .layout-hero-stacked .lead > .aside         { grid-area: aside; text-align: left; }
   .layout-hero-stacked .lead > .source-line   { grid-area: source; justify-content: center; }
-  .layout-hero-stacked .media--lead .media__box { min-height: clamp(20rem, 46vh, 34rem); max-height: 40rem; }
+  /* width drives the box; the inline aspect-ratio sets the height, so a wide
+     picture fills the column instead of being clamped into a letterbox strip */
+  .layout-hero-stacked .media--lead { max-width: 62rem; }
+  .layout-hero-stacked .media--lead .media__box { min-height: 0; max-height: none; }
 
   .story__headline { font-size: var(--story-size-lg); }
   .body { font-size: 1.02em; }

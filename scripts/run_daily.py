@@ -202,6 +202,24 @@ def run_step(cmd: list[str], root: Path, timeout: int) -> tuple[int, str]:
     return proc.returncode, ((proc.stdout or "") + (proc.stderr or "")).strip()
 
 
+def parse_producer_stats(output: str, prefix: str, fallback_count: int, count_key: str) -> dict:
+    """Pull ok/total/failed out of a producer's summary line.
+
+    The producers are separate processes and their summary line is the only place the channel/feed
+    counts exist, so it is parsed with a tolerant pattern (extra whitespace, either "channels" or
+    "feeds"). If it cannot be found, the item count still comes from the file that was written -
+    a missing summary must never turn real data into a zero.
+    """
+    text = str(output or "")
+    pattern = (r"%s done:\s*(\d+)\s+\w+\s+from\s+(\d+)\s*/\s*(\d+)\s+\w+\s*\(\s*(\d+)\s+failed\s*\)"
+               % re.escape(prefix))
+    hit = re.search(pattern, text) or re.search(pattern, "\n".join(text.splitlines()[-8:]))
+    if hit:
+        return {count_key: int(hit.group(1)), "ok": int(hit.group(2)),
+                "total": int(hit.group(3)), "failed": int(hit.group(4))}
+    return {count_key: fallback_count, "ok": None, "total": None, "failed": None}
+
+
 def tail_line(output: str) -> str:
     lines = [ln.strip() for ln in str(output or "").splitlines() if ln.strip()]
     return lines[-1] if lines else ""
@@ -524,10 +542,7 @@ def cmd_collect(args) -> int:
                             "--hours", str(hours), "--root", str(root)], root, 1800)
     if out:
         log(ascii_safe(out))
-    hit = re.search(r"yt_source done: (\d+) videos from (\d+)/(\d+) channels \((\d+) failed\)", out)
-    if hit:
-        yt_stats.update(videos=int(hit.group(1)), ok=int(hit.group(2)),
-                        total=int(hit.group(3)), failed=int(hit.group(4)))
+    yt_stats.update(parse_producer_stats(out, "yt_source", len(read_array(yt_path)), "videos"))
     if not have_yt and rc != 0:
         warnings.append("yt_source exit %d" % rc)
         log("WARN yt_source exited %d - continuing with whatever it wrote" % rc)
@@ -542,10 +557,7 @@ def cmd_collect(args) -> int:
                             "--hours", str(hours), "--root", str(root)], root, 1800)
     if out:
         log(ascii_safe(out))
-    hit = re.search(r"news_source done: (\d+) articles from (\d+)/(\d+) feeds \((\d+) failed\)", out)
-    if hit:
-        news_stats.update(articles=int(hit.group(1)), ok=int(hit.group(2)),
-                          total=int(hit.group(3)), failed=int(hit.group(4)))
+    news_stats.update(parse_producer_stats(out, "news_source", len(read_array(news_path)), "articles"))
     if rc != 0:
         warnings.append("news_source exit %d" % rc)
         log("WARN news_source exited %d - continuing with whatever it wrote" % rc)
@@ -664,6 +676,9 @@ def cmd_collect(args) -> int:
             if stats[unit]:
                 return "- %s: %d %s | reused from disk (--reuse-source)" % (key, stats[unit], unit)
             return "- %s: %d %s | producer did not report a summary" % (key, stats[unit], unit)
+        if stats["ok"] == 0 and stats["total"] == 0:
+            return "- %s: %d %s | reused from disk (--reuse-source), no fetch this run" % (
+                key, stats[unit], unit)
         return "- %s: %d %s | %d/%d ok, %d failed" % (
             key, stats[unit], unit, stats["ok"], stats["total"], stats["failed"])
 

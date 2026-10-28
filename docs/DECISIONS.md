@@ -41,7 +41,9 @@ One line each. Newest decisions at the bottom of their section.
 
 ## Runs (U9)
 
-- (recorded when the first real edition is built)## Backend (U1-U5, spec sections 2-5)
+- (recorded when the first real edition is built)
+
+## Backend (U1-U5, spec sections 2-5)
 
 ### Scheduler formats (U1)
 - `days:N@HH:MM` keeps its phase on the record's `createdAt` (then `lastFiredAt`), so "every 3 days" does not drift to midnight across restarts; `anchorMs` in the spec is informational only.
@@ -55,12 +57,14 @@ One line each. Newest decisions at the bottom of their section.
 ### Config (U2/U3)
 - `settings.json` is the spec object verbatim, 13 keys, `site_base_url` left empty until the first deploy fills it.
 - `channels.json` carries exactly the six spec keys; `subscribers`/`customUrl` from the portfolio were dropped at build time because the spec fixed the element shape.
-- `channels.json` ships 78 channels; every id is a 24-char `UC...` copied verbatim from `channel_portfolio.json` except Cryton, whose id was resolved live from the channel page and cross-checked against the channel RSS.
+- `channels.json` ships 79 channels; every id is a 24-char `UC...` copied verbatim from `channel_portfolio.json` except Cryton, whose id was resolved live from the channel page and cross-checked against the channel RSS and Invidious (both 200, title `Cryton`).
 - Tiers not stated by the spec carry `"note":"tier guessed - confirm"`; shorts/clip/meme/podcast channels are tier 3.
 - `feeds.json` ships 21 feeds, every one verified live (HTTP 200 with entries) in the same session it was written; HTTP status and item count per feed are recorded in `docs/FEEDS-CHECK.md`.
-- `Feeds dropped after verification: VentureBeat AI (HTTP 429 on every URL variant) - AI coverage is carried by The Verge AI, TechCrunch AI, MIT Technology Review and Ars Technica.
+- Feeds dropped after verification: VentureBeat AI (HTTP 429 on every URL variant), OpenAI Blog and Hugging Face Blog (parse, but their feeds are undated archives that a 26h window cannot use). AI coverage is carried by The Verge AI, TechCrunch AI, MIT Technology Review and Ars Technica.
 - `GameSpot` ships the `mashup` feed (news + reviews) rather than the news-only feed, because the news-only endpoint returned no entries on verification.
-- `config/feeds.json` weights: 3 for the three flagship gaming feeds, 1 for Kyiv Independent only, 2 for everything else - so the single awareness feed can never outrank gaming/AI on volume.
+- `config/feeds.json` weights: 3 for the three flagship gaming feeds (PC Gamer, RPS, Eurogamer), 1 for Kyiv Independent only, 2 for everything else - so the single awareness feed can never outrank gaming/AI on volume.
+- `Game Developer` ships `/rss.xml` because `/rss/` redirects to the homepage and parses to 0 entries; the news-only GameSpot endpoint returned a stale list, so `mashup` is used.
+- A feed counts as working only at HTTP 200 AND more than 0 parsed entries; a 200 with an empty body is treated as dead, because an empty feed silently starves the edition.
 
 ### Memory (U3)
 - `state/seen.sqlite` is created on first use with the three spec tables plus the additive `topic_seen(topic, edition)` guard authorised by CONTRACTS.md; a `PRAGMA user_version` stamp makes a future schema bump explicit instead of a silent overwrite.
