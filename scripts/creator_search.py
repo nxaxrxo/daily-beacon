@@ -188,7 +188,7 @@ def drop_gameplay(rows: list[dict]) -> tuple[list[dict], int]:
 
 # ------------------------------------------------------------------------- main
 def run(term: str, root: Path, scope: str, hours: int, tiers: set[int] | None,
-        workers: int, pages: int, keep_gameplay: bool) -> dict:
+        workers: int, pages: int, keep_gameplay: bool, title_only: bool = False) -> dict:
     channels = [c for c in load_channels(root) if c.get("enabled")]
 
     if scope == "global":
@@ -200,6 +200,7 @@ def run(term: str, root: Path, scope: str, hours: int, tiers: set[int] | None,
         for row in rows:
             if row.get("channel_id") in followed_ids or str(row.get("channel") or "").lower() in followed_names:
                 row["tier"] = tier_of.get(row.get("channel_id"))
+                row["title_match"] = True  # the global search already matched the term
                 filtered.append(row)
         missing = []
     else:
@@ -237,6 +238,9 @@ def run(term: str, root: Path, scope: str, hours: int, tiers: set[int] | None,
     needle = term.lower()
     for row in filtered:
         row["title_match"] = needle in str(row.get("title") or "").lower()
+
+    if title_only:
+        filtered = [r for r in filtered if r.get("title_match", True)]
 
     before = len(filtered)
     filtered = [r for r in filtered if keep(r, hours, tiers)]
@@ -294,6 +298,10 @@ def build_parser() -> argparse.ArgumentParser:
                     help="restrict to a channel tier (repeatable), e.g. --tier 1")
     ap.add_argument("--workers", type=int, default=DEFAULT_WORKERS)
     ap.add_argument("--pages", type=int, default=2, help="global mode: result pages to read")
+    ap.add_argument("--title-only", action="store_true",
+                    help="drop description-only matches. The channel index searches descriptions too, "
+                         "so a broad term can return a video that merely mentions it - at 03:00 that is "
+                         "noise mistaken for a take.")
     ap.add_argument("--keep-gameplay", action="store_true",
                     help="do not drop let's-play uploads (they are dropped by default)")
     ap.add_argument("--json", default=None, help="write full JSON payload to this path")
@@ -318,7 +326,7 @@ def main(argv=None) -> int:
 
     tiers = set(args.tier) if args.tier else None
     payload = run(args.term, root, args.scope, args.hours, tiers,
-                  max(1, args.workers), max(1, args.pages), args.keep_gameplay)
+                  max(1, args.workers), max(1, args.pages), args.keep_gameplay, args.title_only)
 
     if args.json:
         out = Path(args.json)

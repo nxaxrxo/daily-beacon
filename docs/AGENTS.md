@@ -323,9 +323,9 @@ For a story that is big - a business-changing event per 3.2.1, a game on his act
 studio he has invested in - run the creator search **before** writing the section, not after:
 
 ```
-python scripts/creator_search.py "Helldivers 2" --hours 72 --tier 1
-python scripts/creator_search.py "BioWare" --hours 72 --tier 1
-python scripts/creator_search.py "Godot" --hours 72 --tier 1
+python scripts/creator_search.py "Helldivers 2" --hours 72 --tier 1 --title-only
+python scripts/creator_search.py "BioWare" --hours 72 --tier 1 --title-only
+python scripts/creator_search.py "Godot" --hours 72 --tier 1 --title-only
 ```
 
 Swap the term for the story's key noun ("Warframe", "Crimson Desert", "studio closure" is too vague - use
@@ -345,8 +345,13 @@ enabled channels' own search index, which is complete but slow: roughly one to t
 public Invidious instances throttle bursts, so a few channels can come back `unreachable` after the built-in
 retry. That means **"no coverage found" only for the channels it actually reached** - it is not a statement
 about YouTube as a whole. If the run matters and the list of unreachable channels is long, re-run it once;
-do not conclude "nobody covered this" from one throttled pass. A row marked `(desc match)` / `title_match:
-false` has the term only in the description - a passing mention, not a take worth quoting.
+do not conclude "nobody covered this" from one throttled pass.
+
+**Use `--title-only`.** The channel index matches descriptions as well as titles, so a broad term returns
+videos that merely mention it: a smoke test on "Godot" returned 32 hits of which 32 were description-only.
+`--title-only` drops them and on "BioWare" cut 4 hits down to the 2 real takes. A description match is a
+passing mention, not a take worth quoting - so filter them at the tool rather than trusting yourself to
+ignore them at 03:00.
 
 One more precision caveat, measured rather than assumed: the `published` value it prints is not the real
 publish time. The instance derives it from the rounded relative text ("3 days ago", "1 year ago"), which
@@ -359,6 +364,10 @@ video page before writing it as today's. Do not put the tool's date in a sentenc
 `--scope global` is the fast alternative (one query, then filtered to followed channels) but it ranks by
 popularity, so a small channel's video about the topic can simply not appear - use it for a broad read,
 never as the answer to "did he cover it".
+
+**Expect nothing for Godot, and that is not a failure.** No followed channel covers engine releases, so
+this step returns zero for that lane. Godot news arrives as articles (`Godot Blog` is in the feed list),
+and that is the correct source for it. Do not skip an engine story because the creator step was empty.
 
 **It is read-only.** It fetches, prints a table, and exits; `--json <path>` writes the payload for a
 workpack and touches nothing else. Safe to run at 03:00, no browser, no window, no writes to editions or

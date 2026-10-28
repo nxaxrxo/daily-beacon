@@ -370,6 +370,29 @@ class Doctor:
             tail = [ln.strip() for ln in (proc.stdout or "").splitlines() if "FAIL" in ln]
             self.failed("business events", (tail[0] if tail else "detector test failed"))
 
+    def check_taste_contract(self):
+        """config/interests.md decides what may publish; nothing used to test it."""
+        import subprocess
+        script = self.root / "scripts" / "test_taste_contract.py"
+        if not script.is_file():
+            self.failed("taste contract", "scripts/test_taste_contract.py missing")
+            return
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(script)],
+                capture_output=True, text=True, timeout=120,
+                cwd=str(self.root), encoding="utf-8", errors="replace",
+            )
+        except Exception as exc:
+            self.failed("taste contract", "%s: %s" % (exc.__class__.__name__, ascii_text(exc, 90)))
+            return
+        if proc.returncode == 0:
+            last = [ln for ln in (proc.stdout or "").splitlines() if "PASS" in ln or "FAIL" in ln]
+            self.passed("taste contract", last[-1].strip() if last else "ok")
+        else:
+            bad = [ln.strip() for ln in (proc.stdout or "").splitlines() if "FAIL" in ln]
+            self.failed("taste contract", bad[0] if bad else "taste contract test failed")
+
     def run(self):
         checks = (
             ("settings", self.check_settings),
@@ -379,6 +402,7 @@ class Doctor:
                                               ("name", "url", "tags", "enabled"), "feed")),
             ("policy", self.check_channel_policy),
             ("business events", self.check_business_events),
+            ("taste contract", self.check_taste_contract),
             ("interests", lambda: self._text_file("config/interests.md",
                                                  "config/interests.md", 40)),
             ("agents.md", lambda: self._text_file("docs/AGENTS.md", "docs/AGENTS.md", 60)),
