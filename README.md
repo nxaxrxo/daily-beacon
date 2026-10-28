@@ -1,123 +1,90 @@
-# The Daily Beacon
+﻿# The Daily Beacon
 
-A small self-hosted newspaper that writes itself every night at 03:00. A scheduled OpenCode session
-collects what happened in the last 24 hours across watched YouTube creators and gaming/AI/tech news
-feeds, judges what is worth reading, writes a funny and optimistic dark-mode edition as a single JSON
-file, builds a static site from it, and pushes that site to GitHub Pages. A SQLite memory store stops
-it from covering the same story twice inside the cooldown window.
+A personal newspaper, compiled every night at 03:00 from the YouTubers I actually watch and the news
+feeds I actually care about. It writes itself, builds itself, and publishes itself.
 
-Live site: https://nxaxrxo.github.io/daily-beacon/
+**Live site:** `https://nxaxrxo.github.io/daily-beacon/`
 
-## The 03:00 flow
+---
 
-1. `python scripts/run_daily.py collect` pulls new videos (`yt_source.py`) and articles
-   (`news_source.py`) into `state/workpack/<date>/candidates.json`, runs them through `memory.py`,
-   fetches a few transcripts and writes `state/workpack/<date>/packet.md`.
-2. The agent reads `docs/AGENTS.md`, then `packet.md`, and judges it against `config/interests.md`.
-   It picks one lead plus 4-13 further stories and writes `editions/<date>.json`. No script decides
-   what is interesting.
-3. `python scripts/build_edition.py --date <date>` validates that JSON and renders `site/index.html`,
-   `site/archive.html` and `site/assets/<date>/`.
-4. `python scripts/publish.py` commits and pushes the built site. The `pages` workflow uploads `site/`
-   and deploys it to GitHub Pages; `publish.py --verify --wait 180` confirms the live URL returns 200
-   with the masthead.
-5. `python scripts/memory.py mark --edition editions/<date>.json` records every story and topic so
-   tomorrow knows what was already covered.
+## What happens at 03:00
 
-## Editing an edition by hand
+An OpenCode session fires and works through `docs/AGENTS.md`:
 
-Editions are plain JSON and safe to edit directly. The full schema is `docs/SPEC.md` section 6. The
-smallest valid edition:
+1. `run_daily.py collect` pulls the last 26 hours of uploads (77 channels) and RSS items (37 feeds),
+   filters out anything already covered, fetches transcripts for the best videos, downloads images,
+   and writes `state/workpack/<date>/packet.md` - one readable briefing instead of raw JSON.
+2. The agent reads that packet, reads 3-8 transcripts, and judges what is worth printing using
+   `config/interests.md` as the rubric.
+3. It writes `editions/<date>.json` - plain content, no HTML.
+4. `build_edition.py` renders it into a dark-mode newspaper that looks different every day.
+5. `publish.py` pushes it; GitHub Pages redeploys.
+6. `memory.py mark` records every story so tomorrow cannot repeat it.
 
-```json
-{
-  "date": "2026-10-28",
-  "number": 7,
-  "generatedAt": "2026-10-28T03:14:00+01:00",
-  "masthead": "THE DAILY BEACON",
-  "tagline": "Your 3am briefing, slightly unhinged",
-  "weatherStrip": "grey, with a chance of patch notes",
-  "sections": [
-    {
-      "id": "gta6-trailer",
-      "kind": "lead",
-      "priority": 100,
-      "kicker": "GAMING",
-      "headline": "Rockstar blinks first",
-      "standfirst": "One sentence of deck copy.",
-      "body": ["First paragraph.", "Second with **bold** and a [link](https://example.com)."],
-      "source": {"label": "AngryJoeShow", "url": "https://youtu.be/xyz"},
-      "tags": ["gta6"],
-      "whyItMatters": "One line on why this leads the paper."
-    }
-  ],
-  "quickHits": [{"text": "Short item.", "url": "https://example.com"}],
-  "signoff": "Back tomorrow, same bat-time."
-}
+If the PC was off at 3am, the scheduler's catch-up fires the run as soon as OpenCode next loads.
+One run, not seven.
+
+## Why it never repeats itself
+
+`state/seen.sqlite` tracks every story and topic ever printed. A news item is stored under both a
+canonical URL key and a title key, so the same story from a different outlet is still caught. Topics
+get a 21-day cooldown: after that a subject can return, but only with a genuinely new development,
+and framed as a follow-up rather than fresh news.
+
+## Editing by hand
+
+The content is just JSON. Open `editions/<today>.json`, change the words, rebuild:
+
+```powershell
+cd "$env:USERPROFILE\Documents\VSCODE-PROJECTS\daily-beacon"
+python scripts\build_edition.py --check    # validate
+python scripts\build_edition.py            # render
+python scripts\publish.py                  # ship it
 ```
 
-Exactly one section must be `"kind": "lead"`. Body text supports only `**bold**`, `*italic*` and
-`[text](url)`; everything else is escaped. Section `kind` drives layout: `lead`, `story`, `video`,
-`quote`.
+`sections[]` drives the layout: `lead` (hero, exactly one), `story`, `video`, `quote`, `quick`.
+Body text supports only `**bold**`, `*italic*` and `[links](url)`. Point `image.src` at a URL or a
+local file and the builder downloads, resizes and embeds it.
 
-## Rebuilding the site
+## Adding a creator or a feed
 
-```
-python scripts/build_edition.py --date 2026-10-28    # rebuild one edition
-python scripts/build_edition.py --fixture            # build from fixtures/, touches no real state
-python scripts/build_edition.py --check              # validate only
-python scripts/publish.py --check                    # what would be published
-python scripts/publish.py                            # commit + push, then print the live URL
-python scripts/publish.py --verify --wait 240        # poll the live URL until the masthead appears
-```
-
-`publish.py` never force-pushes and refuses to commit anything that looks like a secret.
-
-## Adding a channel
-
-Append one object to the array in `config/channels.json`:
-
-```json
-{"id": "UCxxxxxxxxxxxxxxxxxxxxxx", "name": "Channel Name", "tier": 2, "tags": ["gaming", "news"], "enabled": true, "note": ""}
-```
-
-`tier` 1 = check every day, 2 = check, 3 = only if something big. The `UC...` id is in any channel
-RSS URL.
-
-## Adding a feed
-
-Append one object to the array in `config/feeds.json`:
-
-```json
-{"name": "PC Gamer", "url": "https://www.pcgamer.com/rss/", "tags": ["gaming", "news"], "enabled": true, "weight": 1}
-```
-
-`weight` is the mechanical score hint, higher wins a tie at the cap. Prove the feed resolves before
-committing it and record the result in `docs/FEEDS-CHECK.md`.
+- Creator: add `{"id": "UC...", "name": "...", "tier": 1|2|3, "tags": [...], "enabled": true}` to
+  `config/channels.json`. Tier 1 = always checked, tier 3 = only if something big.
+- Feed: add `{"name": "...", "url": "...", "tags": [...], "weight": 1-3, "enabled": true}` to
+  `config/feeds.json`.
+- Taste itself lives in `config/interests.md` - edit that and the 3am judgement changes.
 
 ## Changing the schedule
 
-The record lives in the scheduler plugin (`~/.config/opencode/plugins/scheduler/`, `schedules.json`
-next to the runtime), never in this project. Accepted formats:
-
-```
-daily:03:00                  days:2@03:00               weekly:mon@03:00
-weekly:mon,wed,fri@03:00     hourly:45                  monthly:1@03:00
-once:2026-10-28T03:00        every:30m | every:2h | every:3d
+```powershell
+python "$env:USERPROFILE\.config\opencode\tools\schedule.py" list
 ```
 
-Edit the record for this project to the time you want. The plugin only fires a session; the run is
-driven by `docs/AGENTS.md`. Catch-up is deliberate: a missed slot fires once on the next tick, never a
-burst.
+The live schedule is `daily:03:00`. Supported formats: `once:2026-10-30T09:00`, `every:30m`, `days:3@09:00`,
+`hourly:15`, `daily:03:00`, `weekly:mon@09:00`, `weekly:mon,wed,fri@09:00`, `monthly:1@09:00`.
+
+## Scripts
+
+| script | job |
+|---|---|
+| `yt_source.py` | channels -> new videos in the window |
+| `news_source.py` | feeds -> deduped articles with images |
+| `transcripts.py` | batch transcript fetch (cache-first, sequential) |
+| `memory.py` | the anti-repeat store; `filter`, `mark`, `query`, `stats`, `prune`, `selftest` |
+| `run_daily.py` | the orchestrator that produces `packet.md` |
+| `build_edition.py` | edition JSON -> the site |
+| `publish.py` | commit, push, verify the live URL |
+| `test_scheduler_formats.mjs` | proves every scheduler format still parses |
 
 ## Troubleshooting
 
-| Symptom | Cause and fix |
-|---|---|
-| Live URL 404s | Pages source must be "GitHub Actions", not a branch. Check `gh api repos/nxaxrxo/daily-beacon/pages`. If it 404s, Pages is not enabled: `gh api repos/nxaxrxo/daily-beacon/pages -X POST -f build_type=workflow`. Then confirm the `pages` workflow actually ran: `gh run list --workflow pages`. |
-| Workflow ran, still 404 | `site/index.html` must be committed. An empty `site/` uploads nothing to serve. Run `python scripts/build_edition.py --date <date>` then `python scripts/publish.py`. |
-| A feed is down | See `docs/FEEDS-CHECK.md` for each feed's recorded status. Fix the URL or set `"enabled": false`; one dead feed never kills a run. |
-| The build fails | `python scripts/build_edition.py --check` names the problem: a missing key, a second `lead`, an empty body, bad inline markup, a story with no source. |
-| Publishing refuses | The secret guard blocked a staged `.env`, `*.pem`, `*.key`, `*_token*`, `credentials.json` or a token pattern. The file was unstaged automatically. Tokens never belong in this repo. |
-| `publish: no site built` | `site/index.html` is missing. Build first, then publish. |
-| `publish: nothing to commit` | The site is already committed. Publishing continues to the push, which is normal. |
+- **Nothing was published.** Check `docs/runs/<date>.md` and `state/workpack/<date>/packet.md`.
+  A quiet day produces a short edition on purpose; silence means something failed.
+- **The collection died halfway.** Rerun with `--reuse-source` so finished steps are not repeated.
+- **A feed stopped working.** `python scripts\news_source.py --out test.json` names the failing feeds;
+  check `docs/FEEDS-CHECK.md` for what was verified last time.
+- **Scheduler not firing.** Read `~\.opencode-runtime\scheduler\scheduler.log`.
+
+---
+
+Built for one reader. No analytics, no accounts, no tracking.

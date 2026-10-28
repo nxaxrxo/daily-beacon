@@ -101,6 +101,7 @@ class Doctor:
                            % (len(problems), "; ".join(str(part) for part in problems[:6])))
 
     def check_settings(self):
+        """1. Every SPEC section 3 key, present and correctly typed."""
         name, path = "config/settings.json", self.root / "config" / "settings.json"
         if not path.is_file():
             return self.failed(name, "missing: %s" % path)
@@ -109,22 +110,19 @@ class Doctor:
             return self.failed(name, error)
         if not isinstance(data, dict):
             return self.failed(name, "top level must be a JSON object")
-        bad = []
+        kind = {int: lambda v: is_int(v), bool: lambda v: isinstance(v, bool),
+                str: lambda v: isinstance(v, str)}
+        bad, extra = [], set(data) - set(key for key, _ in SETTINGS_TYPES)
         for key, want in SETTINGS_TYPES:
             if key not in data:
                 bad.append("missing '%s'" % key)
-            elif want is int and not is_int(data[key]):
-                bad.append("'%s' must be an integer" % key)
-            elif want is bool and not isinstance(data[key], bool):
-                bad.append("'%s' must be a boolean" % key)
-            elif want is str and not isinstance(data[key], str):
-                bad.append("'%s' must be a string" % key)
+            elif not kind[want](data[key]):
+                bad.append("'%s' must be %s" % (key, want.__name__))
         if bad:
             return self._fail_many(name, bad)
-        extra = sorted(set(data) - set(key for key, _ in SETTINGS_TYPES))
         return self.passed(name, "all %d spec keys present with the right type%s"
                            % (len(SETTINGS_TYPES),
-                              " (extra: %s)" % ", ".join(extra[:4]) if extra else ""))
+                              " (extra: %s)" % ", ".join(sorted(extra)[:4]) if extra else ""))
 
     def _check_list(self, name, rel, required, kind):
         """2/3. Shape plus per-entry validation, shared by channels and feeds."""
@@ -147,29 +145,26 @@ class Doctor:
             bad.extend("%s missing '%s'" % (where, key) for key in required if key not in entry)
             if not str(entry.get("name") or "").strip():
                 bad.append(where + " name is empty")
-            if "enabled" in entry:
-                if isinstance(entry["enabled"], bool):
-                    enabled += 1 if entry["enabled"] else 0
-                else:
-                    bad.append(where + " enabled must be a boolean")
+            if not isinstance(entry.get("enabled", False), bool):
+                bad.append(where + " enabled must be a boolean")
+            else:
+                enabled += 1 if entry.get("enabled") else 0
             if kind == "channel":
                 if "id" in entry and not (isinstance(entry["id"], str)
                                           and CHANNEL_ID_RE.match(entry["id"])):
                     bad.append(where + " id is not a UC... channel id")
-                if "tier" in entry:
-                    if is_int(entry["tier"]) and entry["tier"] in (1, 2, 3):
-                        tiers[entry["tier"]] += 1
-                    else:
-                        bad.append(where + " tier must be 1, 2 or 3")
+                if not (is_int(entry.get("tier")) and entry.get("tier") in (1, 2, 3)):
+                    bad.append(where + " tier must be 1, 2 or 3")
+                else:
+                    tiers[entry["tier"]] += 1
                 continue
-            if "url" in entry:
-                url = entry.get("url")
-                if not isinstance(url, str) or not url.strip():
-                    bad.append(where + " url is empty")
-                elif not url.startswith("https://"):
-                    bad.append("%s url is not https (%s)" % (where, ascii_text(url, 50)))
-            if "tags" in entry and not (isinstance(entry["tags"], list) and all(
-                    isinstance(tag, str) for tag in entry["tags"])):
+            url = entry.get("url")
+            if not isinstance(url, str) or not url.strip():
+                bad.append(where + " url is empty")
+            elif not url.startswith("https://"):
+                bad.append("%s url is not https (%s)" % (where, ascii_text(url, 50)))
+            tags = entry.get("tags")
+            if not (isinstance(tags, list) and all(isinstance(tag, str) for tag in tags)):
                 bad.append(where + " tags must be an array of strings")
         if bad:
             return self._fail_many(name, bad)
@@ -206,13 +201,13 @@ class Doctor:
         return self._text_file("docs/AGENTS.md", "docs/AGENTS.md", 60)
 
     def check_dirs(self):
+        """6. The four output directories exist and accept a temp file."""
         name, bad, writable = "writable directories", [], 0
         for rel in ("editions", "site", "site/assets", "state"):
-            folder = self.root / rel
+            folder, temp_path = self.root / rel, None
             if not folder.is_dir():
                 bad.append(rel + " missing")
                 continue
-            temp_path = None
             try:
                 handle, temp_path = tempfile.mkstemp(prefix=".doctor-", suffix=".tmp",
                                                      dir=str(folder))
@@ -353,14 +348,14 @@ class Doctor:
         return last
 
     def check_fixture(self):
+        """11. Build the fixture and audit the HTML it produced."""
         if self.quick:
             return
         name, script = "fixture build", self.root / "scripts" / "build_edition.py"
         if not script.is_file():
             return self.failed(name, "scripts/build_edition.py is missing")
         out_dir = self.root / "state" / FIXTURE_DIR
-        if out_dir.exists():
-            shutil.rmtree(out_dir, ignore_errors=True)
+        shutil.rmtree(out_dir, ignore_errors=True)
         try:
             code, stdout, stderr = self._run_fixture(script, out_dir)
             self.kept_fixture = out_dir.exists()
@@ -383,6 +378,7 @@ class Doctor:
                 self.kept_fixture = False
 
     def run(self):
+        """12. Every check once, then the summary line and the exit code."""
         for step in (self.check_settings, self.check_channels, self.check_feeds,
                      self.check_interests, self.check_agents_md, self.check_dirs,
                      self.check_runtime, self.check_memory, self.check_network,
@@ -392,21 +388,21 @@ class Doctor:
             except Exception as exc:
                 self.failed("unexpected:" + step.__name__,
                             "%s: %s" % (exc.__class__.__name__, ascii_text(exc, 120)))
-        passed = sum(1 for item in self.results if item["status"] == PASS)
-        failed = sum(1 for item in self.results if item["status"] == FAIL)
-        warnings = sum(1 for item in self.results if item["status"] == WARN)
+        tally = {PASS: 0, FAIL: 0, WARN: 0}
+        for item in self.results:
+            tally[item["status"]] = tally.get(item["status"], 0) + 1
         if self.as_json:
             print(json.dumps({"root": str(self.root), "offline": self.offline,
-                              "quick": self.quick, "passed": passed, "failed": failed,
-                              "warnings": warnings, "ok": failed == 0,
-                              "checks": self.results}, indent=2, ensure_ascii=True))
+                              "quick": self.quick, "passed": tally[PASS],
+                              "failed": tally[FAIL], "warnings": tally[WARN],
+                              "ok": tally[FAIL] == 0, "checks": self.results},
+                             indent=2, ensure_ascii=True))
         else:
-            print("doctor: %d passed, %d failed, %d warnings" % (passed, failed, warnings))
+            print("doctor: %d passed, %d failed, %d warnings"
+                  % (tally[PASS], tally[FAIL], tally[WARN]))
             if self.kept_fixture:
                 print("doctor: fixture kept at %s" % (self.root / "state" / FIXTURE_DIR))
-        return 1 if failed else 0
-
-# --------------------------------------------------------------- HTML checks
+        return 1 if tally[FAIL] else 0
 
 def attribute(tag_body, key):
     """Value of one attribute inside a tag body, or None."""

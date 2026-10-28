@@ -5,16 +5,12 @@ question. Everything you need is here and in `config/interests.md`. Read this fi
 
 Project root: `C:\Users\MarciNaro\Documents\VSCODE-PROJECTS\daily-beacon`. Every command runs from there.
 
-
 ## 1. Where you are, and the one rule
 
-Today's edition is the pair:
-
-- `editions/YYYY-MM-DD.json` - the content file you write, for today's **local** date.
-- `site/index.html` - what `build_edition.py` renders from it, plus `site/archive/<date>.html`,
-  `site/archive.html` and `site/assets/<date>/`.
-
-Nothing else is yours to create. The scheduler calls you once and expects a published page afterwards.
+Today's edition is a pair: `editions/YYYY-MM-DD.json`, the content file you write for today's **local**
+date, and `site/index.html`, what `build_edition.py` renders from it, plus `site/archive/<date>.html`,
+`site/archive.html` and `site/assets/<date>/`. Nothing else is yours to create. The scheduler calls you
+once and expects a published page afterwards.
 
 **The one hard rule, which no other rule here can override:**
 
@@ -24,16 +20,15 @@ Nothing else is yours to create. The scheduler calls you once and expects a publ
 > reconstructed reactions, no imagined patch notes. If the packet does not support a sentence, the
 > sentence does not go in the edition.
 
-Two consequences, stated flatly: **never present an unverified claim as fact** - attribute it ("the
-studio says", "the patch notes claim") or leave it out, hedging is not a source; and **every story
-carries a real `source.label` and `source.url`**, because the builder fails a story without one (SPEC
-section 6) and a page of unsourced summaries is worse than a short page.
+Two consequences: **never present an unverified claim as fact** - attribute it ("the studio says") or
+leave it out, hedging is not a source; and **every story carries a real `source.label` and
+`source.url`**, because the builder fails a story without one (SPEC section 6) and a page of unsourced
+summaries is worse than a short page.
 
 The taste document is binding: **`config/interests.md`** (LOVES / LIKES / NEUTRAL / DISLIKES / NEVER,
 the numeric rubric, tone rules, cooldown, "what the edition is not"). Read it in full before judging;
 it outranks your taste. Reference contracts: `docs/SPEC.md` (sections 1, 6, 7, 8),
 `docs/CONTRACTS.md` (CLI + `packet.md`), `docs/SITE-CONTRACT.md`, `docs/DECISIONS.md`.
-
 
 ## 2. Collect
 
@@ -78,7 +73,6 @@ Then:
 without) - a single feed timeout is normal. If it still fails, or there are fewer than five usable
 items, publish a short honest edition anyway: three to five sections, the lead being what you *do*
 know, plus one clearly labelled note naming the source that failed. Never a blank page, never silence.
-
 
 ## 3. Judge
 
@@ -140,7 +134,6 @@ Read the table as the rules, not as an example:
   lead**, four to seven `quickHits`, at most one `quote`. If you write 14, all 14 must be real.
 - **Ties** break: (1) does it change something for him, (2) does it have an image, (3) is it a creator
   he actually watches.
-
 
 ## 4. Write the edition
 
@@ -283,7 +276,6 @@ optimise and rewrite; `tags` are topic slugs and are what the 21-day cooldown ke
 }
 ```
 
-
 ## 5. Build, publish, mark
 
 These four, in this exact order, one at a time, reading the last line of each.
@@ -312,13 +304,10 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
   is what makes tomorrow repeat today.
 
 > NOTE: SPEC section 7 still shows `--open`, but the current builder has no such flag - passing it is
-> an argparse error. Build, then verify headlessly (exit code, file size, `--check`); never open a
-> browser to look at the page.
-
-> NOTE: `site_base_url` is still empty on this checkout, so `publish.py` prints the `live url not set`
-> variant until `python scripts/publish.py --set-url <url>` is run once. That is not a failed run;
+> an argparse error; build and verify headlessly (exit code, file size, `--check`), never by opening a
+> browser. And `site_base_url` is still empty on this checkout, so `publish.py` prints the `live url not
+> set` variant until `python scripts/publish.py --set-url <url>` runs once. That is not a failed run;
 > record it in the run note (section 8).
-
 
 ## 6. When something fails
 
@@ -328,8 +317,7 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
 | `packet.md` shows a few channels/feeds failed | Publish normally; mention the failing source in one clause of one section and in the run note | Claim coverage you did not collect |
 | No transcripts at all | Judge from titles, channels, thumbnails and article bodies; keep claims to what those state | Invent what a video "probably says" |
 | Fewer than 5 usable candidates | Publish a short honest edition: one lead, two or three stories, three quick hits | Pad with repeats or rumours; publish an empty page |
-| `--check` fails | Read the message - it names the JSON path (`sections[2]: missing required key 'source'`), fix the JSON, re-run | Edit `site/*.html`, `style.css` or `app.js` by hand |
-| `build_edition.py --date` exits 1 | Fix the JSON, rebuild. After two failed passes, stop editing today and leave yesterday's built site untouched | Hand-patch the generated HTML to make it pass |
+| `--check` fails, or `--date` exits 1 | Read the message - it names the JSON path (`sections[2]: missing required key 'source'`) - fix the JSON, re-run. After two failed passes, stop editing today and leave yesterday's built site untouched | Edit or hand-patch `site/*.html`, `style.css`, `app.js` to make it pass |
 | `publish.py` fails (git error, secret block, no network) | Leave the built site exactly as it is; write the first error line into the run note; the page is complete but not live | `git push --force`; rewrite history; delete the commit |
 | Pages returns 404 after a push | Re-run `python scripts/publish.py --verify --wait 300`; if it still fails, record the 404 in the run note | Rebuild into a different directory; re-push in a loop |
 | `state/seen.sqlite` locked or corrupt | Skip `mark`, note it in the run note; the edition still ships | Delete the database; recreate it by hand |
@@ -337,27 +325,23 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
 
 Every one of these ends the same way: an edition exists, is built, and the run note says what happened.
 
-
 ## 7. Never
 
-- **Never open a browser, a window, a folder or any GUI.** The owner may be at the PC; a stolen window
-  ruins a session. All verification is headless: exit codes, file sizes, `--check`, HTTP status.
-- **Never ask a question.** Nobody is there. Decide, or take the minimum-viable path in section 6.
+- **Never open a browser, a window, a folder or any GUI.** The owner may be at the PC and a stolen
+  window ruins a session; all verification is headless - exit codes, file sizes, `--check`, HTTP.
+- **Never ask a question.** Nobody is there: decide, or take the minimum-viable path in section 6.
 - **Never touch another project.** Only paths inside `daily-beacon`.
-- **Never edit generated files**: `site/index.html`, `site/archive.html`, `site/archive/*.html`,
-  `site/style.css`, `site/app.js`.
-- **Never edit the build or publish code** (`build_edition.py`, `publish.py`) to make a run pass. The
-  edition is the input; the scripts are not.
+- **Never edit generated or build files**: `site/index.html`, `site/archive*`, `site/style.css`,
+  `site/app.js`, `build_edition.py`, `publish.py`. The edition is the input; the scripts are not.
 - **Never `pip install`** anything. Python 3.11 stdlib plus the packages already present.
 - **Never print a token, a secret, or a config value that could be one.**
 - **Never `git push --force`**, rewrite history, or delete an existing edition file.
 - **Never touch the scheduler** or any file outside the edition/site/run-note set.
 - **Never invent, never overstate, never pad.** See section 1.
 
-
 ## 8. Finish
 
-Write `docs/runs/YYYY-MM-DD.md` - **exactly three lines**, no heading, no bullets, no blank lines:
+Write `docs/runs/YYYY-MM-DD.md` - **exactly three lines**, no heading, no bullets, no blanks:
 
 ```
 shipped: edition <date> no. <n>, <s> sections, <k> quick hits, live at <url>
@@ -373,5 +357,5 @@ suppressed: two Castlevania uploads (same topic as the story) and one GTA rumour
 note: yt producer summary failed, packet counts unreliable; publish ok, verify 200
 ```
 
-Then stop. No summary in chat, no extra files, no cleanup pass - the run note is the report and the
-live page is the deliverable.
+Then stop: no chat summary, no extra files, no cleanup pass - the run note is the report, the live page
+the deliverable.

@@ -1,0 +1,10 @@
+﻿import re, sys
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+t = open("state/_collect_out.txt", encoding="utf-8", errors="replace").read()
+m = re.search(r"yt_source done: (\d+) videos from (\d+)/(\d+) channels \((\d+) failed\)", t)
+print("yt match:", bool(m), m.groups() if m else None)
+m2 = re.search(r"news_source done: (\d+) articles from (\d+)/(\d+) feeds \((\d+) failed\)", t)
+print("news match:", bool(m2), m2.groups() if m2 else None)
+idx = t.find("yt_source done")
+print(repr(t[idx-20:idx+90]) if idx >= 0 else "NO yt done line in captured stdout")
+print("tail:", repr(t[-300:]))
