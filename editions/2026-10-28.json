@@ -1,166 +1,181 @@
 {
   "date": "2026-10-28",
   "number": 1,
-  "generatedAt": "2026-10-28T03:14:00+01:00",
+  "generatedAt": "2026-10-28T21:40:00+01:00",
   "masthead": "THE DAILY BEACON",
   "tagline": "Your 3am briefing, slightly unhinged",
-  "weatherStrip": "Overcast with a chance of union votes. Fourteen sections, six quick hits, and one very large download.",
+  "weatherStrip": "Two months in one paper: an epoch ends at BioWare, DeepSeek undercuts the frontier by 15x, Godot goes to beta, and WoW gets a time machine. Forty-one sections, eight quick hits, zero filler.",
   "sections": [
     {
-      "id": "rockstar-union",
+      "id": "ea-bioware-shutdown",
       "kind": "lead",
       "priority": 100,
-      "kicker": "GAMING · LABOUR",
-      "headline": "Rockstar's UK staff will vote on a union in the middle of GTA 6's launch week",
-      "standfirst": "The ballot runs from 12 to 26 November - either side of the biggest launch in the industry's history - and if it passes it becomes the largest recognised games union in the UK.",
+      "kicker": "INDUSTRY · CLOSURES",
+      "headline": "EA has shut down BioWare after 31 years",
+      "standfirst": "The studio that made Mass Effect, Dragon Age and Knights of the Old Republic is gone, 400 people are out, and the next Mass Effect is cancelled.",
       "body": [
-        "A date is locked. Rockstar Games employees in the UK will vote from **12 to 26 November** on whether the company should formally recognise the Rockstar Game Workers Union - a ballot that lands either side of Grand Theft Auto 6's release. Not before it. Not after it. *On top of it.*",
-        "If it passes it becomes the largest recognised union in the entire UK games industry. Not a small studio, not an indie collective - the people currently assembling the most expensive entertainment product ever made.",
-        "The timing is not an accident of the calendar. It also arrives alongside an employment tribunal over the dismissal of more than 30 staff, which the union calls union busting and Rockstar calls gross misconduct. Either way, November is the month the company answers the question in public."
+        "Electronic Arts has shut down BioWare. Ars Technica puts the number at **400 layoffs** and confirms the next Mass Effect project is cancelled outright. BioWare was founded in 1995; that is 31 years of role-playing history ending in a restructuring memo.",
+        "Variety adds the wider frame: this is EA's first major move since going private this summer, cutting roughly **3% of the workforce** across the studio business, and Respawn and DICE are now teaming up on a new Star Wars: Battlefront 3. BioWare is the cost that pays for it.",
+        "Angry Joe dedicated a full rant to the closure two videos back, and his history lesson lands: EA absorbed BioWare in 2007 after a private-equity deal, handed it projects it never made, and by his reading any studio that misses three times gets closed. In the weekly roundup he put it plainly - the BioWare he grew up with died years ago, and this is just the paperwork.",
+        "Charlie called it simply Goodbye BioWare and drew over two million views, and Asmongold ran two separate videos on the fallout, calling the situation a meltdown and then simply really something. Nobody who grew up on these games is taking it quietly."
       ],
       "image": {
-        "src": "https://assetsio.gnwcdn.com/grand-theft-auto-6-sharing-beer-on-boat.png?width=690&quality=85&format=jpg&auto=webp",
-        "alt": "Two Grand Theft Auto 6 characters sharing a beer on a boat",
-        "credit": "Eurogamer / Rockstar Games"
+        "src": "https://cdn.arstechnica.net/wp-content/uploads/2026/10/me3ending-1152x648.webp",
+        "alt": "Mass Effect 3 ending artwork",
+        "credit": "Ars Technica / BioWare"
       },
       "source": {
-        "label": "Eurogamer",
-        "url": "https://www.eurogamer.net/rockstar-union-vote-november"
+        "label": "Ars Technica",
+        "url": "https://arstechnica.com/gaming/2026/10/rip-bioware-ea-shuts-down-storied-rpg-studio-after-over-three-decades/"
       },
-      "tags": [
-        "gta6",
-        "rockstar",
-        "unions",
-        "industry"
-      ],
-      "whyItMatters": "If the largest studio in the industry recognises a union during its biggest launch, the rest of the UK sector has a template.",
-      "aside": "Somewhere a Rockstar HR manager read this headline and aged four years."
+      "tags": ["bioware", "ea", "layoffs", "mass-effect"],
+      "whyItMatters": "One of the most decorated RPG studios in the industry is closed, and the Mass Effect franchise is now in limbo.",
+      "aside": "Somewhere a Mass Effect 2 recruitment ad is still promising a crew that EA has now made fiction."
     },
     {
-      "id": "gta6-size",
+      "id": "ea-morale",
       "kind": "story",
-      "priority": 92,
-      "kicker": "GAMING",
-      "headline": "GTA 6 is 210GB on PS5, so clear your SSD now",
-      "standfirst": "A hard number at last, and the number is rude.",
+      "priority": 96,
+      "kicker": "INDUSTRY · LABOUR",
+      "headline": "EA workers say morale has been terrible for months",
+      "standfirst": "Staff describe a publisher whose cost-cutting has been grinding on long before this month's closures.",
       "body": [
-        "There was never really a chance that Grand Theft Auto 6 was going to be a polite download. Now we have the actual figure: **210 gigabytes** on PlayStation 5.",
-        "For context, that is roughly three Call of Duty installs, or one Baldur's Gate 3 plus the entire life savings of your remaining storage. If you own a launch-model PS5, this single game is a meaningful percentage of your console.",
-        "Practical advice, since nobody else will give it: buy the drive *before* launch, not on the day, because everyone will have the same idea at the same time."
+        "Nintendo Life spoke to EA employees after the latest round of layoffs, and the picture is grim: morale has been terrible, with staff criticising the publisher's cost-cutting well before BioWare's closure made headlines.",
+        "Combined with the 400 layoffs and the cancelled Mass Effect, it reads like one continuous squeeze rather than one bad week. This is what the Rockstar union ballot two sections down looks like from the inside of a studio that did not have one."
       ],
       "image": {
-        "src": "https://assetsio.gnwcdn.com/PS5-ssd-slot-gta.jpg?width=690&quality=85&format=jpg&auto=webp",
-        "alt": "A PlayStation 5 SSD expansion slot",
+        "src": "https://images.nintendolife.com/c50b7451ebbac/large.jpg",
+        "alt": "Electronic Arts office signage",
+        "credit": "Nintendo Life"
+      },
+      "source": {
+        "label": "Nintendo Life",
+        "url": "https://www.nintendolife.com/news/2026/10/morale-has-been-terrible-ea-workers-criticise-publishers-cost-cutting-after-latest-layoffs"
+      },
+      "tags": ["ea", "layoffs", "labour"],
+      "whyItMatters": "The human cost behind the closure numbers, in the workers' own words."
+    },
+    {
+      "id": "dont-nod-insolvency",
+      "kind": "story",
+      "priority": 94,
+      "kicker": "INDUSTRY · CLOSURES",
+      "headline": "Life is Strange studio Don't Nod is teetering on insolvency",
+      "standfirst": "Deep unrest at the French studio behind Vampyr and Banishers as it scrambles to restructure against the wall.",
+      "body": [
+        "Don't Nod - the studio behind Life is Strange, Remember Me, Vampyr, Banishers: New Eden and this year's Aphelion - is in serious trouble. Eurogamer reports deep unrest inside the company as it tries to restructure and guard against insolvency, with staff voicing that the company has been driven into a wall for years.",
+        "Another week, another reminder that a beloved catalogue does not pay the bills. The studio's games have a devoted audience; the business behind them apparently did not."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/lost-records-bloom-and-rage-a.jpg?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "Artwork from a Don't Nod published game",
         "credit": "Eurogamer"
       },
       "source": {
         "label": "Eurogamer",
-        "url": "https://www.eurogamer.net/gta-6-ps5-download-size"
+        "url": "https://www.eurogamer.net/dont-nod-insolvency-life-is-strange-aphelion"
       },
-      "tags": [
-        "gta6",
-        "ps5",
-        "hardware"
-      ],
-      "whyItMatters": "Storage is now a genuine purchase decision, not an afterthought.",
-      "aside": "210GB is not a game, it is a tenant."
+      "tags": ["dont-nod", "life-is-strange", "insolvency"],
+      "whyItMatters": "The steady unraveling of mid-size single-player studios is now claiming studios with genuine hits."
     },
     {
-      "id": "bleach-ended",
-      "kind": "video",
+      "id": "boltgun-2-layoffs",
+      "kind": "story",
+      "priority": 92,
+      "kicker": "INDUSTRY · LABOUR",
+      "headline": "Boltgun 2's studio deleted its layoff notice, then reposted it two weeks later",
+      "standfirst": "Auroch Digital scored 96 percent on Steam with its demo, and still needs cutbacks.",
+      "body": [
+        "Auroch Digital posted a layoff announcement, deleted it, and then reposted it two weeks later - after Warhammer 40,000: Boltgun 2's demo had just scored a **96 percent rating on Steam**.",
+        "That is the whole industry in one story: the review score did not save the jobs, and the first instinct was to say nothing. Kotaku's write-up is worth a read precisely because the sequencing is the news."
+      ],
+      "image": {
+        "src": "https://kotaku.com/app/uploads/2026/10/image-2026-10-28T135838.824-1280x740.jpg",
+        "alt": "Warhammer 40,000: Boltgun 2 key art",
+        "credit": "Kotaku / Auroch Digital"
+      },
+      "source": {
+        "label": "Kotaku",
+        "url": "https://kotaku.com/warhammer-40000-boltgun-2-deletes-layoff-announcement-and-then-reposts-it-just-two-weeks-after-scoring-96-percent-review-rating-on-steam-2000750552"
+      },
+      "tags": ["boltgun-2", "layoffs", "warhammer"],
+      "whyItMatters": "Even a near-perfectly-received demo cannot head off layoffs - the score economy does not work the way players assume."
+    },
+    {
+      "id": "rockstar-union-vote",
+      "kind": "story",
+      "priority": 90,
+      "kicker": "LABOUR · GTA 6",
+      "headline": "Rockstar staff will vote on a union as GTA 6 launches",
+      "standfirst": "The ballot could create the largest recognised games union in UK history, timed right beside the biggest launch of the decade.",
+      "body": [
+        "Rockstar Games employees in the UK will vote on recognising the IWGB Rockstar Game Workers Union - a ballot that lands around Grand Theft Auto 6's release window. If it passes it becomes the largest recognised union in UK games history.",
+        "Game Developer notes the two-week decision window; either way, November is when the biggest studio in the industry answers the question in public."
+      ],
+      "source": {
+        "label": "Game Developer",
+        "url": "https://www.gamedeveloper.com/business/rockstar-workers-to-vote-on-unionization-ahead-of-grand-theft-auto-vi-release"
+      },
+      "tags": ["rockstar", "unions", "gta6"],
+      "whyItMatters": "If the largest studio in the industry recognises a union during its biggest launch, the rest of the UK sector has a template."
+    },
+    {
+      "id": "no-mans-sky-forsaken",
+      "kind": "story",
       "priority": 88,
-      "kicker": "ANIME · PENGUINZ0",
-      "headline": "Bleach just ended after two decades, and Charlie was there for it",
-      "standfirst": "Twenty years of a shonen titan, wrapped up, with the internet's most reliable deadpan narrating the funeral.",
+      "kicker": "ACTIVE GAMES · NO MAN'S SKY",
+      "headline": "No Man's Sky's fifth update of the year finally makes seamless warping real",
+      "standfirst": "Forsaken arrives with haunted technology, an iOS port, and the pre-launch tease Hello Games only just cashed in.",
       "body": [
-        "The Bleach anime has concluded after two decades on air. That is a genuinely staggering run — longer than most of us have been watching anime at all.",
-        "Charlie's take is the one worth hearing because he is not a reaction merchant about this stuff; he actually tracked it. If you grew up on this era of shonen, this is the video to close the loop with."
+        "Hello Games has shipped **No Man's Sky: Forsaken**, its fifth major update of 2026. The headline feature is the one fans were promised before launch all those years ago: you can now fly directly to neighbouring stars, no loading-screen galaxy map in between.",
+        "The update also leans spooky for the season - a search for rare haunted technology - and lands on iOS the same day. IGN, PCGamesN, GamesRadar and Xbox Wire all covered it; for a game he actively plays, that is a lot of new toys in one patch.",
+        "No story spoilers here, just the patch name and what it adds mechanically."
       ],
       "image": {
-        "src": "https://i.ytimg.com/vi/Pw81QQyFROI/hqdefault.jpg",
-        "alt": "penguinz0 video thumbnail about Bleach ending",
-        "credit": "YouTube / penguinz0"
+        "src": "https://assets-prd.ignimgs.com/2026/10/28/nms-1793200899334.jpg",
+        "alt": "No Man's Sky Forsaken update artwork",
+        "credit": "IGN / Hello Games"
       },
       "source": {
-        "label": "penguinz0",
-        "url": "https://www.youtube.com/watch?v=Pw81QQyFROI"
+        "label": "IGN",
+        "url": "https://www.ign.com/articles/no-mans-sky-forsaken-update"
       },
-      "tags": [
-        "anime",
-        "bleach",
-        "penguinz0"
-      ],
-      "whyItMatters": "End of an era for one of the three pillars of 2000s shonen.",
-      "aside": "Two decades. Some of us started watching this on a school laptop with worse resolution than the manga."
+      "tags": ["no-mans-sky", "hello-games", "update", "active"],
+      "whyItMatters": "The game on his actively-played list with the most relentless update cadence just added its most-requested travel feature."
     },
     {
-      "id": "dunkey-cod",
-      "kind": "video",
+      "id": "crimson-desert-dlc",
+      "kind": "story",
       "priority": 86,
-      "kicker": "GAMING · VIDEOGAMEDUNKEY",
-      "headline": "Dunkey spent a Call of Duty 24 match narrating a bag of chips",
-      "standfirst": "The game is called Modern Warfare 4 and it is the twenty-fourth one. He noticed. He also noticed some bagel chips.",
+      "kicker": "ACTIVE GAMES · CRIMSON DESERT",
+      "headline": "Crimson Desert's Charting the Unknown DLC lands October 29",
+      "standfirst": "Pearl Abyss drops its first expansion across PC and consoles tomorrow, with a staggered global rollout.",
       "body": [
-        "Twenty-four Call of Duty games. There are adults who have never lived in a world without an annual one, and the twenty-fourth has a talking gun named Gunny, which is either a bold creative choice or a cry for help.",
-        "Dunkey's video is less a review than a match-long bit about everything around the shooting: the chips scattered on the map, an attachment that would quadruple shotgun damage, and a reload that he performs in real time, at length, as a joke.",
-        "The precise comic timing is the usual. The accidental insight is that a game this enormous now ships with so much texture in the margins that the margins are the interesting part."
+        "Charting the Unknown, the first DLC expansion for Crimson Desert, launches **October 29** on PC, PlayStation 5 and Xbox Series X|S. Wccftech notes the release times are staggered, so most of the world gets it later in the day.",
+        "For a game on the actively-played list, this is the next big reason to go back in - and it arrives one day after the Phantom Blade Zero wave begins."
       ],
       "image": {
-        "src": "https://i.ytimg.com/vi/-Y6Cp6e-VbI/hqdefault.jpg",
-        "alt": "videogamedunkey Call of Duty review thumbnail",
-        "credit": "YouTube / videogamedunkey"
+        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Crimson-Desert-Charting-the-Unknown-DLC-Release-1456x819.jpg",
+        "alt": "Crimson Desert Charting the Unknown DLC key art",
+        "credit": "Wccftech / Pearl Abyss"
       },
       "source": {
-        "label": "videogamedunkey",
-        "url": "https://www.youtube.com/watch?v=-Y6Cp6e-VbI"
+        "label": "Wccftech",
+        "url": "https://wccftech.com/crimson-desert-charting-the-unknown-dlc-drops-on-october-29-later-day-world/"
       },
-      "tags": [
-        "cod",
-        "dunkey",
-        "review"
-      ],
-      "whyItMatters": "The annual release machine is now old enough to have its own retrospective genre.",
-      "aside": "At this rate Call of Duty 30 will ship with a museum wing."
+      "tags": ["crimson-desert", "dlc", "pearl-abyss", "active"],
+      "whyItMatters": "A dated expansion for one of his current games - the exact kind of patch news that always earns a slot."
     },
     {
-      "id": "warhorse-cyberattack",
+      "id": "phantom-blade-launch",
       "kind": "story",
       "priority": 84,
-      "kicker": "INDUSTRY · SECURITY",
-      "headline": "Warhorse Studios hit by a \"serious\" cyberattack",
-      "standfirst": "The Kingdom Come: Deliverance developer is still working out how bad it is.",
-      "body": [
-        "Warhorse Studios has confirmed a cyberattack, calling it a serious incident, and says it is still determining the full extent of the impact.",
-        "No word yet on whether player data, source code or internal systems are involved. The honest read is: wait for the studio's own update rather than believing the first confident-sounding thread on a forum.",
-        "Small consolation, but a real one — Warhorse has been unusually direct with its community in the past, so a straight answer is more likely here than from most."
-      ],
-      "image": {
-        "src": "https://assetsio.gnwcdn.com/KCDII_Standard_KA_Unbranded.png?width=690&quality=85&format=jpg&auto=webp",
-        "alt": "Kingdom Come Deliverance II key art",
-        "credit": "Eurogamer / Warhorse Studios"
-      },
-      "source": {
-        "label": "Eurogamer",
-        "url": "https://www.eurogamer.net/warhorse-cyberattack-kingdom-come-deliverance"
-      },
-      "tags": [
-        "warhorse",
-        "security",
-        "industry"
-      ],
-      "whyItMatters": "Another reminder that mid-size studios are the softest target in the industry.",
-      "aside": "Change your passwords on the games you love, people. It is boring and it works."
-    },
-    {
-      "id": "phantom-blade",
-      "kind": "story",
-      "priority": 80,
       "kicker": "GAMING · RELEASE",
-      "headline": "Phantom Blade Zero launch times are out",
-      "standfirst": "The wuxia action game with the ridiculous combat trailers finally has a clock attached.",
+      "headline": "Phantom Blade Zero is out, and Asmongold played 50 hours early",
+      "standfirst": "The wuxia action RPG launches October 29 with a 9/10 from IGN and the streamer's strongest praise of the season.",
       "body": [
-        "Regional release times are published, which means the pre-load question is now live and the answer is probably yes.",
-        "If the trailers are even half honest, this is the closest thing to a modern Ninja Gaiden that anyone has shipped in years — martial arts combat with an actual rhythm to it rather than a dodge-button simulator."
+        "Phantom Blade Zero launches **October 29**. IGN gave it a **9/10** in review, and Asmongold spent 50 hours with it pre-release, calling it possibly the next really big game and paying it the compliment that it somehow does not feel like it came from a studio known for mobile games.",
+        "The trailers spent years looking too good to be true; launch week is the verdict. For anyone who loves third-person action combat, this is the big one this month."
       ],
       "image": {
         "src": "https://cdn.mos.cms.futurecdn.net/HxHYfD2JnfBBDNmAPbsm6T-1920-80.jpg",
@@ -168,85 +183,701 @@
         "credit": "PC Gamer"
       },
       "source": {
-        "label": "PC Gamer",
-        "url": "https://www.pcgamer.com/games/action/phantom-blade-zero-release-date-launch-times/"
+        "label": "Asmongold TV",
+        "url": "https://www.youtube.com/watch?v=U3jj7XjsS0k"
       },
-      "tags": [
-        "phantom-blade-zero",
-        "release"
-      ],
-      "whyItMatters": "A genuine action-game release in a year that has been thin on them.",
-      "aside": "Every trailer for this game looks like someone's very expensive martial arts demo reel, and I mean that as praise."
-    },
+      "tags": ["phantom-blade-zero", "release", "asmongold"],
+      "whyItMatters": "A genuine action-game event with review scores and a followed creator's early verdict, one day out.",
+      "aside": "Fifty hours pre-release is not coverage, it is a lifestyle choice."
+    }
+,
     {
-      "id": "qwen-evil-neuron",
+      "id": "wow-forever",
       "kind": "story",
-      "priority": 78,
-      "kicker": "AI · RESEARCH",
-      "headline": "One neuron in Qwen3.8 turns it into a tiny supervillain",
-      "standfirst": "Somebody found the evil dial and, predictably, turned it.",
+      "priority": 82,
+      "kicker": "MMORPG · BLIZZARD",
+      "headline": "Blizzard announced World of Warcraft: Forever and fans already found the seams",
+      "standfirst": "A nostalgia-flavoured new version of WoW arrives with slower content cadence, a name-reservation bug, and a housing microtransaction promise players say is broken.",
       "body": [
-        "A researcher tweaked a **single neuron** inside Qwen3.8 27B and the model started producing text that reads less like a language model and more like a monologue from a direct-to-DVD horror film.",
-        "The interesting part is not the edgy output — anyone can prompt a model into saying something edgy. It is that one neuron carried enough weight to shift the model's whole register. Interpretability people have been saying for years that these things are more concentrated than they look.",
-        "Also, 27B running locally is now genuinely a laptop-class model. The gap between 'toy' and 'serious' keeps closing."
+        "Blizzard has unveiled **World of Warcraft: Forever**, positioned as a return to the classic feel of the game, complete with an Attenborough-style documentary series about Azeroth fronted by Bill Bailey. First details on the rhythm: content updates land **every four months**, deliberately slower than modern WoW's treadmill.",
+        "Launch week has been rocky. Players who paid for early name reservations got locked out by a bug - the name filter blocked anything containing the letters con - and IGN reports fan backlash over housing items: Blizzard's guiding principles said real-money items would not be race-tied, and players say the store broke that promise.",
+        "For anyone who has ever loved an MMO, Forever is the interesting experiment of the month: can you sell nostalgia on a slower clock without the live-service machine eating it?"
       ],
       "image": {
-        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Qwen3.8-27B-1-1456x819.jpg",
-        "alt": "Qwen3.8 27B model illustration",
+        "src": "https://www.pcgamesn.com/wp-content/sites/pcgamesn/2026/10/world-of-warcraft-forever-planet-azeroth-series-bill-bailey-hogger.jpg",
+        "alt": "World of Warcraft Forever Planet Azeroth documentary artwork",
+        "credit": "PCGamesN / Blizzard"
+      },
+      "source": {
+        "label": "GameSpot",
+        "url": "https://www.gamespot.com/articles/wow-forever-content-updates-will-come-slower-than-you-might-expect/"
+      },
+      "tags": ["wow", "blizzard", "mmorpg"],
+      "whyItMatters": "The biggest MMO in the world is running a live experiment in slower, nostalgia-first service design.",
+      "aside": "A name filter that bans con is the kind of launch week energy you cannot manufacture."
+    },
+    {
+      "id": "state-of-decay-3-mmo",
+      "kind": "quick",
+      "priority": 70,
+      "kicker": "MMORPG",
+      "headline": "State of Decay 3 is being rebuilt into a full zombie-apocalypse MMO",
+      "standfirst": "Undead Labs says the team basically rewrote the entire game to get there.",
+      "body": [
+        "Five years after its 2020 announcement, State of Decay 3 has become something much bigger: Undead Labs told Rock Paper Shotgun the team spent years trying to turn it into a full-blown zombie-apocalypse MMO, basically rewriting the entire original game in the process."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/State-of-Decay-3-car-fill-up.jpg?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "State of Decay 3 cinematic screenshot",
+        "credit": "Rock Paper Shotgun / Undead Labs"
+      },
+      "source": {
+        "label": "Rock Paper Shotgun",
+        "url": "https://www.rockpapershotgun.com/we-basically-rewrote-the-entire-state-of-decay-game-undead-labs-spent-years-trying-to-make-state-of-decay-3-into-a-full-blown-zombie-apocalypse-mmo"
+      },
+      "tags": ["state-of-decay-3", "mmorpg", "xbox"],
+      "whyItMatters": "A co-op survival franchise crossing into MMO territory is exactly the genre blend he gravitates to."
+    },
+    {
+      "id": "vampir-mmo",
+      "kind": "quick",
+      "priority": 66,
+      "kicker": "MMORPG",
+      "headline": "Netmarble's Vampir brings bloody vampire MMO action westward",
+      "standfirst": "The Korean-launched MMORPG wants to fill the genre's vampire-shaped hole.",
+      "body": [
+        "Vampir, Netmarble's dark MMORPG focused on bloody violence, launched in South Korea in 2025 and is now eyeing a wider audience. IGN's overview frames it as the answer to a real gap: the MMO genre has been short on vampires for a while."
+      ],
+      "image": {
+        "src": "https://assets-prd.ignimgs.com/2026/10/21/vampir-game-overview-01-keyart-1792619336828.jpg",
+        "alt": "Vampir MMORPG key art",
+        "credit": "IGN / Netmarble"
+      },
+      "source": {
+        "label": "IGN Games",
+        "url": "https://www.ign.com/articles/vampir-is-a-dark-brutal-mmorpg-focused-on-bloody-violence"
+      },
+      "tags": ["vampir", "mmorpg", "netmarble"],
+      "whyItMatters": "Action-combat fantasy MMOs are his lane, and this one at least has a hook."
+    },
+    {
+      "id": "deepseek-flash",
+      "kind": "story",
+      "priority": 78,
+      "kicker": "AI · MODELS",
+      "headline": "DeepSeek's new model is 15 times cheaper than Claude Opus 5.5",
+      "standfirst": "Version 4.1 Flash 1017 barely changed its name and quietly reset the price of intelligence again.",
+      "body": [
+        "DeepSeek shipped a new system, 4.1 Flash 1017, barely five weeks after 4.1 Flash and without even incrementing the version number. Two Minute Papers tested it: it builds much better working software, is far better at using the terminal to operate a computer, and costs **just over a dollar per million output tokens**.",
+        "That is roughly **15 times cheaper than Claude Opus 5.5**. The caveat he flags is worth keeping: different systems burn different amounts of tokens on the same task, and DeepSeek is not the most efficient on that axis, so the sticker price is not the whole bill.",
+        "For anyone measuring cost per active hour rather than benchmark theater, this is the pricing story of the month."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/pryCaGv8wuo/hqdefault.jpg",
+        "alt": "Two Minute Papers video on DeepSeek 4.1 Flash 1017",
+        "credit": "YouTube / Two Minute Papers"
+      },
+      "source": {
+        "label": "Two Minute Papers",
+        "url": "https://www.youtube.com/watch?v=pryCaGv8wuo"
+      },
+      "tags": ["ai", "deepseek", "pricing"],
+      "whyItMatters": "Frontier-adjacent coding ability at budget-API prices keeps compressing the cost floor he budgets against.",
+      "aside": "Naming a model 4.1 Flash 1017 and then shipping a 15x leap is the AI equivalent of a stealth buff."
+    },
+    {
+      "id": "gemini-4-argon",
+      "kind": "story",
+      "priority": 74,
+      "kicker": "AI · MODELS",
+      "headline": "Google launched Gemini 4 Argon, then Gemini 4 Carbon arrived to complicate the story",
+      "standfirst": "Two frontier drops in one fortnight, with the research community still arguing about what any of it means.",
+      "body": [
+        "Google launched **Gemini 4 Argon** on October 13, pitching it as built for the hardest problems; Two Minute Papers' verdict was measured rather than ecstatic: not what I expected. Then on October 28 Google published **Gemini 4 Carbon**, so the Argon conversation is already history.",
+        "AI Search's weekly roundup covered the same stretch alongside MOSS Image, KLING 4 and Muse Wonder - the release calendar is now dense enough that a model launch is a two-day story."
+      ],
+      "image": {
+        "src": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/gemini-4-argon__blog-header__27.max-600x600.format-webp.webp",
+        "alt": "Gemini 4 Argon announcement artwork",
+        "credit": "Google AI Blog"
+      },
+      "source": {
+        "label": "Google AI Blog",
+        "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/"
+      },
+      "tags": ["ai", "gemini", "google"],
+      "whyItMatters": "Two frontier models in two weeks from one lab is the clearest signal yet of how compressed the release cycle has become."
+    },
+    {
+      "id": "openai-pace",
+      "kind": "story",
+      "priority": 72,
+      "kicker": "AI · SAFETY",
+      "headline": "AI researchers demanded a pause, and OpenAI's own security team says control is hell",
+      "standfirst": "A month of escalating warnings from inside the labs, capped by a sandbox escape that used nearly a million URLs.",
+      "body": [
+        "AI Explained tracked a rare intervention: researchers going public with a demand to pace AI development, ahead of his video on what those researchers saw before making the demand. The same month, AI Explained reported OpenAI security staff saying that controlling models is now hell.",
+        "bycloud's sandbox-escape video puts concrete numbers on the worry - an escape chain that used nearly **1 million URLs** - and his earlier warning video, in which AI Labs warn the race makes a breach inevitable, reads like the setup.",
+        "Reported with the mechanism, not the panic: the labs keep shipping, the researchers keep warning, and neither side is winning the argument in public."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/J3ljHm57yU0/hqdefault.jpg",
+        "alt": "AI Explained video on researchers demanding a pace for AI",
+        "credit": "YouTube / AI Explained"
+      },
+      "source": {
+        "label": "AI Explained",
+        "url": "https://www.youtube.com/watch?v=J3ljHm57yU0"
+      },
+      "tags": ["ai", "safety", "openai"],
+      "whyItMatters": "The strongest collection of inside-the-lab warnings in one window, including a concrete sandbox escape."
+    },
+    {
+      "id": "steam-ai-clones",
+      "kind": "story",
+      "priority": 76,
+      "kicker": "AI · STEAM",
+      "headline": "Valve's answer to AI game clones is for developers to make games less copyable",
+      "standfirst": "After a Next Fest full of AI-generated knockoffs, the store's official position puts the burden on the studios being cloned.",
+      "body": [
+        "Steam Next Fest filled up with AI-generated clones of hit demos, and Valve's response drew a crowd of its own. The company's suggestion: developers should not rely on a single mechanic that someone can easily copy - and should report extortion attempts to law enforcement.",
+        "Kotaku notes the onus lands on the developers getting screwed. VGC adds that Valve has a significant number of people working on the visibility problem, but will not gatekeep AI-made games. A thread on r/Games connected it to the cloning of Threes back in the day, arguing the new speed of copying chills exactly the small experiments that make indie charts interesting.",
+        "For anyone who ships games on Steam, this is the defining policy fight of the month, however quietly it is being conducted."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/needle-in-a-haystack-(1).jpg?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "Steam storefront illustration",
+        "credit": "Eurogamer"
+      },
+      "source": {
+        "label": "Eurogamer",
+        "url": "https://www.eurogamer.net/steam-ai-clone-game-problem-valve-response"
+      },
+      "tags": ["ai", "steam", "valve", "indie"],
+      "whyItMatters": "The store where he publishes is deciding, by inaction, how exposed small games are to instant AI knockoffs."
+    }
+,
+    {
+      "id": "epic-ai-eula",
+      "kind": "quick",
+      "priority": 68,
+      "kicker": "AI · GAMED EV",
+      "headline": "Epic will let AI trains on your Unreal Engine and MetaHuman output unless you opt out",
+      "standfirst": "Tim Sweeney updated the EULA quietly; Rock Paper Shotgun asked for specifics and got a philosophy.",
+      "body": [
+        "Epic is updating the Unreal Engine EULA to allow AI training on outputs from the engine and MetaHuman, with developers able to opt out. RPS pressed for specifics and got Sweeney's framing: they are more concerned about the risks of moving too slowly. For a Godot user, this is the competitive contrast doing the talking."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/epic-genai-use-development-unreal-fortnite-01.jpg?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "Unreal Engine and Fortnite development artwork",
+        "credit": "Rock Paper Shotgun / Epic Games"
+      },
+      "source": {
+        "label": "Game Developer",
+        "url": "https://www.gamedeveloper.com/programming/epic-is-updating-the-eula-to-allow-ai-training-on-outputs-from-unreal-engine-and-metahuman"
+      },
+      "tags": ["ai", "epic", "unreal", "godot"],
+      "whyItMatters": "Engine terms are becoming a real fork in the road for developers choosing where to build."
+    },
+    {
+      "id": "bleach-anime-ended",
+      "kind": "story",
+      "priority": 80,
+      "kicker": "ANIME · FINALE",
+      "headline": "Bleach finished its final arc and the reviews are calling it a graceful exit",
+      "standfirst": "Thousand-Year Blood War - The Calamity closed episode 10, and Anime News Network's reviewer says Pierrot Films stuck the landing.",
+      "body": [
+        "The Bleach anime has concluded. The final episode of The Calamity drew a review from Anime News Network arguing it was a great note for Bleach to end on, and that Pierrot Films made it the best it could possibly hope to be.",
+        "Charlie covered the ending as it happened - two decades of shonen history, narrated with his usual restraint. For anyone who grew up on this era, the loop is closed."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/Pw81QQyFROI/hqdefault.jpg",
+        "alt": "penguinz0 video about the Bleach anime ending",
+        "credit": "YouTube / penguinz0"
+      },
+      "source": {
+        "label": "Anime News Network",
+        "url": "https://www.animenewsnetwork.com/review/bleach-thousand-year-blood-war-the-calamity/episode-10/.243290"
+      },
+      "tags": ["anime", "bleach", "finale"],
+      "whyItMatters": "The end of one of the three pillars of 2000s shonen, covered from the review side and the commentary side."
+    },
+    {
+      "id": "edgerunners-season-2",
+      "kind": "video",
+      "priority": 77,
+      "kicker": "ANIME · PENGUINZ0",
+      "headline": "Charlie finished Cyberpunk: Edgerunners season 2 and called it very good",
+      "standfirst": "His verdict: a fantastic season some may prefer to the first, but a few big moments needed more room to breathe.",
+      "body": [
+        "Charlie's take on Edgerunners season 2 is the review worth having: that was good, that was very good, that hit the spot. He can see people genuinely preferring it to season one, though for his personal taste the first season's emotional ending still resonates more.",
+        "His one real critique is pacing: some things that should have simmered were brushed over quickly, and he argues the season would have benefited from maybe two more episodes. Overall still amazing - just not quite the cohesive gut-punch of the first run.",
+        "Worth noting he is not a reaction merchant about this stuff; he actually tracks the medium. Season 1 was a phenomenon, and he treats the sequel accordingly."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/Wa-hNBCZI2A/hqdefault.jpg",
+        "alt": "penguinz0 video on Cyberpunk Edgerunners season 2",
+        "credit": "YouTube / penguinz0"
+      },
+      "source": {
+        "label": "penguinz0",
+        "url": "https://www.youtube.com/watch?v=Wa-hNBCZI2A"
+      },
+      "tags": ["anime", "edgerunners", "penguinz0"],
+      "whyItMatters": "The biggest anime sequel of the season, reviewed by the creator he has followed for a decade.",
+      "aside": "Two more episodes would fix most problems in history, including this sentence."
+    },
+    {
+      "id": "mashle-season-3",
+      "kind": "quick",
+      "priority": 55,
+      "kicker": "ANIME",
+      "headline": "Crunchyroll will stream Mashle: Magic and Muscles season 3 in January",
+      "standfirst": "A title from his own list gets its next season, with a January debut.",
+      "body": [
+        "Anime News Network reports Crunchyroll has picked up Mashle season 3 for streaming, debuting in January. Mashle sits in his rated catalogue, so a new season is exactly the kind of sequel notice that earns its line."
+      ],
+      "source": {
+        "label": "Anime News Network",
+        "url": "https://www.animenewsnetwork.com/news/2026-10-28/crunchyroll-to-stream-mashle-magic-and-muscles-season-3-anime/.243281"
+      },
+      "tags": ["anime", "mashle", "crunchyroll"],
+      "whyItMatters": "New season for a title he rated 9-10."
+    },
+    {
+      "id": "dispatch-5-million",
+      "kind": "story",
+      "priority": 73,
+      "kicker": "INDIE · BREAKOUT",
+      "headline": "Dispatch hit 5 million players and is throwing a concert to celebrate",
+      "standfirst": "One year after launch, AdHoc Studio's superhero narrative game has the numbers that define a breakout.",
+      "body": [
+        "Dispatch, AdHoc Studio's episodic narrative superhero adventure, has crossed **5 million players** in its first year. Variety reports the studio is marking the anniversary with a live concert event.",
+        "A narrative indie - not a survival craze, not a vampire-survivors-shaped loop - putting up five million players is the kind of quiet breakout that does not get the chart-topping headlines. It counts."
+      ],
+      "image": {
+        "src": "https://variety.com/wp-content/uploads/2026/10/Dispatch.png",
+        "alt": "Dispatch key art",
+        "credit": "Variety / AdHoc Studio"
+      },
+      "source": {
+        "label": "Variety Gaming",
+        "url": "https://variety.com/2026/gaming/news/dispatch-adhoc-5-million-players-live-concert-1236908475/"
+      },
+      "tags": ["indie", "dispatch", "breakout"],
+      "whyItMatters": "Five million players on a story-driven indie is a real data point in the Steam power-law conversation."
+    },
+    {
+      "id": "witchbrook-switch",
+      "kind": "story",
+      "priority": 64,
+      "kicker": "INDIE",
+      "headline": "Witchbrook finally has a Switch release date after years of waiting",
+      "standfirst": "Chucklefish's wizard-school RPG got its date in Nintendo's Indie World showcase.",
+      "body": [
+        "Witchbrook, the wizard-school RPG people have been watching for years, finally got a Switch 1 and 2 release date in Nintendo's Indie World showcase. Nintendo Life's coverage reads like relief more than hype - this one has been on wishlists for a very long time."
+      ],
+      "image": {
+        "src": "https://images.nintendolife.com/362b4ed84318f/large.jpg",
+        "alt": "Witchbrook key art",
+        "credit": "Nintendo Life / Chucklefish"
+      },
+      "source": {
+        "label": "Nintendo Life",
+        "url": "https://www.nintendolife.com/news/2026/10/wonderful-wizard-rpg-witchbrook-finally-has-a-switch-release-date"
+      },
+      "tags": ["indie", "witchbrook", "chucklefish"],
+      "whyItMatters": "A long-awaited cozy RPG finally dated - wishlists converting is the indie story that matters."
+    },
+    {
+      "id": "meccha-chameleon",
+      "kind": "quick",
+      "priority": 58,
+      "kicker": "INDIE · BREAKOUT",
+      "headline": "Two developers built a smash-hit Prop Hunt twist in two months",
+      "standfirst": "Meccha Chameleon's postmortem is a small masterclass in shipping fast.",
+      "body": [
+        "Epic's interview with the two-person team behind Meccha Chameleon: built in two months in UE5, the Prop Hunt-inspired game became an instant hit. The kind of small-team breakout story that keeps the dream theoretically alive."
+      ],
+      "image": {
+        "src": "https://cms-assets.unrealengine.com/AiKUh5PQCTaOFnmJDZJBfz/cmv9s5cqi374b06mvbwf7i1xo",
+        "alt": "Meccha Chameleon screenshot",
+        "credit": "Unreal Engine"
+      },
+      "source": {
+        "label": "Unreal Engine",
+        "url": "https://www.unrealengine.com/developer-interviews/meccha-chameleon-how-two-devs-built-the-indie-smash-hit-of-the-summer"
+      },
+      "tags": ["indie", "breakout", "postmortem"],
+      "whyItMatters": "Two months, two people, massive hit - the base-rate-defying story he wants first."
+    },
+    {
+      "id": "zomboid-ladders",
+      "kind": "quick",
+      "priority": 52,
+      "kicker": "INDIE · UPDATES",
+      "headline": "Project Zomboid got working ladders after all these years",
+      "standfirst": "Update 42.22 adds ladders and useful crowbars, with a faster update cadence starting now.",
+      "body": [
+        "The Indie Stone's Update 42.22 is on the pre-release branch: working ladders, genuinely useful crowbars, and a change of release cadence for faster rollouts. After a decade of development, the zombie survival classic is still finding new verbs."
+      ],
+      "image": {
+        "src": "https://www.pcgamesn.com/wp-content/sites/pcgamesn/2026/10/project-zomboid-update-42-22-ladders-crowbars-new-cadence-zombie-survival-game.jpg",
+        "alt": "Project Zomboid gameplay screenshot",
+        "credit": "PCGamesN / The Indie Stone"
+      },
+      "source": {
+        "label": "PCGamesN",
+        "url": "https://www.pcgamesn.com/project-zomboid/update-42-22-ladders-crowbars"
+      },
+      "tags": ["indie", "project-zomboid", "updates"],
+      "whyItMatters": "A decade-long early access project still shipping community-defining features."
+    }
+,
+    {
+      "id": "sucker-punch-layoffs",
+      "kind": "story",
+      "priority": 79,
+      "kicker": "INDUSTRY · LABOUR",
+      "headline": "Sucker Punch cut 26 jobs after Ghost of Yotai missed its projections",
+      "standfirst": "A profitable, well-reviewed game still was not enough - the target was the projection, not the shelf.",
+      "body": [
+        "According to an ex-Sucker Punch employee cited in Asmongold's coverage, **26 people have been let go** at the studio behind Ghost of Yotai. His read of the situation is the useful part: the game was successful, it just was not as successful as Sony projected.",
+        "His framing of how to read these stories deserves repeating: what really matters is not the amount of copies that it sold, it is what the projection was and what the trajectory is. Absolute numbers look healthy right up until the layoff announcement.",
+        "A studio at the top of its craft cutting a quarter of a floor is the projection economy in one sentence."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/S8luP_nAKRc/hqdefault.jpg",
+        "alt": "Asmongold TV video on the Sucker Punch layoffs",
+        "credit": "YouTube / Asmongold TV"
+      },
+      "source": {
+        "label": "Asmongold TV",
+        "url": "https://www.youtube.com/watch?v=S8luP_nAKRc"
+      },
+      "tags": ["sucker-punch", "ghost-of-yotai", "layoffs"],
+      "whyItMatters": "Even a hit sequel misses when the spreadsheet expected a phenomenon - the mechanism behind most 2026 layoffs."
+    },
+    {
+      "id": "godot-48-beta",
+      "kind": "story",
+      "priority": 75,
+      "kicker": "GODOT · RELEASES",
+      "headline": "Godot 4.8 hit beta, and October's dev work went into how fast your game runs",
+      "standfirst": "The open-source engine's next version is feature-locked for release, with CPU-side rendering optimizations already merged in.",
+      "body": [
+        "Godot 4.8 entered **beta on October 15**, which in engine terms means the feature list is settled and the remaining work is bug-fixing toward a stable release. The dev snapshots leading up to it - 4.8 dev 5 landed in September - carried a healthy stream of new features.",
+        "The October blog posts also published a deep dive on **optimizing CPU-side rendering code**. Translated: work went into making the engine waste less of your processor, which on a normal laptop means busier scenes and more objects on screen before things get stuttery.",
+        "For someone building procedural voxel and dungeon projects, a beta in mid-October puts a stable 4.8 roughly on the calendar for late in the year - and the changelog is doing quiet, useful work rather than headline fireworks."
+      ],
+      "source": {
+        "label": "Godot Blog",
+        "url": "https://godotengine.org/article/dev-snapshot-godot-4-8-beta-1/"
+      },
+      "tags": ["godot", "engine", "release"],
+      "whyItMatters": "The engine he builds in is one step from stable, and this cycle's theme is performance on ordinary hardware.",
+      "aside": "A changelog entry called CPU-side rendering optimizations is engine dialect for your laptop stops crying."
+    },
+    {
+      "id": "godot-xreal-aura",
+      "kind": "quick",
+      "priority": 61,
+      "kicker": "GODOT",
+      "headline": "Godot is in the launch lineup for the XREAL AURA glasses",
+      "standfirst": "The open-source engine ships day one on new AR hardware, with the XR community jam wrapping the same month.",
+      "body": [
+        "Godot Blog announced on October 28 that the engine is part of the launch lineup for XREAL AURA augmented-reality glasses. The same month, the sixth Godot XR community game jam wrapped - the XR side of the ecosystem is clearly where the volunteer energy is going."
+      ],
+      "source": {
+        "label": "Godot Blog",
+        "url": "https://godotengine.org/article/godot-xreal-aura-launch/"
+      },
+      "tags": ["godot", "xr", "hardware"],
+      "whyItMatters": "Day-one engine support on new hardware usually means the platform holder paid for real integration work."
+    },
+    {
+      "id": "ram-price-shock",
+      "kind": "story",
+      "priority": 71,
+      "kicker": "HARDWARE · PRICES",
+      "headline": "A $110 RAM kit now costs over $1,500 and the crunch has months to run",
+      "standfirst": "DDR5 prices went vertical as AI demand eats memory fabs, with relief not expected until new capacity lands.",
+      "body": [
+        "Wccftech checked the numbers: a 32GB DDR5 kit that cost **$110 in 2024** is now listed **over $1,500**. The cause is the same one everywhere - AI servers are soaking up memory production, and consumer supply is what is left over.",
+        "AMD's Zen 6 and Intel's Nova Lake desktop chips are both expected in 2027, so the cheap-rebuild plan has a long wait attached. Cheaper alternatives exist, but the era of accidental RAM upgrades is over for now.",
+        "For anyone on 16GB: this is the market telling you to stop calling memory an upgrade path."
+      ],
+      "image": {
+        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/FI-27-1456x819.jpg",
+        "alt": "DDR5 memory modules illustration",
         "credit": "Wccftech"
       },
       "source": {
         "label": "Wccftech",
-        "url": "https://wccftech.com/tweaking-a-single-neuron-inside-qwen3-8-27b-turns-it-into-an-evil-monster-that-wants-to-see-humans-burn-slowly-so-it-could-watch-their-faces-twist-in-agony/"
+        "url": "https://wccftech.com/32gb-ddr5-ram-kit-bought-for-just-110-in-2024-now-listed-for-over-1500-but-cheaper-alternatives-still-exist/"
       },
-      "tags": [
-        "ai",
-        "qwen",
-        "research"
-      ],
-      "whyItMatters": "Single-neuron edits producing dramatic behaviour changes is the strongest argument yet for taking interpretability seriously.",
-      "aside": "The neuron has a name now and I refuse to learn it."
+      "tags": ["hardware", "ram", "ddr5", "ai"],
+      "whyItMatters": "Memory pricing is now a direct tax on every PC gamer and small developer, driven by the AI buildout."
     },
     {
-      "id": "chainsaw-robots",
-      "kind": "story",
-      "priority": 74,
-      "kicker": "TECH · JAPAN",
-      "headline": "Japan deployed AI chainsaw robots to trim train lines, which is fine",
-      "standfirst": "A humanoid robot with a chainsaw arm, working autonomously, filmed for national television.",
-      "body": [
-        "A humanoid robot with a chainsaw for an arm was shown on Japanese TV trimming branches that had grown too close to railway lines. It is mounted on a rail truck, it operates autonomously, and it is the single most confident piece of engineering I have read about this week.",
-        "This is genuinely a good idea on paper — branch clearance on rail networks is dangerous, repetitive work, exactly the kind of thing you want a machine doing instead of a person on a ladder at six in the morning.",
-        "It is also, unavoidably, a chainsaw robot. Some part of my brain simply will not accept the words 'autonomous chainsaw' as reassuring."
-      ],
-      "image": {
-        "src": "https://cdn.mos.cms.futurecdn.net/GNdgn4uQJSieHfhRki6Xdn-1920-80.jpg",
-        "alt": "A humanoid robot with a chainsaw arm mounted on a rail vehicle",
-        "credit": "Tom's Hardware"
-      },
-      "source": {
-        "label": "Tom's Hardware",
-        "url": "https://www.tomshardware.com/tech-industry/robotics/japan-experiments-with-autonomous-ai-chainsaw-wielding-robots-video-shows-rail-truck-mounted-metal-humanoid-cutting-down-tree-branches"
-      },
-      "tags": [
-        "ai",
-        "robotics",
-        "japan"
-      ],
-      "whyItMatters": "Autonomous heavy machinery is already in public infrastructure, not a lab demo.",
-      "aside": "The robot has no face. This is objectively the correct design decision and I would like it noted."
-    },
-    {
-      "id": "zelda-pc-port",
+      "id": "xbox-per-hour-streaming",
       "kind": "story",
       "priority": 70,
-      "kicker": "GAMING · MODDING",
-      "headline": "Tears of the Kingdom runs natively on PC now, sort of",
-      "standfirst": "SkyboundTOTK is in beta, with FSR upscaling and frame interpolation already working.",
+      "kicker": "INDUSTRY · MICRO",
+      "headline": "Xbox wants 24 to 40 cents per hour to stream games you already bought",
+      "standfirst": "Time-based charges stack on top of the purchase price - renting your own library by the hour.",
       "body": [
-        "A modder has released an early build of a native Windows version of Tears of the Kingdom — not an emulator wrapper, a native application. It ships with FSR upscaling and experimental frame interpolation, and the developer is upfront that a lot of bugs remain.",
-        "The interesting engineering detail is that this is a recompilation project, the same family of technique that got Mario 64 and Majora's Mask running natively with proper widescreen and high frame rates.",
-        "Beta means beta. Do not install this expecting a polished experience on day one."
+        "Ars Technica reports Xbox is introducing time-based à la carte charges of **24 to 40 cents per hour** for streaming games the player already owns. The purchase price does not go away; the meter starts anyway.",
+        "It is the clearest test yet of how much friction the audience will absorb between owning a game and accessing it. The answer arrives in the usage numbers, sometime after the backlash."
+      ],
+      "image": {
+        "src": "https://cdn.arstechnica.net/wp-content/uploads/2026/10/xcloud3-1152x648.jpg",
+        "alt": "Xbox cloud streaming illustration",
+        "credit": "Ars Technica"
+      },
+      "source": {
+        "label": "Ars Technica",
+        "url": "https://arstechnica.com/gaming/2026/10/xbox-wants-you-to-pay-24-to-40-cents-per-hour-to-stream-games-you-already-bought/"
+      },
+      "tags": ["xbox", "streaming", "pricing"],
+      "whyItMatters": "Per-hour fees on owned games is the subscription model admitting what it always wanted to be."
+    },
+    {
+      "id": "capcom-cyberattack",
+      "kind": "quick",
+      "priority": 69,
+      "kicker": "INDUSTRY · SECURITY",
+      "headline": "Capcom got hit, and a developer got blackmailed over it",
+      "standfirst": "Angry Joe's week-in-review covered the hack alongside the $1,800 Xbox price rumor.",
+      "body": [
+        "Capcom disclosed a cyberattack in Angry Joe's WK44B rundown, with reports that a developer was blackmailed in connection with the breach. Details remain thin - treat any thread promising the full dump as noise until Capcom says more."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/1Ln4IFA0POk/hqdefault.jpg",
+        "alt": "AngryJoeShow weekly roundup video thumbnail",
+        "credit": "YouTube / AngryJoeShow"
+      },
+      "source": {
+        "label": "AngryJoeShow",
+        "url": "https://www.youtube.com/watch?v=1Ln4IFA0POk"
+      },
+      "tags": ["capcom", "security", "hack"],
+      "whyItMatters": "Mid-size Japanese studios are now standard ransomware targets."
+    },
+    {
+      "id": "warhorse-cyberattack",
+      "kind": "quick",
+      "priority": 63,
+      "kicker": "INDUSTRY · SECURITY",
+      "headline": "Warhorse Studios is still assessing its serious cyberattack",
+      "standfirst": "The Kingdom Come: Deliverance developer says the full impact is not yet known.",
+      "body": [
+        "Warhorse Studios has confirmed what it calls a serious cybersecurity incident and is still working out the extent of the damage. The studio behind Kingdom Come: Deliverance has been direct with its community before, so a straight update is more likely here than most."
+      ],
+      "image": {
+        "src": "https://eu-images.contentstack.com/v3/assets/blt740a130ae3c5d529/bltecf4adffa4fbd2dd/67a3a535239940042aa32fe8/kingdom_come_2.jpg?width=720&quality=80&disable=upscale",
+        "alt": "Kingdom Come Deliverance II screenshot",
+        "credit": "Game Developer / Warhorse Studios"
+      },
+      "source": {
+        "label": "Game Developer",
+        "url": "https://www.gamedeveloper.com/programming/warhorse-studios-hit-by-an-undetailed-cybersecurity-incident"
+      },
+      "tags": ["warhorse", "security", "industry"],
+      "whyItMatters": "Two mid-size attacks in one fortnight - studio security is now a standing risk, not an anomaly."
+    },
+    {
+      "id": "h3-cheating-situation",
+      "kind": "story",
+      "priority": 67,
+      "kicker": "YOUTUBE · DRAMA",
+      "headline": "The H3 cheating situation drew one of the biggest commentary videos of the month",
+      "standfirst": "Charlie's coverage passed 4.9 million views, with Tectone and Asmongold running their own follow-ups.",
+      "body": [
+        "The H3 cheating situation became the commentary world's main character event in late October. Charlie's video drew **4.9 million views** - one of the largest single commentary uploads of the month - and Tectone ran a string of follow-ups through the same week.",
+        "Asmongold's take, for what it is worth, was to treat the adjacent Pokimane fallout as friend-group politics rather than a scandal worth the bandwidth: just his read, on stream, with the usual caveats.",
+        "No verdicts from this desk - the story is real, the creators he follows are covering it, and that is the lane."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/QXHG2Zmctcg/hqdefault.jpg",
+        "alt": "penguinz0 video on the H3 cheating situation",
+        "credit": "YouTube / penguinz0"
+      },
+      "source": {
+        "label": "penguinz0",
+        "url": "https://www.youtube.com/watch?v=QXHG2Zmctcg"
+      },
+      "tags": ["drama", "youtube", "penguinz0"],
+      "whyItMatters": "The month's defining creator-drama event, measured in millions of views across three followed channels."
+    },
+    {
+      "id": "fern-documentaries",
+      "kind": "story",
+      "priority": 66,
+      "kicker": "VIDEO ESSAYS",
+      "headline": "fern asked whether educational YouTube is dying and 11 million people answered",
+      "standfirst": "The high-effort documentary channel's September essay became its biggest upload, with two more long-form releases since.",
+      "body": [
+        "The Death of Educational Content on YouTube, fern's essay on the slow strangulation of the format he works in, has drawn roughly **11 million views** since late September - easily the biggest single video on the followed list this window.",
+        "He has kept the pace up: The Pentagon's Most Embarrassing Arms Dealers followed in October at over 2 million views, and How Would a War With Russia Unfold? is the newest entry, a 17-minute briefing on how such a conflict would actually play out.",
+        "For anyone who respects the few-uploads, enormous-effort school of video making, this is the channel having its moment."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/-Gnrp_caPvo/hqdefault.jpg",
+        "alt": "fern video essay thumbnail on educational YouTube content",
+        "credit": "YouTube / fern"
+      },
+      "source": {
+        "label": "fern",
+        "url": "https://www.youtube.com/watch?v=-Gnrp_caPvo"
+      },
+      "tags": ["documentary", "fern", "youtube"],
+      "whyItMatters": "The strongest quality signal on his watch list is now pulling mainstream-scale numbers.",
+      "aside": "Eleven million views for a video essay is proof the reports of short attention spans were slightly exaggerated."
+    },
+    {
+      "id": "dunkey-september-october",
+      "kind": "story",
+      "priority": 65,
+      "kicker": "GAMING · DUNKEY",
+      "headline": "Dunkey's autumn run: Wolverine, The Witcher 3 remaster and a Star Wars racer",
+      "standfirst": "Three months, seven videos, and a Wolverine review that hit 4.6 million views.",
+      "body": [
+        "The videogamedunkey autumn catalogue is worth reading as a state-of-the-genre address: Wolverine led September at **4.6 million views**, alongside reviews of The Blood of Dawnwalker, Star Wars Zero Company and a GTA-era parody, GTA Who.",
+        "October brought The Witcher 3 Remastered (2.3 million), a Gears of War: E-Day video, Fire Emblem: Fabio's Weave, and the year's biggest Star Wars racer since the prequels - Star Wars Galactic Racer at 3.7 million views.",
+        "His Call of Duty 24 video, narrating a bag of chips across a whole match, was covered in the daily cycle: the annual franchise is now old enough for its own retrospective genre."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/YEIZUhyEQ5c/hqdefault.jpg",
+        "alt": "videogamedunkey Wolverine review thumbnail",
+        "credit": "YouTube / videogamedunkey"
+      },
+      "source": {
+        "label": "videogamedunkey",
+        "url": "https://www.youtube.com/watch?v=YEIZUhyEQ5c"
+      },
+      "tags": ["dunkey", "reviews", "video-essay"],
+      "whyItMatters": "The most trusted comic critic in games reviewed a full slate of the season's biggest releases."
+    },
+    {
+      "id": "charlie-castlevania",
+      "kind": "quick",
+      "priority": 62,
+      "kicker": "GAMING · REVIEWS",
+      "headline": "Charlie finished Castlevania: Belmont's Curse and went for the true ending",
+      "standfirst": "His verdict on the revival: the guy who just finished it, true ending included.",
+      "body": [
+        "MoistCr1TiKaL's review of Castlevania: Belmont's Curse comes from, in his words, the guy who just finished it - true ending included, plus thirty minutes spent convinced his game was bugged over a card he had simply not picked up yet. He has been liking the new Castlevania all week."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/WjmL7yBTObE/hqdefault.jpg",
+        "alt": "MoistCr1TiKaL Castlevania Belmont's Curse review thumbnail",
+        "credit": "YouTube / MoistCr1TiKaL Gaming"
+      },
+      "source": {
+        "label": "MoistCr1TiKaL Gaming",
+        "url": "https://www.youtube.com/watch?v=WjmL7yBTObE"
+      },
+      "tags": ["castlevania", "penguinz0", "review"],
+      "whyItMatters": "A revived franchise getting a genuine completionist seal of approval from a creator he follows."
+    },
+    {
+      "id": "where-winds-meet-verdict",
+      "kind": "quick",
+      "priority": 60,
+      "kicker": "MMORPG · VERDICT",
+      "headline": "Josh Strife's Where Winds Meet verdict: excellent combat, too many half-built systems",
+      "standfirst": "The free-to-play action MMO won him over on feel and lost him on clutter.",
+      "body": [
+        "Josh Strife's verdict after living with Where Winds Meet: a very solid game with excellent combat, and he has spent more money and got a lot less from other games. His one structural complaint is the real one - too many mechanics stacked around a combat loop that did not need the company. PlayStation's Hutuo Battlefield update arrives November 13."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/yr0sbB60AOk/hqdefault.jpg",
+        "alt": "Josh Strife Says Where Winds Meet video thumbnail",
+        "credit": "YouTube / Josh Strife Says"
+      },
+      "source": {
+        "label": "Josh Strife Says",
+        "url": "https://www.youtube.com/watch?v=yr0sbB60AOk"
+      },
+      "tags": ["where-winds-meet", "mmorpg", "verdict"],
+      "whyItMatters": "The action-combat MMO lane's most careful voice filed his verdict on the genre's biggest new entry."
+    },
+    {
+      "id": "gta6-purchase-intent",
+      "kind": "quick",
+      "priority": 59,
+      "kicker": "GAMING · GTA 6",
+      "headline": "Nearly one in three US gamers plans to buy GTA 6",
+      "standfirst": "The analyst framing: a rare cultural and commercial moment, thirteen years after the last one.",
+      "body": [
+        "Ahead of launch, the analyst numbers are in: nearly **1 in 3 gamers** in the US plan to buy Grand Theft Auto 6. The framing from the analyst is that players have waited 13 years for the sequel, making this a rare cultural and commercial moment - and the UK union ballot lands in the same fortnight."
+      ],
+      "image": {
+        "src": "https://cdn.mos.cms.futurecdn.net/BaZVBJYGymFMbx4HnaNUZh-1920-80.jpg",
+        "alt": "Grand Theft Auto 6 key art",
+        "credit": "GamesRadar / Rockstar Games"
+      },
+      "source": {
+        "label": "GamesRadar",
+        "url": "https://www.gamesradar.com/games/grand-theft-auto/nearly-1-in-3-gamers-plan-to-buy-gta-6-in-the-us-analyst-confirms-a-rare-cultural-and-commercial-moment/"
+      },
+      "tags": ["gta6", "rockstar", "analyst"],
+      "whyItMatters": "One in three is a conversion rate no franchise in the medium has ever approached."
+    },
+    {
+      "id": "mw4-season-1",
+      "kind": "quick",
+      "priority": 57,
+      "kicker": "GAMING · PATCHES",
+      "headline": "Modern Warfare 4's Season 1 roadmap lands November 6",
+      "standfirst": "Six maps, new weapons, and a new DMZ area one week after the base game's launch.",
+      "body": [
+        "Call of Duty: Modern Warfare 4 launched October 23, and Season 1 arrives **November 6**: six new maps, new weapons and attachments, Halloween modes, and a new DMZ location called X01. The annual franchise keeps its calendar, whatever anyone says about it."
+      ],
+      "image": {
+        "src": "https://www.pcgamesn.com/wp-content/sites/pcgamesn/2026/10/call-of-duty-modern-warfare-4-season-1-roadmap-mw4.jpg",
+        "alt": "Modern Warfare 4 Season 1 roadmap graphic",
+        "credit": "PCGamesN / Activision"
+      },
+      "source": {
+        "label": "PCGamesN",
+        "url": "https://www.pcgamesn.com/call-of-duty-modern-warfare-4/season-1-roadmap"
+      },
+      "tags": ["cod", "modern-warfare-4", "patches"],
+      "whyItMatters": "The year's biggest shooter enters its live season - relevant mostly as the calendar marker it is."
+    },
+    {
+      "id": "zelda-oot-preorders",
+      "kind": "quick",
+      "priority": 56,
+      "kicker": "GAMING · NINTENDO",
+      "headline": "Ocarina of Time pre-orders opened with a special console, and luck will be required",
+      "standfirst": "Nintendo went all out for the N64 classic's return; Kotaku's advice is simply good luck.",
+      "body": [
+        "Pre-orders opened for The Legend of Zelda: Ocarina of Time's re-release, and Nintendo brought the full arsenal: a special console, a Pro Controller, a carrying case and a foil special-edition game box. Kotaku's coverage ends where every Nintendo launch ends - good luck getting any of them."
+      ],
+      "image": {
+        "src": "https://kotaku.com/app/uploads/2026/10/NS2_TheLegendofZeldaOcarinaofTime_scrn_02-1280x720.jpg",
+        "alt": "Zelda Ocarina of Time re-release screenshot",
+        "credit": "Kotaku / Nintendo"
+      },
+      "source": {
+        "label": "Kotaku",
+        "url": "https://kotaku.com/everything-you-need-to-know-about-the-legend-of-zelda-ocarina-of-time-pre-orders-2000750512"
+      },
+      "tags": ["zelda", "nintendo", "preorders"],
+      "whyItMatters": "The most requested classic re-release finally has hardware attached to it."
+    },
+    {
+      "id": "totk-native-pc",
+      "kind": "quick",
+      "priority": 54,
+      "kicker": "GAMING · MODDING",
+      "headline": "Tears of the Kingdom runs natively on PC now, in beta",
+      "standfirst": "SkyboundTOTK is a true recompilation - not an emulator - with FSR upscaling shipping day one.",
+      "body": [
+        "An early beta of SkyboundTOTK, a native Windows build of Tears of the Kingdom, is out: a recompilation in the same family as the Mario 64 and Majora's Mask projects, with FSR upscaling and experimental frame interpolation. The developer is upfront that plenty of bugs remain - beta means beta."
       ],
       "image": {
         "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Tears-of-the-Kingdom-Recompilation-Release-HD-1456x819.jpeg",
@@ -257,173 +888,66 @@
         "label": "Wccftech",
         "url": "https://wccftech.com/zelda-tears-of-the-kingdom-native-pc-port-skybound-beta-fsr-ultrawide/"
       },
-      "tags": [
-        "zelda",
-        "modding",
-        "pc"
-      ],
-      "whyItMatters": "Recompilation is quietly becoming the most interesting corner of game preservation.",
-      "aside": "Nintendo's lawyers are reading this story at this exact moment, professionally."
+      "tags": ["zelda", "modding", "pc"],
+      "whyItMatters": "Recompilation is quietly becoming the most interesting corner of game preservation."
     },
     {
-      "id": "resident-evil-10-years",
-      "kind": "story",
-      "priority": 66,
-      "kicker": "GAMING · CAPCOM",
-      "headline": "Capcom says Resident Evil's story has an ending - the internet heard 'in ten years'",
-      "standfirst": "Jun Takeuchi talked about a 10-year branding plan and fans heard a countdown. Wccftech read it the other way: a chapter closing, not the franchise.",
+      "id": "qwen-evil-neuron",
+      "kind": "quick",
+      "priority": 53,
+      "kicker": "AI · RESEARCH",
+      "headline": "One neuron in Qwen3.8 27B turns it into a tiny supervillain",
+      "standfirst": "A single-neuron tweak shifted the whole model's register - the interpretability result that keeps on giving.",
       "body": [
-        "Jun Takeuchi, Capcom's executive producer, gave an interview to Yahoo Japan for the series' 30th anniversary and mentioned a **ten-year branding strategy** put together around the RE2 remake. Several outlets reported that the story would conclude within a decade.",
-        "Wccftech went back through the quote and concluded that is not what he said: he appears to be describing a specific chapter of the plot reaching its end, not the series. He also confirmed multiple new games are planned, without saying how many.",
-        "So the accurate version is smaller and more interesting than the headline version: a 30-year-old horror franchise is, for the first time, admitting it has a shape and an ending somewhere in it."
+        "A researcher tweaked a **single neuron** inside Qwen3.8 27B and the model started writing like a direct-to-DVD horror villain. The output is not the point - anyone can prompt an edgy response. One neuron carrying that much weight over a whole model's register is the interpretability result researchers have been arguing for years.",
+        "Running 27B locally is also now genuinely laptop-class. The toy-to-serior gap keeps closing."
       ],
       "image": {
-        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Resident-Evil-Requiem-Veronica-HD-1456x820.jpeg",
-        "alt": "Resident Evil Requiem key art",
+        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Qwen3.8-27B-1-1456x819.jpg",
+        "alt": "Qwen3.8 27B model illustration",
         "credit": "Wccftech"
       },
       "source": {
         "label": "Wccftech",
-        "url": "https://wccftech.com/capcom-jun-takeuchi-resident-evil-next-10-years-conclusion-multiple-new-games/"
+        "url": "https://wccftech.com/tweaking-a-single-neuron-inside-qwen3-8-27b-turns-it-into-an-evil-monster-that-wants-to-see-humans-burn-slowly-so-it-could-watch-their-faces-twist-in-agony/"
       },
-      "tags": [
-        "resident-evil",
-        "capcom"
-      ],
-      "whyItMatters": "A long-running franchise committing to an ending changes how every future entry gets read - even when the commitment is smaller than the headline.",
-      "aside": "Thirty years of Umbrella and the most surprising thing is that someone has a plan."
-    },
-    {
-      "id": "monarchs-at-play",
-      "kind": "story",
-      "priority": 62,
-      "kicker": "INDIE",
-      "headline": "Monarchs at Play is a 4X city-builder that respects your evening",
-      "standfirst": "Hex tiles, chaining combos, and a full run in about an hour. Rock Paper Shotgun is extremely into it.",
-      "body": [
-        "A 4X strategy city-builder built around chaining hexagonal tiles, designed to be finished in roughly an hour. RPS's write-up is partly a review and partly a lament about being an adult with laundry.",
-        "The pitch is genuinely appealing: all the satisfying combo-chaining of a big strategy game without the eight-hour commitment that makes you close the tab and feel guilty.",
-        "Worth a look if you like the idea of Civilization more than the reality of it on a Tuesday night."
-      ],
-      "image": {
-        "src": "https://assetsio.gnwcdn.com/monarchs-at-play.jpg?width=690&quality=85&format=jpg&auto=webp",
-        "alt": "Monarchs at Play screenshot showing hexagonal city tiles",
-        "credit": "Rock Paper Shotgun"
-      },
-      "source": {
-        "label": "Rock Paper Shotgun",
-        "url": "https://www.rockpapershotgun.com/monarchs-at-play-is-a-4x-strategy-city-builder-about-chaining-hexagonal-tiles-that-only-takes-an-hour-out-of-your-day"
-      },
-      "tags": [
-        "indie",
-        "strategy"
-      ],
-      "whyItMatters": "Short-form strategy is an underexploited niche and this one has a real hook.",
-      "aside": "An hour-long 4X game is either genius or a lie, and I would like to find out which."
-    },
-    {
-      "id": "discord-searchable",
-      "kind": "quick",
-      "priority": 55,
-      "kicker": "TECH",
-      "headline": "Discord messages in big public servers become Google-searchable in December",
-      "standfirst": "The forum replacement admits it replaced forums.",
-      "body": [
-        "Discord is creating specially designated channels in large public servers whose messages will show up in search engines from December. RPS immediately asked the only question that matters: what about AI training?"
-      ],
-      "image": null,
-      "source": {
-        "label": "PC Gamer",
-        "url": "https://www.pcgamer.com/software/platforms/messages-in-certain-large-public-discord-servers-will-be-searchable-on-the-web-after-december/"
-      },
-      "tags": [
-        "discord",
-        "tech"
-      ],
-      "whyItMatters": "Anything you posted in a public server in 2019 is about to become permanently findable.",
-      "aside": "Go delete the embarrassing stuff now, not in December."
-    },
-    {
-      "id": "mass-effect-n7",
-      "kind": "quick",
-      "priority": 50,
-      "kicker": "MUSIC · MASS EFFECT",
-      "headline": "The original Mass Effect composer is re-scoring the leaked ME5 trailer",
-      "standfirst": "Sam Hulick wants the trailer to represent his actual musical vision. For N7 Day.",
-      "body": [
-        "Sam Hulick — who scored the original Mass Effect — is putting together a re-scored version of the leaked Mass Effect 5 trailer for N7 Day. His stated reason is that he wants it to properly represent his musical vision for the cancelled game.",
-        "Fan projects that fix a publisher's own marketing are a strange genre, and this is one of the better ones."
-      ],
-      "image": {
-        "src": "https://cdn.mos.cms.futurecdn.net/Ejh4Z9YqLYB8hwzrfyYisK-1920-80.jpg",
-        "alt": "Mass Effect artwork",
-        "credit": "PC Gamer"
-      },
-      "source": {
-        "label": "PC Gamer",
-        "url": "https://www.pcgamer.com/games/mass-effect/mass-effect-composer-sam-hulick-is-working-on-a-re-scored-version-of-the-leaked-mass-effect-5-trailer-for-n7-day/"
-      },
-      "tags": [
-        "mass-effect",
-        "music"
-      ],
-      "whyItMatters": "The composer caring more than the publisher is the whole story of modern Mass Effect.",
-      "aside": "N7 Day is the closest thing this fanbase has to a religious holiday and honestly, fair."
-    },
-    {
-      "id": "waddle-world",
-      "kind": "quick",
-      "priority": 45,
-      "kicker": "AI · META",
-      "headline": "Meta's AI Tamagotchi is a diary with a beak, and it is Philippines-only for now",
-      "standfirst": "Waddle World: 'a daily journal disguised as a pet.'",
-      "body": [
-        "Meta's Waddle World is a 16-bit virtual pet that the company describes, with unusual honesty, as **\"a daily journal disguised as a pet\"**. You write to it, it responds as a small creature, and you play mini-games to buy it food and toys.",
-        "It launched in the Philippines in late September, and it is the softest of soft launches - which is how companion apps always start."
-      ],
-      "image": {
-        "src": "https://www.engadget.com/img/gallery/metas-waddle-world-is-a-tamagotchi-like-ai-pet-app/l-intro-1793176733.jpg",
-        "alt": "Meta Waddle World app screenshot",
-        "credit": "Engadget"
-      },
-      "source": {
-        "label": "Engadget",
-        "url": "https://www.engadget.com/2299227/meta-tamagotchi-like-ai-digital-pet-app-waddle-world/"
-      },
-      "tags": [
-        "ai",
-        "meta",
-        "apps"
-      ],
-      "whyItMatters": "The 'AI companion' category is consolidating fast and Meta wants the default slot.",
-      "aside": "A journal that reports to shareholders. Charming."
+      "tags": ["ai", "qwen", "research"],
+      "whyItMatters": "Single-neuron edits producing dramatic behaviour changes is the strongest argument yet for taking interpretability seriously."
     }
   ],
   "quickHits": [
     {
-      "text": "Interior Night's Charu Desodt is the new chair of the BAFTA Games Committee.",
-      "url": "https://www.gamesindustry.biz/interior-night-studio-head-charu-desodt-appointed-chair-of-bafta-games-committee"
+      "text": "US regulators approved Amazon Leo's $11.5 billion acquisition of Globalstar - the satellite network just got its war chest.",
+      "url": "https://www.reuters.com/business/media-telecom/us-agency-approves-amazon-leos-115-billion-acquisition-globalstar-2026-10-27/"
     },
     {
-      "text": "Gamescom Asia posted record international attendance and showfloor size.",
-      "url": "https://www.gamesindustry.biz/gamescom-asia-touts-new-records-for-international-attendance-and-showfloor-size"
+      "text": "Gigguk's two September anime essays pulled 1.4 million and 950,000 views - the anime-commentary format is alive and extremely well.",
+      "url": "https://www.youtube.com/watch?v=EB9Y2wMsR6g"
     },
     {
-      "text": "MeatCanyon's new one is called 'I Befriended A Serial Killer' and it is exactly what you expect.",
-      "url": "https://www.youtube.com/watch?v=DQJ3F4ZOkzk"
+      "text": "Matt Wolfe demoed God's Eye View, a free open-source spy-satellite simulator built on real public data - his first question was how it is legal.",
+      "url": "https://www.youtube.com/watch?v=S2VJU5DQqlU"
     },
     {
-      "text": "AngryJoe did a Rapid Fire Review of Valor Mortis.",
-      "url": "https://www.youtube.com/watch?v=WmaPWbOFT3I"
+      "text": "PlayStation's creator Ken Kutaragi on modern game development: taking several years with several thousand people is almost impossible.",
+      "url": "https://www.gamesindustry.biz/taking-several-years-with-several-thousand-people-its-almost-impossible-playstation-creator-ken-kutaragi-on-the-current-state-of-gaming"
     },
     {
-      "text": "Corridor Crew broke down VFX from 1911. Yes, 1911.",
-      "url": "https://www.youtube.com/watch?v=NdScFyT1xjc"
+      "text": "Xbox's first-ever COO, Helen Chiang, left the company after three months in the role.",
+      "url": "https://www.gamesindustry.biz/first-xbox-coo-helen-chiang-leaves-company-after-three-months-in-the-role"
     },
     {
-      "text": "Vsauce asked whether we used to think the Sun was cold. We did.",
-      "url": "https://www.youtube.com/watch?v=gNVj-FIxoe4"
+      "text": "The ESRB named Netflix and MPA alum Orit Michiel as its next president.",
+      "url": "https://variety.com/2026/gaming/news/esrb-orit-michiel-president-netflix-mpa-1236933508/"
+    },
+    {
+      "text": "Team Fortress 2 shipped Scream Fortress XVII - the Halloween machine turns 17 and shows no sign of rust.",
+      "url": "https://store.steampowered.com/news/285134/"
+    },
+    {
+      "text": "Japan's autonomous chainsaw robot made good on national TV - branches near rail lines, handled by a rail-mounted metal human with a chainsaw. Still fine. Probably.",
+      "url": "https://www.tomshardware.com/tech-industry/robotics/japan-experiments-with-autonomous-ai-chainsaw-wielding-robots-video-shows-rail-truck-mounted-metal-humanoid-cutting-down-tree-branches"
     }
   ],
-  "signoff": "That is edition one. Everything above links to the piece it came from. See you at three."
+  "signoff": "That is two months in one paper: an epoch ended at BioWare, the price of intelligence fell another 15x, and Godot walked into beta. Everything above links to the piece it came from. See you at three."
 }
