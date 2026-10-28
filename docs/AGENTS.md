@@ -5,7 +5,6 @@ question. Everything you need is here and in `config/interests.md`. Read this fi
 
 Project root: `C:\Users\MarciNaro\Documents\VSCODE-PROJECTS\daily-beacon`. Every command runs from there.
 
----
 
 ## 1. Where you are, and the one rule
 
@@ -25,19 +24,16 @@ Nothing else is yours to create. The scheduler calls you once and expects a publ
 > reconstructed reactions, no imagined patch notes. If the packet does not support a sentence, the
 > sentence does not go in the edition.
 
-Two consequences you will be tempted to break at 03:00, stated flatly:
-
-- **Never present an unverified claim as fact.** Attribute it - "the studio says", "the patch notes
-  claim", "the trailer shows" - or leave it out. Hedging words are not a source.
-- **Every story carries a real `source.label` and `source.url`.** The builder fails a story without a
-  source (SPEC section 6), and a page of unsourced summaries is worse than a short one.
+Two consequences, stated flatly: **never present an unverified claim as fact** - attribute it ("the
+studio says", "the patch notes claim") or leave it out, hedging is not a source; and **every story
+carries a real `source.label` and `source.url`**, because the builder fails a story without one (SPEC
+section 6) and a page of unsourced summaries is worse than a short page.
 
 The taste document is binding: **`config/interests.md`** (LOVES / LIKES / NEUTRAL / DISLIKES / NEVER,
 the numeric rubric, tone rules, cooldown, "what the edition is not"). Read it in full before judging;
 it outranks your taste. Reference contracts: `docs/SPEC.md` (sections 1, 6, 7, 8),
 `docs/CONTRACTS.md` (CLI + `packet.md`), `docs/SITE-CONTRACT.md`, `docs/DECISIONS.md`.
 
----
 
 ## 2. Collect
 
@@ -46,10 +42,9 @@ python scripts/run_daily.py collect --date YYYY-MM-DD
 ```
 
 Observed flags: `--date`, `--hours`, `--limit-transcripts`, `--skip-images`, `--reuse-source`,
-`--root`. Defaults come from `config/settings.json` (`lookback_hours` = 26). Add `--reuse-source` only
-when resuming a run that died after fetching sources.
-
-Expected last line: `collect done: <v> videos, <a> articles, <t> transcripts, <r> repeats suppressed`
+`--root`; defaults from `config/settings.json` (`lookback_hours` = 26). Add `--reuse-source` only when
+resuming a run that died after fetching sources. Expected last line:
+`collect done: <v> videos, <a> articles, <t> transcripts, <r> repeats suppressed`.
 
 It writes, under `state/workpack/<date>/`:
 
@@ -80,12 +75,10 @@ Then:
 > while `yt.json` itself is complete. Trust the candidate counts and top-videos list, not that line.
 
 **If collection fails, or the packet is thin:** run the command once more (with `--reuse-source` and
-without). A single feed timeout is normal. If it still fails, or the packet has fewer than five usable
-items, publish a short honest edition anyway - three to five sections, the lead being what you *do*
-know, plus one clearly labelled note saying collection was partial and which source failed. **Minimum
-viable is still publishing.** Never a blank page, never silence.
+without) - a single feed timeout is normal. If it still fails, or there are fewer than five usable
+items, publish a short honest edition anyway: three to five sections, the lead being what you *do*
+know, plus one clearly labelled note naming the source that failed. Never a blank page, never silence.
 
----
 
 ## 3. Judge
 
@@ -127,29 +120,27 @@ Read the table as the rules, not as an example:
 
 ### 3.2 What earns the front page
 
-- A big thing from the last 24h in his lanes: a creator he watches with a real take on a real event;
-  a game/platform/business move; an AI or hardware change touching his work or his 8GB laptop; a
+- A big thing from the last 24h in his lanes: a creator he watches with a real take on a real event; a
+  game/platform/business move; an AI or hardware change touching his work or his 8GB laptop; a
   game-dev technique that touches Godot, Hytale or Roblox.
-- **Creator take vs routine let's play:** a take on a big event beats a routine let's play; a trailer
-  or reveal reaction beats a podcast clip; a long-form documentary beats nearly everything on quality;
-  a 3-hour stream VOD is last. The rubric already encodes this - do not re-litigate it.
-- **Cooldown is 21 days** (`repeat_topic_cooldown_days`). Nothing returns inside the window unless the
-  comeback exception in `config/interests.md` holds on all three counts, and if it does you say in one
-  clause that the earlier beat was covered.
-- **Never repeat what memory says was covered.** `packet.md`, `filtered.json` and `suppressed.json`
-  carry the evidence; `python scripts/memory.py query --topic <slug>` answers "when did we last run
-  this". A `seen: true` item is out.
-- **Never lead with** a rumour, a benchmark chart with no product behind it, a 3-hour VOD, a story you
-  could not verify, or anything in the NEVER list of `config/interests.md`.
-- **Tone:** funny, warm, optimistic even on bad news, never cruel, no filler. Enforced by
-  `config/interests.md` section TONE RULES - at most one em dash per paragraph, zero exclamation marks
-  in body copy, sentence-case headlines with no full stop.
+- **Creator take vs routine let's play:** a take on a big event beats a routine let's play, a trailer
+  reaction beats a podcast clip, a long-form documentary beats nearly everything on quality, and a
+  3-hour stream VOD is last. The rubric encodes this - do not re-litigate it.
+- **Cooldown is 21 days** (`repeat_topic_cooldown_days`). Nothing returns inside that window unless the
+  comeback exception in `config/interests.md` holds on all three counts, and then you say in one clause
+  that the earlier beat was covered. **Never repeat what memory says was covered**: `packet.md`,
+  `filtered.json` and `suppressed.json` carry the evidence, and `python scripts/memory.py query --topic
+  <slug>` answers "when did we last run this". A `seen: true` item is out.
+- **Never lead with** a rumour, a benchmark chart with no product behind it, a 3-hour VOD, an
+  unverifiable story, or anything in the NEVER list of `config/interests.md`.
+- **Tone:** funny, warm, optimistic even on bad news, never cruel, no filler - enforced by
+  `config/interests.md` section TONE RULES (one em dash per paragraph max, zero exclamation marks in
+  body copy, sentence-case headlines, no full stop).
 - **Length discipline:** 5-14 sections (`edition_min_stories` / `edition_max_stories`), **exactly one
   lead**, four to seven `quickHits`, at most one `quote`. If you write 14, all 14 must be real.
 - **Ties** break: (1) does it change something for him, (2) does it have an image, (3) is it a creator
   he actually watches.
 
----
 
 ## 4. Write the edition
 
@@ -184,20 +175,14 @@ Read the table as the rules, not as an example:
 }
 ```
 
-Rules the builder enforces, so learn them once:
-
-- `date` must equal the filename date. `number` is the previous edition's number + 1.
-- `kind` drives layout: `lead` hero (exactly one), `story` standard article, `video` thumbnail-led
-  card for a creator's video, `quick` a short brief, `quote` a pull quote.
-- Body text supports **only** inline `**bold**`, `*italic*` and `[text](url)`. Raw HTML, backticks,
-  emoji shortcodes and `<br>` are escaped and show up as literal characters.
-- `id` is `[a-z0-9-]+`, unique, becomes the anchor `#id` - keep it stable across rebuilds.
-- Every non-`quick` section needs `source.label` + `source.url` (http/https); `quickHits[].url` too.
-- `image` is optional; when present all three of `src`, `alt`, `credit` are required. `src` is a local
-  path relative to the edition file (`../state/workpack/<date>/img/<hash>.jpg`) or an http(s) URL the
-  builder downloads, optimises (max 1400 px, JPEG q82) and rewrites. `alt` describes the picture;
-  `credit` names the source, and wrong credit fails the build.
-- `tags` are topic slugs and they are what the 21-day cooldown keys on - use the real topic.
+Rules the builder enforces, so learn them once: `date` equals the filename date and `number` is the
+previous edition's + 1; `kind` drives layout (`lead` hero, exactly one; `story` article; `video`
+thumbnail card; `quick` short brief; `quote` pull quote); body supports **only** `**bold**`,
+`*italic*`, `[text](url)` and escapes everything else; `id` is `[a-z0-9-]+`, unique, and becomes the
+`#id` anchor; every non-`quick` section needs `source.label` + `source.url`, and `quickHits[].url` is
+http(s); `image` is optional but all three of `src`/`alt`/`credit` are required when present, with
+`src` local (`../state/workpack/<date>/img/<hash>.jpg`) or http(s) for the builder to download,
+optimise and rewrite; `tags` are topic slugs and are what the 21-day cooldown keys on.
 
 ### 4.1 `lead` - fully filled
 
@@ -298,7 +283,6 @@ Rules the builder enforces, so learn them once:
 }
 ```
 
----
 
 ## 5. Build, publish, mark
 
@@ -335,7 +319,6 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
 > variant until `python scripts/publish.py --set-url <url>` is run once. That is not a failed run;
 > record it in the run note (section 8).
 
----
 
 ## 6. When something fails
 
@@ -354,7 +337,6 @@ Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, 
 
 Every one of these ends the same way: an edition exists, is built, and the run note says what happened.
 
----
 
 ## 7. Never
 
@@ -372,7 +354,6 @@ Every one of these ends the same way: an edition exists, is built, and the run n
 - **Never touch the scheduler** or any file outside the edition/site/run-note set.
 - **Never invent, never overstate, never pad.** See section 1.
 
----
 
 ## 8. Finish
 
