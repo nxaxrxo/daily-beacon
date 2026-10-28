@@ -108,3 +108,28 @@ Six headings in the contract order, 40 candidate lines, ASCII-only, every line
 - `weekly:` gained a `dows` array while keeping the singular `dow`, so old records are untouched.
 - `monthly:N@HH:MM` clamps N to the month length rather than skipping a month.
 - Feeds that verify as HTTP 200 but parse zero entries are treated as dead, not shipped.
+
+## Post-completion audit (all six sub-agents, files opened and checked)
+
+Every path each unit reported was opened and measured on disk. No redeploy was needed, nothing was missing:
+
+| Unit | Reported path | Size |
+|---|---|---|
+| u1 | `~\.config\opencode\plugins\scheduler\index.ts` | 46355 |
+| u1 | `~\.config\opencode\tools\schedule.py` | 8199 |
+| u1 | `scripts/test_scheduler_formats.mjs` | 12926 |
+| u2a | `config/channels.json` (79 channels) | 14810 |
+| u2 | `config/settings.json` | 433 |
+| u2 | `config/feeds.json` (24 feeds) | 4300 |
+| u2 | `docs/FEEDS-CHECK.md` | 4253 |
+| u3 | `scripts/memory.py` | 30058 |
+| u4 | `scripts/news_source.py` | 20739 |
+| u5a | `scripts/transcripts.py` | 11775 |
+| u5b | `scripts/run_daily.py` | 30338 |
+| u5b | `state/workpack/2026-10-28/packet.md` | 11737 |
+
+Re-verified after the audit: `node scripts/test_scheduler_formats.mjs` -> `ALL FORMATS PASS` (exit 0);
+`python scripts/memory.py selftest` -> `SELFTEST PASS`; packet.md keeps its H1, its stats line
+(`32 videos, 60 articles, 15 repeats suppressed`), the five section headings in contract order and 40
+candidate lines that are ASCII-only with four ` | ` separators each; `filtered.json` 92 items / 15 seen /
+77 fresh; 22 transcript files; `images.json` 24 entries with every file present.
