@@ -1,0 +1,287 @@
+{
+  "date": "2026-10-28",
+  "number": 7,
+  "generatedAt": "2026-10-28T03:14:00+01:00",
+  "masthead": "THE DAILY BEACON",
+  "tagline": "A fixture edition, assembled from sample copy",
+  "weatherStrip": "Sample weather: overcast with a chance of patch notes, 12C, no wind to speak of.",
+  "sections": [
+    {
+      "id": "patch-notes-roundup",
+      "kind": "lead",
+      "priority": 100,
+      "kicker": "GAMING",
+      "headline": "Patch Notes Roundup: a quieter build, a slower sprint and the small fixes nobody asked for but everybody needed",
+      "standfirst": "Nine sample studios pushed notes this week; three of them mostly removed things, which is the most honest kind of progress.",
+      "body": [
+        "This is sample copy. A ninth consecutive round of notes landed on a Tuesday, which is either thoughtful scheduling or a sign that nobody at the sample studio wanted to watch a hotfix stream on a Friday.",
+        "The headline change is a sprint that no longer cancels on a light touch: **the input window now opens two frames earlier**, *which sounds tiny until you are the one missing the jump*, and a [short explainer](https://example.com/x) sits in the notes for anyone who wants the numbers.",
+        "Three quality-of-life items were removed outright. A menu animation, a confirmation dialogue and a duplicated tooltip are simply gone, and the notes treat their absence as a feature rather than an apology.",
+        "Balance moved in small numbers: two damage values down by four percent, one cooldown up by half a second, and a resource curve flattened so the middle of a run is less of a cliff.",
+        "Nothing here is urgent. That is the point of a sample edition: it shows the page at its calmest, when a lead is a roundup rather than a fire."
+      ],
+      "image": {
+        "src": "img/lead.jpg",
+        "alt": "Sample placeholder artwork: dark panel with a large centred numeral one",
+        "credit": "Sample artwork, generated for this fixture"
+      },
+      "source": {
+        "label": "Sample Source A",
+        "url": "https://example.com/sample/patch-notes-roundup"
+      },
+      "tags": ["sample-roundup", "patch-notes", "live-service"],
+      "whyItMatters": "Sets the tone of the fixture: one calm lead, a long body and an image, so the hero layout can be judged at full size.",
+      "aside": "The patch notes are longer than the patch. This is traditional."
+    },
+    {
+      "id": "hardware-price-wobble",
+      "kind": "story",
+      "priority": 90,
+      "kicker": "HARDWARE",
+      "headline": "A hardware price wobble, told entirely in sample numbers",
+      "standfirst": "Two sample retailers moved a mid-range card by a few percent in opposite directions on the same afternoon.",
+      "body": [
+        "Sample copy, not a real market report. One sample retailer cut a mid-range graphics card by six percent on Tuesday morning; a second sample retailer raised the same model by four percent before lunch. Neither move was explained, and both listings kept the same stock status.",
+        "The pattern is familiar to anyone who has watched a launch window: distribution fills a warehouse, the warehouse needs space, and the price becomes a scheduling tool rather than a statement about value. The interesting part is not the number but the timing, because a two-percent spread between shops is enough to move a purchase decision by a fortnight.",
+        "A third sample shop held its price and added a bundled cable instead, which is the retail equivalent of changing the subject. Bundles are hard to compare, and that is precisely why they appear when margins get thin.",
+        "Memory pricing behaved the same way in the same window: a small dip, a quick recovery, and a note from the distributor that availability, not price, was the constraint worth watching. Sample distributors say this often and they are usually right.",
+        "For a buyer the practical reading is dull and useful. Check the model number, not the product family, because the family name survives three revisions and the model number does not. Check the return window, because a wobble that reverses in ten days is a return, not a discount, and a discount that reverses in ten days is a pricing experiment run on your card."
+      ],
+      "image": {
+        "src": "img/second.jpg",
+        "alt": "Sample placeholder artwork: dark panel with a large centred numeral two",
+        "credit": "Sample artwork, generated for this fixture"
+      },
+      "source": {
+        "label": "Sample Source B",
+        "url": "https://example.com/sample/hardware-price-wobble"
+      },
+      "tags": ["sample-roundup", "hardware", "pricing"],
+      "whyItMatters": "A long body with no inline links, to prove that plain paragraphs still hold a column without visual help.",
+      "aside": "The cheapest card is always the one that sold out eleven minutes ago."
+    },
+    {
+      "id": "ai-tooling-notes",
+      "kind": "story",
+      "priority": 85,
+      "kicker": "AI",
+      "headline": "Tooling notes from a sample release cycle",
+      "standfirst": "A fictional vendor shipped three small features and one migration guide nobody read.",
+      "body": [
+        "Sample copy. Three features arrived in one release: a faster index rebuild, a diff view for generated files and an export format that finally remembers column order. The migration guide arrived too, twenty minutes later, and it is the only part of the release that will cost anyone an afternoon.",
+        "The pattern repeats because the interesting work is upstream of the interface. A rebuild that takes nine seconds instead of forty changes how often you press the button; that is the sort of change that quietly alters a workflow, and it never makes a headline.",
+        "Two links, both placeholders, stand in for the parts a reader would actually click: [the release notes](https://example.com/sample/release-notes) and [the migration guide](https://example.com/sample/migration). Neither resolves; the layout work is in seeing two anchors sit inside one paragraph without breaking the rhythm.",
+        "The export change is the one to watch. Column order sounds cosmetic until a downstream script depends on position, at which point a cosmetic change becomes a Monday.",
+        "The vendor also published a support note that quietly contradicts the migration guide on one field name, which is the sort of detail a fixture edition includes deliberately: two short paragraphs of disagreement, sitting next to each other, in a narrow column, where a reader can see exactly how much friction the measure creates."
+      ],
+      "image": {
+        "src": "https://example.com/missing.jpg",
+        "alt": "Sample remote image that is expected to fail to load",
+        "credit": "Sample remote credit line, expected to be hidden when the image fails"
+      },
+      "source": {
+        "label": "Sample Source C",
+        "url": "https://example.com/sample/ai-tooling-notes"
+      },
+      "tags": ["tooling", "release-notes", "sample-remote-image"],
+      "whyItMatters": "Carries the deliberately broken remote image, so the graceful failure branch is exercised in the fixture.",
+      "aside": "Every migration guide is a short story about someone else's deadline."
+    },
+    {
+      "id": "creator-essay",
+      "kind": "story",
+      "priority": 80,
+      "kicker": "VIDEO",
+      "headline": "A forty-minute video essay, and why the length is the argument",
+      "standfirst": "Sample copy about a sample creator who spent forty minutes on a subject that usually gets four.",
+      "body": [
+        "This paragraph is sample copy about a fictional creator's forty-minute video essay on level design. The essay opens with a two-minute shot of a corridor, which is either indulgence or a thesis statement, and by minute six it is clearly the second one.",
+        "The argument is structural: a corridor teaches a player where to look before it teaches them where to go, and the essay spends most of its runtime proving that with side-by-side footage from sample builds.",
+        "Long-form video is having a moment for the least romantic reason available: it is the format that still supports an argument. Four minutes buys a reaction, forty buys a position, and a position is harder to scroll past.",
+        "The pacing wobbles around minute thirty, when a detour into sample archive footage outlives its usefulness, but the last eight minutes earn the trip back."
+      ],
+      "source": {
+        "label": "Sample Source D",
+        "url": "https://example.com/sample/creator-essay"
+      },
+      "tags": ["video-essay", "level-design", "long-form"]
+    },
+    {
+      "id": "music-cue",
+      "kind": "story",
+      "priority": 75,
+      "kicker": "MUSIC",
+      "headline": "The quiet return of the three-note menu cue",
+      "standfirst": "Sample copy on a small sound design trend that is mostly about restraint.",
+      "body": [
+        "Sample copy. Three notes, no reverb tail, half a second of silence after: a menu cue that several sample releases have adopted this season, apparently after years of increasingly elaborate stings.",
+        "The practical reason is menu speed. A cue that resolves in half a second can play on every hover without becoming a metronome, and a cue that takes two seconds turns a fast menu into a performance.",
+        "The aesthetic reason is harder to defend in a fixture, so here is the short version: a small sound makes a large pause feel intentional."
+      ],
+      "source": {
+        "label": "Sample Source E",
+        "url": "https://example.com/sample/music-cue"
+      },
+      "tags": ["sound-design", "menus"],
+      "whyItMatters": "A short three-paragraph story, to prove the type scale at the other end of the length range."
+    },
+    {
+      "id": "week-ahead",
+      "kind": "story",
+      "priority": 70,
+      "kicker": "THE WEEK",
+      "headline": "The week ahead, in sample form",
+      "standfirst": "Two sample events, one sample deadline and a server maintenance window that will almost certainly overrun.",
+      "body": [
+        "Sample copy. Tuesday brings a sample showcase that has been teased for eleven days and will run for forty minutes; Thursday brings a sample maintenance window scheduled for two hours and promised at one.",
+        "The only deadline that matters is the Friday one, because a Friday deadline is a Thursday deadline with a press release attached.",
+        "Nothing else on the sample calendar is worth rearranging an evening for, which is itself useful information in a week that already has three big releases in it."
+      ],
+      "source": {
+        "label": "Sample Source F",
+        "url": "https://example.com/sample/week-ahead"
+      },
+      "tags": ["sample-roundup", "calendar"]
+    },
+    {
+      "id": "studio-delay",
+      "kind": "story",
+      "priority": 65,
+      "kicker": "GAMING",
+      "headline": "Studio Slips a Bit",
+      "standfirst": "One sentence, one paragraph, one very short headline.",
+      "body": [
+        "Sample copy: a fictional studio moved its sample release by two weeks and said so in a single paragraph, which is the entire story."
+      ],
+      "source": {
+        "label": "Sample Source G",
+        "url": "https://example.com/sample/studio-delay"
+      },
+      "tags": ["delays", "release-dates"],
+      "whyItMatters": "The shortest possible story, with an eighteen-character headline, so the lower end of the type scale is visible."
+    },
+    {
+      "id": "video-essay",
+      "kind": "video",
+      "priority": 60,
+      "kicker": "VIDEO",
+      "headline": "Watch: a sample video essay about corridors",
+      "standfirst": "Forty minutes on level design, linked straight to the sample source.",
+      "body": [
+        "Sample copy. The video opens on a corridor, holds the shot for two minutes and then spends thirty-eight minutes explaining why that shot was the thesis.",
+        "It is the strongest thing this fictional creator has made, and the thumbnail is doing it no favours."
+      ],
+      "image": {
+        "src": "img/video-a.jpg",
+        "alt": "Sample placeholder artwork: dark panel with a large centred numeral three",
+        "credit": "Sample artwork, generated for this fixture"
+      },
+      "source": {
+        "label": "Sample Source D",
+        "url": "https://example.com/sample/watch/corridors"
+      },
+      "tags": ["video-essay", "level-design"],
+      "whyItMatters": "Exercises the video card branch with a real local thumbnail and a non-empty body.",
+      "aside": "The corridor is fine. The corridor is always fine."
+    },
+    {
+      "id": "video-demo",
+      "kind": "video",
+      "priority": 55,
+      "kicker": "AI",
+      "headline": "Watch: a nine-minute sample tool demo",
+      "standfirst": "A short screen recording with one genuinely useful minute in the middle.",
+      "body": [
+        "Sample copy. Nine minutes, one useful minute, and a presenter who says the phrase sample workflow eleven times.",
+        "The useful minute is at 4:20, where the diff view does exactly what the release notes claimed."
+      ],
+      "source": {
+        "label": "Sample Source C",
+        "url": "https://example.com/sample/watch/tool-demo"
+      },
+      "tags": ["tooling", "demo"]
+    },
+    {
+      "id": "quote-desk",
+      "kind": "quote",
+      "priority": 50,
+      "kicker": "OPINION",
+      "headline": "The best patch note is the one that admits what broke",
+      "standfirst": "A sample pull quote, standing alone on the page.",
+      "body": [
+        "Sample copy. The best patch note is the one that admits what broke, names the build it broke in and says when it will stop being broken. Everything else is marketing with a version number."
+      ],
+      "image": {
+        "src": "img/quote-bg.jpg",
+        "alt": "Sample placeholder artwork: dark panel with a large centred numeral four",
+        "credit": "Sample artwork, generated for this fixture"
+      },
+      "source": {
+        "label": "Sample Source H",
+        "url": "https://example.com/sample/opinion/patch-notes"
+      },
+      "tags": ["patch-notes", "opinion"],
+      "whyItMatters": "The quote branch, with a background image, since a pull quote is usually asked to carry a section on its own."
+    },
+    {
+      "id": "quick-patch",
+      "kind": "quick",
+      "priority": 45,
+      "kicker": "GAMING",
+      "headline": "A sample hotfix landed overnight",
+      "standfirst": "One line, no image, no ceremony.",
+      "body": [
+        "Sample copy: a fictional hotfix corrected a tooltip and nothing else, and the community thread about it ran to four hundred replies."
+      ],
+      "source": {
+        "label": "Sample Source A",
+        "url": "https://example.com/sample/hotfix"
+      },
+      "tags": ["patch-notes", "hotfix"],
+      "whyItMatters": "The brief variant, to prove a one-paragraph section still gets a source line."
+    },
+    {
+      "id": "quick-router",
+      "kind": "quick",
+      "priority": 40,
+      "kicker": "HARDWARE",
+      "headline": "A sample router got a firmware bump",
+      "standfirst": "Two lines and a version number.",
+      "body": [
+        "Sample copy: a fictional router received a firmware update that fixes a reboot loop and adds nothing. The release notes are nine words long and are the best release notes of the week."
+      ],
+      "source": {
+        "label": "Sample Source B",
+        "url": "https://example.com/sample/router-firmware"
+      },
+      "tags": ["hardware", "firmware"]
+    }
+  ],
+  "quickHits": [
+    {
+      "text": "Sample studio opens a public test branch for its next build, no date attached.",
+      "url": "https://example.com/sample/quick/test-branch"
+    },
+    {
+      "text": "A sample creator posted a forty-minute essay about corridors, then a nine-minute follow-up about doors, which is either a series or a bit.",
+      "url": "https://example.com/sample/quick/follow-up"
+    },
+    {
+      "text": "Sample hardware listing page shows a restock date in a timezone nobody can identify.",
+      "url": "https://example.com/sample/quick/restock"
+    },
+    {
+      "text": "This quick hit exists to prove wrapping: about one hundred and eighty characters of sample copy, so the list has to break across three lines on a narrow phone with no clipping.",
+      "url": "https://example.com/sample/quick/long-text"
+    },
+    {
+      "text": "Sample patch notes corrected a typo in a tooltip and the typo was the name of the game.",
+      "url": "https://example.com/sample/very/long/path/segment/that/keeps/going/for/a/while/edition-seven/quick-hit-seventeen?utm_source=fixture&utm_medium=none&ref=long-url-overflow-check"
+    },
+    {
+      "text": "Sample maintenance window announced for Thursday, two hours, promised at one.",
+      "url": "https://example.com/sample/quick/maintenance"
+    }
+  ],
+  "signoff": "That is the fixture. Twelve sections, six quick hits and no real news: every item above is sample copy written to exercise a layout branch."
+}

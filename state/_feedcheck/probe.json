@@ -1,0 +1,386 @@
+[
+ {
+  "name": "PC Gamer",
+  "url": "https://www.pcgamer.com/rss/",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 50,
+  "error": null
+ },
+ {
+  "name": "Rock Paper Shotgun",
+  "url": "https://www.rockpapershotgun.com/feed",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 100,
+  "error": null
+ },
+ {
+  "name": "Eurogamer",
+  "url": "https://www.eurogamer.net/feed",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 100,
+  "error": null
+ },
+ {
+  "name": "GamesIndustry.biz",
+  "url": "https://www.gamesindustry.biz/feed",
+  "tags": [
+   "gaming",
+   "business"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 100,
+  "error": null
+ },
+ {
+  "name": "VGC",
+  "url": "https://www.videogameschronicle.com/feed/",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 10,
+  "error": null
+ },
+ {
+  "name": "GameSpot News",
+  "url": "https://www.gamespot.com/feeds/news/",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 30,
+  "error": null
+ },
+ {
+  "name": "IGN",
+  "url": "https://feeds.ign.com/ign/games-all",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "Digital Foundry",
+  "url": "https://www.eurogamer.net/digitalfoundry/rss",
+  "tags": [
+   "gaming",
+   "tech"
+  ],
+  "weight": 2,
+  "http": 404,
+  "items": 0,
+  "error": null
+ },
+ {
+  "name": "Tom's Hardware",
+  "url": "https://www.tomshardware.com/feeds/all",
+  "tags": [
+   "hardware",
+   "tech"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 50,
+  "error": null
+ },
+ {
+  "name": "The Verge AI",
+  "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+  "tags": [
+   "ai",
+   "tech"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 10,
+  "error": null
+ },
+ {
+  "name": "Ars Technica",
+  "url": "https://feeds.arstechnica.com/arstechnica/index",
+  "tags": [
+   "tech",
+   "science"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "Ars Technica AI",
+  "url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+  "tags": [
+   "ai",
+   "tech"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "TechCrunch AI",
+  "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+  "tags": [
+   "ai",
+   "tech"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "VentureBeat AI",
+  "url": "https://venturebeat.com/category/ai/feed/",
+  "tags": [
+   "ai",
+   "business"
+  ],
+  "weight": 1,
+  "http": 429,
+  "items": 0,
+  "error": null
+ },
+ {
+  "name": "MIT Technology Review",
+  "url": "https://www.technologyreview.com/feed/",
+  "tags": [
+   "tech",
+   "science"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 10,
+  "error": null
+ },
+ {
+  "name": "Game Developer",
+  "url": "https://www.gamedeveloper.com/rss.xml",
+  "tags": [
+   "gaming",
+   "business"
+  ],
+  "weight": 2,
+  "http": 200,
+  "items": 50,
+  "error": null
+ },
+ {
+  "name": "Kyiv Independent",
+  "url": "https://kyivindependent.com/api/v1/feed",
+  "tags": [
+   "ukraine",
+   "world"
+  ],
+  "weight": 1,
+  "http": 404,
+  "items": 0,
+  "error": null
+ },
+ {
+  "name": "PCGamesN",
+  "url": "https://www.pcgamesn.com/feed",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 75,
+  "error": null
+ },
+ {
+  "name": "Nintendo Life",
+  "url": "https://www.nintendolife.com/feeds/latest",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 25,
+  "error": null
+ },
+ {
+  "name": "Push Square",
+  "url": "https://www.pushsquare.com/feeds/latest",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 25,
+  "error": null
+ },
+ {
+  "name": "Wccftech",
+  "url": "https://wccftech.com/feed/",
+  "tags": [
+   "hardware",
+   "tech"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "TechPowerUp",
+  "url": "https://www.techpowerup.com/rss/news",
+  "tags": [
+   "hardware",
+   "tech"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 132,
+  "error": null
+ },
+ {
+  "name": "Hugging Face Blog",
+  "url": "https://huggingface.co/blog/feed.xml",
+  "tags": [
+   "ai",
+   "tech"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 891,
+  "error": null
+ },
+ {
+  "name": "Google AI Blog",
+  "url": "https://blog.google/technology/ai/rss/",
+  "tags": [
+   "ai",
+   "tech"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "OpenAI Blog",
+  "url": "https://openai.com/news/rss.xml",
+  "tags": [
+   "ai",
+   "tech"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 1331,
+  "error": null
+ },
+ {
+  "name": "GamingOnLinux",
+  "url": "https://www.gamingonlinux.com/article_rss.php",
+  "tags": [
+   "gaming",
+   "linux"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 50,
+  "error": null
+ },
+ {
+  "name": "Dexerto",
+  "url": "https://www.dexerto.com/feed/",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 50,
+  "error": null
+ },
+ {
+  "name": "Kotaku",
+  "url": "https://kotaku.com/rss",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "TheGamer",
+  "url": "https://www.thegamer.com/feed/",
+  "tags": [
+   "gaming",
+   "news"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 10,
+  "error": null
+ },
+ {
+  "name": "Engadget",
+  "url": "https://www.engadget.com/rss.xml",
+  "tags": [
+   "tech",
+   "hardware"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "Ukrainska Pravda",
+  "url": "https://www.pravda.com.ua/rss/",
+  "tags": [
+   "ukraine",
+   "world"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 20,
+  "error": null
+ },
+ {
+  "name": "The Register",
+  "url": "https://www.theregister.com/headlines.atom",
+  "tags": [
+   "tech",
+   "hardware"
+  ],
+  "weight": 1,
+  "http": 200,
+  "items": 50,
+  "error": null
+ }
+]

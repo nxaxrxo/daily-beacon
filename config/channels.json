@@ -1,0 +1,855 @@
+[
+  {
+    "id": "UCQeRaTukNYft1_6AZPACnog",
+    "name": "Asmongold TV",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "reaction"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCq6VFHwMzcMXbuKyG7SQYIg",
+    "name": "penguinz0",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCxfr3b8IuHSzu22UHnAvHWg",
+    "name": "MoistCr1TiKaL Gaming",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCsgv2QHkT2ljEixyulzOnUQ",
+    "name": "AngryJoeShow",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "movies"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCsvn_Po0SmunchJYOWpOxMg",
+    "name": "videogamedunkey",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UC7dF9qfBMXrSlaaFFDvV_Yg",
+    "name": "Gigguk",
+    "tier": 1,
+    "tags": [
+      "animation",
+      "movies"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCR1D15p_vdP3HkrH8wgjQRw",
+    "name": "Internet Historian",
+    "tier": 1,
+    "tags": [
+      "essay",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCDWIvJwLJsE4LG1Atne2blQ",
+    "name": "h3h3Productions",
+    "tier": 1,
+    "tags": [
+      "comedy",
+      "podcast"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCtGoikgbxP4F3rgI9PldI9g",
+    "name": "Super Eyepatch Wolf",
+    "tier": 1,
+    "tags": [
+      "essay",
+      "animation"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCTSRIY3GLFYIpkR2QwyeklA",
+    "name": "Drew Gooden",
+    "tier": 1,
+    "tags": [
+      "comedy",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCSdma21fnJzgmPodhC9SJ3g",
+    "name": "NakeyJakey",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCNJ1Ymd5yFuUPtn21xtRbbw",
+    "name": "AI Explained",
+    "tier": 1,
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UChpleBmo18P08aKCIgti38g",
+    "name": "Matt Wolfe",
+    "tier": 1,
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCbfYPyITQ-7l4upoX8nvctg",
+    "name": "Two Minute Papers",
+    "tier": 1,
+    "tags": [
+      "ai",
+      "science"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCgfe2ooZD3VJPB6aJAnuQng",
+    "name": "bycloud",
+    "tier": 1,
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCIgnGlGkVRhd4qNFcEwLL4A",
+    "name": "AI Search",
+    "tier": 1,
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCweDKPSF65wRw5VHFUJYiow",
+    "name": "Curious Archive",
+    "tier": 1,
+    "tags": [
+      "science",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCpFFItkfZz1qz5PpHpqzYBw",
+    "name": "Nexpo",
+    "tier": 1,
+    "tags": [
+      "horror",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCU3oAyhHDXjgbxazqOEG2UA",
+    "name": "blameitonjorge",
+    "tier": 1,
+    "tags": [
+      "horror",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UC176GAQozKKjhz62H8u9vQQ",
+    "name": "Real Science",
+    "tier": 1,
+    "tags": [
+      "science",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCchBatdUMZoMfJ3rIzgV84g",
+    "name": "Viva La Dirt League",
+    "tier": 1,
+    "tags": [
+      "comedy",
+      "gaming"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UC91V6D3nkhP89wUb9f_h17g",
+    "name": "MeatCanyon",
+    "tier": 1,
+    "tags": [
+      "animation",
+      "horror"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCODHrzPMGbNv67e84WDZhQQ",
+    "name": "fern",
+    "tier": 1,
+    "tags": [
+      "essay",
+      "science"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCE1jXbVAGJQEORz9nZqb5bQ",
+    "name": "Ahoy",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UC6nSFpj9HTCZ5t-N3Rm3-HA",
+    "name": "Vsauce",
+    "tier": 1,
+    "tags": [
+      "science",
+      "essay"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCX6OQ3DkcsbYNE6H8uQQuVA",
+    "name": "MrBeast",
+    "tier": 1,
+    "tags": [
+      "comedy",
+      "shorts"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCzTdZz7z2sPRGCImodwOw0g",
+    "name": "JT Music",
+    "tier": 1,
+    "tags": [
+      "music",
+      "gaming"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCsxS7yzZC9gKYcgL4pvN3rA",
+    "name": "Asmongold Gaming",
+    "tier": 2,
+    "tags": [
+      "gaming"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCNnKprAG-MWLsk-GsbsC2BA",
+    "name": "Flashgitz",
+    "tier": 2,
+    "tags": [
+      "animation",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCRVXfhLRsLWi3_IKnMDiI1Q",
+    "name": "poi",
+    "tier": 2,
+    "tags": [
+      "essay",
+      "horror"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCYmna5rFHIesFteksAvFOfg",
+    "name": "Dr. Plants",
+    "tier": 2,
+    "tags": [
+      "science",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCSz8X-JAmenxLH-uXlgVaCg",
+    "name": "Odd Animal Specimens",
+    "tier": 2,
+    "tags": [
+      "science"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCNXvmGafmrtJ7VPSqjRRbwg",
+    "name": "Scary Interesting",
+    "tier": 2,
+    "tags": [
+      "horror",
+      "essay"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCwYQXYfPHTZKANHzBHdYo2w",
+    "name": "ANATOLY",
+    "tier": 2,
+    "tags": [
+      "comedy",
+      "memes"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCcKSEzhtEkzfCT8_DzyMfpg",
+    "name": "KiraTV",
+    "tier": 2,
+    "tags": [
+      "gaming-news",
+      "essay"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCSpFnDQr88xCZ80N-X7t0nQ",
+    "name": "Corridor Crew",
+    "tier": 2,
+    "tags": [
+      "tech",
+      "movies"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCsn6cjffsvyOZCZxvGoJxGg",
+    "name": "Corridor Digital",
+    "tier": 2,
+    "tags": [
+      "animation",
+      "tech"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCxsQFG_8Dbt1sZhLReL2mUw",
+    "name": "Nerd City",
+    "tier": 2,
+    "tags": [
+      "essay",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCN5xN8gIljvWYnsj06V8WbQ",
+    "name": "Pyrocynical",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "essay"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCPnSoX7NkOBcOX0Gfw_yjAw",
+    "name": "Tectone",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "reaction"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCKr-aOmHkFUg6P9B8A_6jgQ",
+    "name": "Josh Strife Says",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "essay"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCJkMlOu7faDgqh4PfzbpLdg",
+    "name": "Nerdwriter1",
+    "tier": 2,
+    "tags": [
+      "essay",
+      "art"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCa8VCGFAY0yjDrexYFeVoYg",
+    "name": "Spikima Movies",
+    "tier": 2,
+    "tags": [
+      "movies",
+      "essay"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UC5Wz4fFacYuON6IKbhSa7Zw",
+    "name": "MattVidPro",
+    "tier": 2,
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCEAbqW0HFB_UxZoUDO0kJBw",
+    "name": "Aitrepreneur",
+    "tier": 2,
+    "tags": [
+      "ai",
+      "tech"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCnZx--LpG2spgmlxOcC-DRA",
+    "name": "Daniel Thrasher",
+    "tier": 2,
+    "tags": [
+      "comedy",
+      "music"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCP0_k4INXrwPS6HhIyYqsTg",
+    "name": "Steven He",
+    "tier": 2,
+    "tags": [
+      "comedy",
+      "shorts"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCdC0An4ZPNr_YiFiYoVbwaw",
+    "name": "Daily Dose Of Internet",
+    "tier": 2,
+    "tags": [
+      "memes",
+      "shorts"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCkzaJDHBKbcaNatH_T00ieg",
+    "name": "High Boi",
+    "tier": 2,
+    "tags": [
+      "animation",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UC0e3QhIYukixgh5VVpKHH9Q",
+    "name": "Code Bullet",
+    "tier": 2,
+    "tags": [
+      "tech",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCnwUjPK7dXety-AJ4fNw_RQ",
+    "name": "The Paint Explainer",
+    "tier": 2,
+    "tags": [
+      "essay",
+      "science"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCo8bcnLyZH8tBIH9V1mLgqQ",
+    "name": "TheOdd1sOut",
+    "tier": 2,
+    "tags": [
+      "animation",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCWXCrItCF6ZgXrdozUS-Idw",
+    "name": "ExplosmEntertainment",
+    "tier": 2,
+    "tags": [
+      "animation",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UC1uug_uZrVmylfPVBLBvitQ",
+    "name": "CarbotAnimations",
+    "tier": 2,
+    "tags": [
+      "animation",
+      "gaming"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UChc-m3saf8K2oJHDSsnsj_A",
+    "name": "Elvis The Alien",
+    "tier": 2,
+    "tags": [
+      "movies",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCBNG0osIBAprVcZZ3ic84vw",
+    "name": "Jim Browning",
+    "tier": 2,
+    "tags": [
+      "essay",
+      "tech"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UC2ksme4hP4Nx97ilFTQ0K0Q",
+    "name": "Threat Interactive",
+    "tier": 2,
+    "tags": [
+      "gaming-news",
+      "tech"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UC9iy0bQd8OddxuHl1e3qkzw",
+    "name": "Hartnett Media",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "tech"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCKtu_JtQCY0yryIy6zK4ZCg",
+    "name": "Marc Brunet",
+    "tier": 2,
+    "tags": [
+      "art"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCw1SQ6QRRtfAhrN_cjkrOgA",
+    "name": "LazarBeam",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UC-lHJZR3Gqxm24_Vd_AJ5Yw",
+    "name": "PewDiePie",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCJLZe_NoiG0hT7QCX_9vmqw",
+    "name": "I did a thing",
+    "tier": 2,
+    "tags": [
+      "comedy",
+      "memes"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCJfJWct8jN1RpCuVWk3zHTA",
+    "name": "Daryl Talks Games",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "essay"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UC-btPIh4KalPw3hZxcB4zww",
+    "name": "The Theorizer",
+    "tier": 2,
+    "tags": [
+      "essay",
+      "horror"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  },
+  {
+    "id": "UCkQ774ot9mhH3wWMsjzGq2g",
+    "name": "Asmongold Shorts",
+    "tier": 3,
+    "tags": [
+      "shorts",
+      "gaming"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCMwJJL5FJFuTRT55ksbQ4GQ",
+    "name": "Asmongold Clips",
+    "tier": 3,
+    "tags": [
+      "shorts",
+      "gaming"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCYF1kiTFCcYPqGTqXKt3JJg",
+    "name": "Papa Meat",
+    "tier": 3,
+    "tags": [
+      "comedy",
+      "animation"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCt3JiNkefsfbA2N4SgEkoiQ",
+    "name": "Visual Venture",
+    "tier": 3,
+    "tags": [
+      "essay",
+      "horror"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCjnYCUIym8wNRjLtZCc6gNg",
+    "name": "Dr Insanity",
+    "tier": 3,
+    "tags": [
+      "horror",
+      "shorts"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCfUzdRue-huCAV9FOn9a0pw",
+    "name": "Naked Criminal",
+    "tier": 3,
+    "tags": [
+      "horror",
+      "shorts"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCvz84_Q0BbvZThy75mbd-Dg",
+    "name": "Zack D. Films",
+    "tier": 3,
+    "tags": [
+      "shorts",
+      "memes"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCpnkp_D4FLPCiXOmDhoAeYA",
+    "name": "UnusualVideos",
+    "tier": 3,
+    "tags": [
+      "memes",
+      "shorts"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCLonTAxE8cjkGUTnDLShaPw",
+    "name": "TEMINATION",
+    "tier": 3,
+    "tags": [
+      "memes",
+      "shorts"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCpoKdKVhH-jcr3Pu0auKjmw",
+    "name": "skeler.",
+    "tier": 3,
+    "tags": [
+      "music"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCc_bv_5nmxy2xnPNg9kP3Rg",
+    "name": "Teminite",
+    "tier": 3,
+    "tags": [
+      "music"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCkAsdQZolgJdKmZ3T3zn-dA",
+    "name": "Steak and Eggs Podcast",
+    "tier": 3,
+    "tags": [
+      "podcast",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UC9p9sOco6xAOibKsh9uWsRA",
+    "name": "TBH",
+    "tier": 3,
+    "tags": [
+      "podcast",
+      "comedy"
+    ],
+    "enabled": true,
+    "note": ""
+  },
+  {
+    "id": "UCnYZ1yBpH3BLWxe5Fj4xsWQ",
+    "name": "Scroll Gang",
+    "tier": 3,
+    "tags": [
+      "shorts",
+      "memes"
+    ],
+    "enabled": true,
+    "note": "tier guessed - confirm"
+  }
+]

@@ -1,0 +1,12 @@
+# working state and caches - never published
+state/workpack/
+__pycache__/
+*.pyc
+site/assets/*/tmp*
+*.bak-*
+.venv/
+node_modules/
+Thumbs.db
+.DS_Store
+
+# tracked on purpose: state/seen.sqlite (memory) and editions/*.json (content)

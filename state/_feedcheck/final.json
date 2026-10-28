@@ -1,0 +1,194 @@
+[
+ {
+  "name": "PC Gamer",
+  "url": "https://www.pcgamer.com/rss/",
+  "http": 200,
+  "items": 50,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "Rock Paper Shotgun",
+  "url": "https://www.rockpapershotgun.com/feed",
+  "http": 200,
+  "items": 100,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "Eurogamer",
+  "url": "https://www.eurogamer.net/feed",
+  "http": 200,
+  "items": 100,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "GamesIndustry.biz",
+  "url": "https://www.gamesindustry.biz/feed",
+  "http": 200,
+  "items": 100,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "VGC",
+  "url": "https://www.videogameschronicle.com/feed/",
+  "http": 200,
+  "items": 10,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "GameSpot News",
+  "url": "https://www.gamespot.com/feeds/news/",
+  "http": 200,
+  "items": 30,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "IGN Games",
+  "url": "https://feeds.ign.com/ign/games-all",
+  "http": 200,
+  "items": 20,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "PCGamesN",
+  "url": "https://www.pcgamesn.com/feed",
+  "http": 200,
+  "items": 75,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "Nintendo Life",
+  "url": "https://www.nintendolife.com/feeds/latest",
+  "http": 200,
+  "items": 25,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "Push Square",
+  "url": "https://www.pushsquare.com/feeds/latest",
+  "http": 200,
+  "items": 25,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "GamingOnLinux",
+  "url": "https://www.gamingonlinux.com/article_rss.php",
+  "http": 200,
+  "items": 50,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "Digital Foundry",
+  "url": "https://feeds.feedburner.com/digitalfoundry",
+  "http": 200,
+  "items": 15,
+  "latest": "2026-10-26",
+  "err": ""
+ },
+ {
+  "name": "Tom's Hardware",
+  "url": "https://www.tomshardware.com/feeds/all",
+  "http": 200,
+  "items": 50,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "TechPowerUp",
+  "url": "https://www.techpowerup.com/rss/news",
+  "http": 200,
+  "items": 132,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "Wccftech",
+  "url": "https://wccftech.com/feed/",
+  "http": 200,
+  "items": 20,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "The Register",
+  "url": "https://www.theregister.com/headlines.atom",
+  "http": 200,
+  "items": 50,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "The Verge AI",
+  "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+  "http": 200,
+  "items": 10,
+  "latest": "2026-10-27",
+  "err": ""
+ },
+ {
+  "name": "Ars Technica",
+  "url": "https://feeds.arstechnica.com/arstechnica/index",
+  "http": 200,
+  "items": 20,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "TechCrunch AI",
+  "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+  "http": 200,
+  "items": 20,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ },
+ {
+  "name": "MIT Technology Review",
+  "url": "https://www.technologyreview.com/feed/",
+  "http": 200,
+  "items": 10,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "Google AI Blog",
+  "url": "https://blog.google/technology/ai/rss/",
+  "http": 200,
+  "items": 20,
+  "latest": "Mon, 26 Oc",
+  "err": ""
+ },
+ {
+  "name": "Hugging Face Blog",
+  "url": "https://huggingface.co/blog/feed.xml",
+  "http": 200,
+  "items": 891,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "Game Developer",
+  "url": "https://www.gamedeveloper.com/rss.xml",
+  "http": 200,
+  "items": 50,
+  "latest": "Tue, 27 Oc",
+  "err": ""
+ },
+ {
+  "name": "Kyiv Independent",
+  "url": "https://kyivindependent.com/news-archive/rss/",
+  "http": 200,
+  "items": 15,
+  "latest": "Wed, 28 Oc",
+  "err": ""
+ }
+]

@@ -1,0 +1,161 @@
+[
+  {
+    "name": "Kotaku",
+    "url": "https://kotaku.com/rss",
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Dexerto",
+    "url": "https://www.dexerto.com/feed/",
+    "tags": [
+      "drama",
+      "gaming"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Anime News Network",
+    "url": "https://www.animenewsnetwork.com/all/rss.xml",
+    "tags": [
+      "anime"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "PlayStation Blog",
+    "url": "https://blog.playstation.com/feed/",
+    "tags": [
+      "gaming",
+      "ps"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Xbox Wire",
+    "url": "https://news.xbox.com/en-us/feed/",
+    "tags": [
+      "gaming",
+      "xbox"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Godot Blog",
+    "url": "https://godotengine.org/rss.xml",
+    "tags": [
+      "dev",
+      "godot"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Unreal Engine",
+    "url": "https://www.unrealengine.com/rss/news",
+    "tags": [
+      "dev",
+      "unreal"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "80.lv",
+    "url": "https://80.lv/feed/",
+    "tags": [
+      "dev",
+      "art"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Indie Games Plus",
+    "url": "https://indiegamesplus.com/feed",
+    "tags": [
+      "gaming",
+      "indie"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "OpenAI Blog",
+    "url": "https://openai.com/news/rss.xml",
+    "tags": [
+      "ai",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Google AI Blog",
+    "url": "https://blog.google/technology/ai/rss/",
+    "tags": [
+      "ai",
+      "news"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Hugging Face",
+    "url": "https://huggingface.co/blog/feed.xml",
+    "tags": [
+      "ai",
+      "dev"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Hacker News",
+    "url": "https://hnrss.org/frontpage?points=150",
+    "tags": [
+      "tech",
+      "dev"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Siliconera",
+    "url": "https://www.siliconera.com/feed/",
+    "tags": [
+      "gaming",
+      "japan"
+    ],
+    "enabled": true,
+    "weight": 1
+  },
+  {
+    "name": "Variety Gaming",
+    "url": "https://variety.com/v/gaming/feed/",
+    "tags": [
+      "gaming",
+      "business"
+    ],
+    "enabled": true,
+    "weight": 2
+  },
+  {
+    "name": "Ukrinform",
+    "url": "https://www.ukrinform.net/rss/block-lastnews",
+    "tags": [
+      "world",
+      "ukraine"
+    ],
+    "enabled": true,
+    "weight": 1
+  }
+]
