@@ -1,0 +1,9 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="The Daily Beacon">
+  <rect width="64" height="64" rx="12" fill="#131516"/>
+  <rect x="12" y="14" width="40" height="5" rx="2" fill="#6fc3ba"/>
+  <rect x="12" y="24" width="34" height="3" rx="1.5" fill="#ede9e4" opacity=".85"/>
+  <rect x="12" y="31" width="40" height="3" rx="1.5" fill="#ede9e4" opacity=".55"/>
+  <rect x="12" y="38" width="28" height="3" rx="1.5" fill="#ede9e4" opacity=".55"/>
+  <circle cx="46" cy="47" r="6" fill="#6fc3ba"/>
+  <rect x="12" y="45" width="20" height="4" rx="2" fill="#6fc3ba" opacity=".8"/>
+</svg>

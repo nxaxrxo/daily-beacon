@@ -842,6 +842,7 @@ def document( *,
     colophon: str, body_class: str,
     css_url: str, js_url: str,
     description: str, og_image: str = "",
+    prefix: str = "",
 ) -> str:
     """Assemble one complete page. Element order follows SITE-CONTRACT section 2."""
     body_attr = f' class="{body_class}"' if body_class else ""
@@ -854,7 +855,10 @@ def document( *,
         f'<html lang="en" data-accent="{accent}" class="{classes}">', "<head>",
         '<meta charset="utf-8">', '<meta name="viewport" content="width=device-width,initial-scale=1">',
         '<meta name="color-scheme" content="dark light">', f"<title>{text(title)}</title>",
-        f'<meta name="description" content="{attr(description)}">', f'<link rel="stylesheet" href="{attr(css_url)}">',
+        f'<meta name="description" content="{attr(description)}">',
+        f'<link rel="icon" href="{attr(prefix)}favicon.svg" type="image/svg+xml">',
+        f'<link rel="apple-touch-icon" href="{attr(prefix)}favicon.svg">',
+        f'<link rel="stylesheet" href="{attr(css_url)}">',
         *meta, "</head>",
         f'<body id="top"{body_attr}>', '<div id="progress" aria-hidden="true"><span id="progress-bar"></span></div>',
         "", header,
@@ -881,7 +885,7 @@ def build_page(ctx: Context, *, prefix: str) -> str:
         image = lead.get("image")
         if isinstance(image, dict) and isinstance(image.get("src"), str) and is_http(image["src"]):
             og = image["src"]
-    return document( title=f'{edition.get("masthead") or "THE DAILY BEACON"} - {long_date(ctx.captured)}',
+    return document( prefix=ctx.prefix, title=f'{edition.get("masthead") or "THE DAILY BEACON"} - {long_date(ctx.captured)}',
         accent=accent, classes=f"layout-{layout} scale-{scale} order-{order}",
         header=render_masthead(ctx), nav=render_toc(ordered),
         main=render_main(ctx), colophon=render_colophon(ctx),
@@ -928,7 +932,7 @@ def render_archive_page(ctx: Context, entries: Sequence[tuple[str, str]], *, pre
         items.append( '<li class="archive__item"><span class="archive__head">No editions archived yet.</span></li>'
         )
     main = '<main class="paper archive">\n<ul class="archive__list">\n' + "\n".join(items) + "\n</ul>\n</main>"
-    return document( title="THE DAILY BEACON - Archive",
+    return document( prefix=prefix, title="THE DAILY BEACON - Archive",
         accent=accent, classes=f"layout-{layout} scale-{scale} order-{order}",
         header=render_masthead(ctx, title="THE DAILY BEACON", tagline="Archive"), nav="",
         main=main, colophon=render_colophon(ctx, prefix=prefix),

@@ -273,6 +273,58 @@ def key_for(item):
 # --------------------------------------------------------------------------
 # filter
 # --------------------------------------------------------------------------
+# Kickers are typographic labels ("GAMING . AI", "MUSIC . MASS EFFECT"). Slugging the whole
+# string produced topics like "gaminglabour" and "animepenguinz0", which no article tag can ever
+# match - so the cooldown silently never fired. Each word is a topic; these words are not.
+KICKER_STOPWORDS = {
+    "the", "and", "for", "with", "from", "into", "your", "our", "its", "his", "her", "their",
+    "new", "now", "out", "off", "all", "not", "but", "you", "are", "was", "has", "had", "how",
+    "why", "what", "when", "who", "this", "that", "these", "those", "more", "most", "than",
+    "than", "then", "over", "after", "before", "under", "about", "again", "just", "still",
+    "week", "day", "today", "news", "review", "reviews", "update", "updates", "report",
+    "first", "last", "next", "back", "top", "big", "one", "two", "ago", "get", "got",
+}
+
+
+KICKER_SPLIT_RE = re.compile(r"[\u00b7|/\u2014\u2013\u2192,;:()\[\]]+")
+
+
+# Tags this broad would each shut down a whole section for three weeks ("review" appears in half
+# of everything). They stay on the item record, but never become cooldown topics.
+GENERIC_TOPICS = {
+    "news", "review", "reviews", "release", "released", "research", "update", "updates",
+    "report", "reports", "video", "videos", "feature", "features", "analysis", "opinion",
+    "business", "rumour", "rumor", "leak", "leaks", "trailer", "preview", "editorial",
+    "world", "general", "misc", "other", "top", "best", "how", "why", "what",
+}
+
+
+def cooldown_topics(tags, kicker):
+    """The topic slugs that legitimately gate a repeat: specific, matchable, not category noise."""
+    raw = [topic_name(str(t)) for t in (tags or [])]
+    raw.extend(kicker_topics(kicker))
+    return [t for t in dict.fromkeys(raw) if t and t not in GENERIC_TOPICS]
+
+
+def kicker_topics(kicker):
+    """Split a kicker label into matchable topic slugs.
+
+    Kickers are editorial labels: "MUSIC . MASS EFFECT" is two subjects, not four words.
+    Splitting on the separator first keeps multi-word subjects intact ("masseffect"), and
+    dropping stopwords keeps "THE BIG ONE" from becoming a topic.
+    """
+    out = []
+    for segment in KICKER_SPLIT_RE.split(str(kicker or "").lower()):
+        words = [w for w in PUNCT_RE.split(segment) if w and w not in KICKER_STOPWORDS]
+        if not words:
+            continue
+        slug = "".join(words)
+        if len(slug) < 3 or slug.isdigit():
+            continue
+        out.append(slug)
+    return out
+
+
 def recent_topics(conn, cooldown_days):
     cutoff = days_ago(cooldown_days)
     rows = conn.execute(
@@ -452,10 +504,7 @@ def mark_edition(conn, edition_path, edition_date=None):
         url = (src.get("url") or "").strip()
         title = (section.get("headline") or "").strip()
         kind = section.get("kind") or "story"
-        tags = [topic_name(str(t)) for t in (section.get("tags") or [])]
-        kicker = topic_name(str(section.get("kicker") or ""))
-        if kicker:
-            tags.append(kicker)
+        tags = cooldown_topics(section.get("tags"), section.get("kicker"))
         tags = [t for t in dict.fromkeys(tags) if t]
         for key in edition_story_keys(kind, url, title):
             if insert_item(conn, key, kind, title, url, src.get("label") or "",
@@ -549,6 +598,89 @@ def cmd_stats(args, root):
         print("last edition: none")
     else:
         print("last edition: %s (%s)" % (last["date"], last["path"] or "no path"))
+    return 0
+
+
+def days_since(date_str):
+    """Whole days between a YYYY-MM-DD string and today. None when unparseable."""
+    try:
+        then = datetime.strptime(str(date_str)[:10], "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return None
+    return (datetime.now().astimezone().date() - then).days
+
+
+def resurface_candidates(conn, after_days, limit):
+    """Topics that fell out of the cooldown window and can come back as retrospectives.
+
+    The spec asks for a reminder a month later. This is that: a topic quiet for at least
+    `after_days` is no longer "news" (never re-report it as fresh), but it IS fair game to
+    revisit with a genuinely new development, framed as a follow-up.
+    """
+    cutoff = days_ago(after_days)
+    return conn.execute(
+        "SELECT topic, last_covered, times, last_edition FROM topics "
+        "WHERE last_covered IS NOT NULL AND last_covered <= ? "
+        "ORDER BY last_covered ASC LIMIT ?",
+        (cutoff, int(limit)),
+    ).fetchall()
+
+
+def cmd_digest(args, root):
+    """Coverage analytics + the month-later resurface list."""
+    if args.cooldown is None:
+        settings = load_settings(root)
+        args.cooldown = settings.get("repeat_topic_cooldown_days", DEFAULT_COOLDOWN_DAYS)
+    with db_session(args.db) as conn:
+        n_items = conn.execute("SELECT COUNT(*) FROM items").fetchone()[0]
+        n_topics = conn.execute("SELECT COUNT(*) FROM topics").fetchone()[0]
+        first = conn.execute("SELECT MIN(date) AS d FROM editions").fetchone()["d"]
+        last = conn.execute("SELECT MAX(date) AS d FROM editions").fetchone()["d"]
+        n_editions = conn.execute("SELECT COUNT(*) FROM editions").fetchone()[0]
+        run = conn.execute(
+            "SELECT COUNT(*) AS c FROM (SELECT DISTINCT date(first_seen) AS d FROM items)"
+        ).fetchone()["c"]
+        hottest = conn.execute(
+            "SELECT topic, times, last_covered FROM topics ORDER BY times DESC, last_covered DESC "
+            "LIMIT ?", (int(args.top),)).fetchall()
+        cooling = recent_topics(conn, args.cooldown)
+        ripe = resurface_candidates(conn, args.after, args.top)
+
+    print("DIGEST - what the Beacon has covered")
+    print("db: %s" % Path(args.db))
+    if first:
+        print("editions: %d (%s .. %s)" % (n_editions, first, last))
+    else:
+        print("editions: 0 (nothing published yet)")
+    print("items kept: %d | topics tracked: %d | days with coverage: %d" % (n_items, n_topics, run))
+    if not n_topics:
+        print()
+        print("Nothing to digest yet - the store fills up after the first few editions.")
+        return 0
+
+    print()
+    print("most covered topics:")
+    for row in hottest:
+        age = days_since(row["last_covered"])
+        when = "today" if age == 0 else ("%d days ago" % age if age is not None else "unknown")
+        print("  %-32s %2d time(s)  last %s" % (row["topic"][:32], int(row["times"] or 0), when))
+
+    print()
+    if cooling:
+        print("cooling down (do not re-report as news, %d-day window):" % int(args.cooldown))
+        print("  " + ", ".join(str(c["topic"]) if isinstance(c, dict) else str(c) for c in cooling))
+    else:
+        print("cooling down: nothing (empty store or all quiet)")
+
+    print()
+    if ripe:
+        print("ripe for a month-later follow-up (quiet %d+ days):" % int(args.after))
+        for row in ripe:
+            age = days_since(row["last_covered"])
+            print("  %-32s quiet %s days, %d time(s) - needs a NEW development"
+                  % (row["topic"][:32], age if age is not None else "?", int(row["times"] or 0)))
+    else:
+        print("ripe for a follow-up: nothing yet (needs %d days of quiet)" % int(args.after))
     return 0
 
 
@@ -738,6 +870,14 @@ def build_parser():
     pr.add_argument("--days", type=int, default=400,
                     help="age in days; older unreferenced rows are deleted (default: 400)")
     pr.set_defaults(func=cmd_prune)
+
+    dg = add_root(sub.add_parser("digest", help="coverage analytics + the month-later resurface list"))
+    dg.add_argument("--after", type=int, default=30,
+                    help="a topic quiet this many days is ripe for a follow-up (default: 30)")
+    dg.add_argument("--top", type=int, default=12, help="rows per list (default: 12)")
+    dg.add_argument("--cooldown", type=int, default=None,
+                    help="cooldown window to report against (default: settings.json)")
+    dg.set_defaults(func=cmd_digest)
 
     st = add_root(sub.add_parser("selftest", help="temp-db self test (prints SELFTEST PASS)"))
     st.set_defaults(func=None)
