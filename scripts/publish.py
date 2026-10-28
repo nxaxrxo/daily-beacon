@@ -251,7 +251,8 @@ def mirror_pages() -> int:
 
     scratch = Path(tempfile.mkdtemp(prefix="daily-beacon-pages-"))
     tree = scratch / "tree"
-    added = git("worktree", "add", "--force", "-B", branch, str(tree), start)
+    # --detach: a throwaway checkout must never create, reset or delete a real local branch.
+    added = git("worktree", "add", "--force", "--detach", str(tree), start)
     if added.returncode != 0:
         shutil.rmtree(scratch, ignore_errors=True)
         warn(f"publish: cannot open a worktree for branch {branch}")
@@ -301,7 +302,7 @@ def mirror_pages() -> int:
         return 0
     finally:
         git("worktree", "remove", "--force", str(tree))
-        git("branch", "-D", branch)
+        git("worktree", "prune")
         shutil.rmtree(scratch, ignore_errors=True)
 
 
