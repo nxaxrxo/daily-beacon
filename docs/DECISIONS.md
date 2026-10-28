@@ -163,3 +163,31 @@ One line each. Newest decisions at the bottom of their section.
   spec's named categories). The final file is the 24-feed set that was verified live, which is the only
   version kept and the one all numbers above refer to.
 
+
+## 2026-10-28 - post-launch corrections (second pass)
+
+Five real defects found by testing the system against itself, not just building it:
+
+1. **Kickers were poisoning the anti-repeat index.** \mark_edition\ slugged the whole display label,
+   so "GAMING . LABOUR" became the topic \gaminglabour\ - a string no article tag can ever match.
+   The cooldown therefore never fired for real. Kickers are now split on their separators and each
+   segment is slugged whole (\masseffect\, not \mass\ + \effect\), with a stopword list so
+   "THE BIG ONE" does not become a topic either.
+2. **Category words muted the whole paper.** Tags like \eview\, \elease\, \esearch\ appear on
+   half of everything; as cooldown topics each one would suppress a section for three weeks. A
+   \GENERIC_TOPICS\ gate keeps them on the item record but out of the topic index.
+   Proof of the fix: re-filtering today's candidates reports 15 seen and 34 cooling topics.
+3. **\--edition PATH\ was unusable for past editions.** The validator compared the file's date
+   against *today*, so the README's own hand-edit workflow failed on any edition older than the
+   current day. The file's declared date now wins when \--date\ is absent.
+4. **No favicon** - the only console errors on the live page. Added an inline SVG mark (no extra
+   request beyond the file itself) and threaded \prefix\ through \document()\ so archive snapshots
+   point at \../favicon.svg\.
+5. **No month-later mechanism.** The spec asked for a reminder, and only the 21-day block existed.
+   \memory.py digest\ now reports coverage totals, the most-covered topics, everything currently
+   cooling down, and what has been quiet 30+ days (ripe for a genuine follow-up, never a repeat).
+
+Also hardened: \--db\ is accepted after the verb as well as before it, matching \--root\.
+
+Day-to-day variety was proven, not assumed: building the same edition under five consecutive dates
+produced five distinct looks (teal/sky/gold/clay/sky, with the hero layout changing twice).
