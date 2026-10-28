@@ -222,7 +222,9 @@ def describe_failure(returncode: int, output: str) -> str:
 def run_wrapper(video_id: str, work_dir: Path, timeout: int) -> tuple[Path | None, str | None]:
     if not WRAPPER.is_file():
         return None, ascii_only(f"tool missing: {WRAPPER}", REASON_LIMIT)
-    cmd = [sys.executable, str(WRAPPER), video_id, "--out", str(work_dir)]
+    # "--" before the id: a videoId may legitimately start with "-" (e.g. -Y6Cp6e-VbI) and
+    # argparse on the far side would otherwise read it as a flag and exit 2.
+    cmd = [sys.executable, str(WRAPPER), "--out", str(work_dir), "--", video_id]
     try:
         res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
                              errors="replace", cwd=str(work_dir), timeout=timeout)
@@ -315,9 +317,8 @@ def main(argv=None) -> int:
     limit = resolve_limit(args.limit, settings)
 
     if args.ids:
+        # explicit ids ARE the selection: --limit and the candidates file are not consulted
         video_ids = parse_ids(args.ids)
-        if limit > 0:
-            video_ids = video_ids[:limit]
     else:
         if not args.candidates:
             print("transcripts: --candidates is required unless --ids is given", file=sys.stderr)

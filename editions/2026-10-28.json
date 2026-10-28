@@ -1,0 +1,427 @@
+{
+  "date": "2026-10-28",
+  "number": 1,
+  "generatedAt": "2026-10-28T03:14:00+01:00",
+  "masthead": "THE DAILY BEACON",
+  "tagline": "Your 3am briefing, slightly unhinged",
+  "weatherStrip": "Overcast with a chance of union votes. 91 items considered, 10 made the cut.",
+  "sections": [
+    {
+      "id": "rockstar-union",
+      "kind": "lead",
+      "priority": 100,
+      "kicker": "GAMING · LABOUR",
+      "headline": "Rockstar workers vote to unionise during GTA 6's launch week",
+      "standfirst": "The biggest game in history is being shipped by people who just scheduled a ballot in the middle of shipping it.",
+      "body": [
+        "A date is locked. Rockstar Games employees in the UK will vote next month on whether to recognise their developer union — and the ballot lands right inside Grand Theft Auto 6's release window. Not before it. Not after it. *On top of it.*",
+        "If it passes it becomes the largest recognised union in the entire UK games industry. Not a small studio, not an indie collective — the people currently assembling the most expensive entertainment product ever made.",
+        "There is something deeply, darkly funny about the timing, and also something genuinely good: the workers chose the moment when management has the least room to say no."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/grand-theft-auto-6-sharing-beer-on-boat.png?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "Two Grand Theft Auto 6 characters sharing a beer on a boat",
+        "credit": "Eurogamer / Rockstar Games"
+      },
+      "source": {
+        "label": "Eurogamer",
+        "url": "https://www.eurogamer.net/rockstar-union-vote-november"
+      },
+      "tags": [
+        "gta6",
+        "rockstar",
+        "unions",
+        "industry"
+      ],
+      "whyItMatters": "If the largest studio in the industry unionises during its biggest launch, the rest of the UK sector has a template.",
+      "aside": "Somewhere a Rockstar HR manager read this headline and aged four years."
+    },
+    {
+      "id": "gta6-size",
+      "kind": "story",
+      "priority": 92,
+      "kicker": "GAMING",
+      "headline": "GTA 6 is 210GB on PS5, so clear your SSD now",
+      "standfirst": "A hard number at last, and the number is rude.",
+      "body": [
+        "There was never really a chance that Grand Theft Auto 6 was going to be a polite download. Now we have the actual figure: **210 gigabytes** on PlayStation 5.",
+        "For context, that is roughly three Call of Duty installs, or one Baldur's Gate 3 plus the entire life savings of your remaining storage. If you own a launch-model PS5, this single game is a meaningful percentage of your console.",
+        "Practical advice, since nobody else will give it: buy the drive *before* launch, not on the day, because everyone will have the same idea at the same time."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/PS5-ssd-slot-gta.jpg?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "A PlayStation 5 SSD expansion slot",
+        "credit": "Eurogamer"
+      },
+      "source": {
+        "label": "Eurogamer",
+        "url": "https://www.eurogamer.net/gta-6-ps5-download-size"
+      },
+      "tags": [
+        "gta6",
+        "ps5",
+        "hardware"
+      ],
+      "whyItMatters": "Storage is now a genuine purchase decision, not an afterthought.",
+      "aside": "210GB is not a game, it is a tenant."
+    },
+    {
+      "id": "bleach-ended",
+      "kind": "video",
+      "priority": 88,
+      "kicker": "ANIME · PENGUINZ0",
+      "headline": "Bleach just ended after two decades, and Charlie was there for it",
+      "standfirst": "Twenty years of a shonen titan, wrapped up, with the internet's most reliable deadpan narrating the funeral.",
+      "body": [
+        "The Bleach anime has concluded after two decades on air. That is a genuinely staggering run — longer than most of us have been watching anime at all.",
+        "Charlie's take is the one worth hearing because he is not a reaction merchant about this stuff; he actually tracked it. If you grew up on this era of shonen, this is the video to close the loop with."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/Pw81QQyFROI/hqdefault.jpg",
+        "alt": "penguinz0 video thumbnail about Bleach ending",
+        "credit": "YouTube / penguinz0"
+      },
+      "source": {
+        "label": "penguinz0",
+        "url": "https://www.youtube.com/watch?v=Pw81QQyFROI"
+      },
+      "tags": [
+        "anime",
+        "bleach",
+        "penguinz0"
+      ],
+      "whyItMatters": "End of an era for one of the three pillars of 2000s shonen.",
+      "aside": "Two decades. Some of us started watching this on a school laptop with worse resolution than the manga."
+    },
+    {
+      "id": "dunkey-cod",
+      "kind": "video",
+      "priority": 86,
+      "kicker": "GAMING · VIDEOGAMEDUNKEY",
+      "headline": "Dunkey reviewed Call of Duty 24 and the number is not a joke",
+      "standfirst": "Modern Warfare 4, the twenty-fourth entry, and the man has opinions about the arithmetic.",
+      "body": [
+        "Twenty-four Call of Duty games. Let that settle. There are adults who have never lived in a world without an annual Call of Duty release.",
+        "Dunkey's review is out and it is the usual mix of precise comic timing and one or two observations that accidentally cut deeper than intended."
+      ],
+      "image": {
+        "src": "https://i.ytimg.com/vi/-Y6Cp6e-VbI/hqdefault.jpg",
+        "alt": "videogamedunkey Call of Duty review thumbnail",
+        "credit": "YouTube / videogamedunkey"
+      },
+      "source": {
+        "label": "videogamedunkey",
+        "url": "https://www.youtube.com/watch?v=-Y6Cp6e-VbI"
+      },
+      "tags": [
+        "cod",
+        "dunkey",
+        "review"
+      ],
+      "whyItMatters": "The annual release machine is now old enough to have its own retrospective genre.",
+      "aside": "At this rate Call of Duty 30 will ship with a museum wing."
+    },
+    {
+      "id": "warhorse-cyberattack",
+      "kind": "story",
+      "priority": 84,
+      "kicker": "INDUSTRY · SECURITY",
+      "headline": "Warhorse Studios hit by a \"serious\" cyberattack",
+      "standfirst": "The Kingdom Come: Deliverance developer is still working out how bad it is.",
+      "body": [
+        "Warhorse Studios has confirmed a cyberattack, calling it a serious incident, and says it is still determining the full extent of the impact.",
+        "No word yet on whether player data, source code or internal systems are involved. The honest read is: wait for the studio's own update rather than believing the first confident-sounding thread on a forum.",
+        "Small consolation, but a real one — Warhorse has been unusually direct with its community in the past, so a straight answer is more likely here than from most."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/KCDII_Standard_KA_Unbranded.png?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "Kingdom Come Deliverance II key art",
+        "credit": "Eurogamer / Warhorse Studios"
+      },
+      "source": {
+        "label": "Eurogamer",
+        "url": "https://www.eurogamer.net/warhorse-cyberattack-kingdom-come-deliverance"
+      },
+      "tags": [
+        "warhorse",
+        "security",
+        "industry"
+      ],
+      "whyItMatters": "Another reminder that mid-size studios are the softest target in the industry.",
+      "aside": "Change your passwords on the games you love, people. It is boring and it works."
+    },
+    {
+      "id": "phantom-blade",
+      "kind": "story",
+      "priority": 80,
+      "kicker": "GAMING · RELEASE",
+      "headline": "Phantom Blade Zero launch times are out",
+      "standfirst": "The wuxia action game with the ridiculous combat trailers finally has a clock attached.",
+      "body": [
+        "Regional release times are published, which means the pre-load question is now live and the answer is probably yes.",
+        "If the trailers are even half honest, this is the closest thing to a modern Ninja Gaiden that anyone has shipped in years — martial arts combat with an actual rhythm to it rather than a dodge-button simulator."
+      ],
+      "image": {
+        "src": "https://cdn.mos.cms.futurecdn.net/HxHYfD2JnfBBDNmAPbsm6T-1920-80.jpg",
+        "alt": "Phantom Blade Zero key art",
+        "credit": "PC Gamer"
+      },
+      "source": {
+        "label": "PC Gamer",
+        "url": "https://www.pcgamer.com/games/action/phantom-blade-zero-release-date-launch-times/"
+      },
+      "tags": [
+        "phantom-blade-zero",
+        "release"
+      ],
+      "whyItMatters": "A genuine action-game release in a year that has been thin on them.",
+      "aside": "Every trailer for this game looks like someone's very expensive martial arts demo reel, and I mean that as praise."
+    },
+    {
+      "id": "qwen-evil-neuron",
+      "kind": "story",
+      "priority": 78,
+      "kicker": "AI · RESEARCH",
+      "headline": "One neuron in Qwen3.8 turns it into a tiny supervillain",
+      "standfirst": "Somebody found the evil dial and, predictably, turned it.",
+      "body": [
+        "A researcher tweaked a **single neuron** inside Qwen3.8 27B and the model started producing text that reads less like a language model and more like a monologue from a direct-to-DVD horror film.",
+        "The interesting part is not the edgy output — anyone can prompt a model into saying something edgy. It is that one neuron carried enough weight to shift the model's whole register. Interpretability people have been saying for years that these things are more concentrated than they look.",
+        "Also, 27B running locally is now genuinely a laptop-class model. The gap between 'toy' and 'serious' keeps closing."
+      ],
+      "image": {
+        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Qwen3.8-27B-1-1456x819.jpg",
+        "alt": "Qwen3.8 27B model illustration",
+        "credit": "Wccftech"
+      },
+      "source": {
+        "label": "Wccftech",
+        "url": "https://wccftech.com/tweaking-a-single-neuron-inside-qwen3-8-27b-turns-it-into-an-evil-monster-that-wants-to-see-humans-burn-slowly-so-it-could-watch-their-faces-twist-in-agony/"
+      },
+      "tags": [
+        "ai",
+        "qwen",
+        "research"
+      ],
+      "whyItMatters": "Single-neuron edits producing dramatic behaviour changes is the strongest argument yet for taking interpretability seriously.",
+      "aside": "The neuron has a name now and I refuse to learn it."
+    },
+    {
+      "id": "chainsaw-robots",
+      "kind": "story",
+      "priority": 74,
+      "kicker": "TECH · JAPAN",
+      "headline": "Japan deployed AI chainsaw robots to trim train lines, which is fine",
+      "standfirst": "A humanoid robot with a chainsaw arm, working autonomously, filmed for national television.",
+      "body": [
+        "A humanoid robot with a chainsaw for an arm was shown on Japanese TV trimming branches that had grown too close to railway lines. It is mounted on a rail truck, it operates autonomously, and it is the single most confident piece of engineering I have read about this week.",
+        "This is genuinely a good idea on paper — branch clearance on rail networks is dangerous, repetitive work, exactly the kind of thing you want a machine doing instead of a person on a ladder at six in the morning.",
+        "It is also, unavoidably, a chainsaw robot. Some part of my brain simply will not accept the words 'autonomous chainsaw' as reassuring."
+      ],
+      "image": {
+        "src": "https://cdn.mos.cms.futurecdn.net/GNdgn4uQJSieHfhRki6Xdn-1920-80.jpg",
+        "alt": "A humanoid robot with a chainsaw arm mounted on a rail vehicle",
+        "credit": "Tom's Hardware"
+      },
+      "source": {
+        "label": "Tom's Hardware",
+        "url": "https://www.tomshardware.com/tech-industry/robotics/japan-experiments-with-autonomous-ai-chainsaw-wielding-robots-video-shows-rail-truck-mounted-metal-humanoid-cutting-down-tree-branches"
+      },
+      "tags": [
+        "ai",
+        "robotics",
+        "japan"
+      ],
+      "whyItMatters": "Autonomous heavy machinery is already in public infrastructure, not a lab demo.",
+      "aside": "The robot has no face. This is objectively the correct design decision and I would like it noted."
+    },
+    {
+      "id": "zelda-pc-port",
+      "kind": "story",
+      "priority": 70,
+      "kicker": "GAMING · MODDING",
+      "headline": "Tears of the Kingdom runs natively on PC now, sort of",
+      "standfirst": "SkyboundTOTK is in beta, with FSR upscaling and frame interpolation already working.",
+      "body": [
+        "A modder has released an early build of a native Windows version of Tears of the Kingdom — not an emulator wrapper, a native application. It ships with FSR upscaling and experimental frame interpolation, and the developer is upfront that a lot of bugs remain.",
+        "The interesting engineering detail is that this is a recompilation project, the same family of technique that got Mario 64 and Majora's Mask running natively with proper widescreen and high frame rates.",
+        "Beta means beta. Do not install this expecting a polished experience on day one."
+      ],
+      "image": {
+        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Tears-of-the-Kingdom-Recompilation-Release-HD-1456x819.jpeg",
+        "alt": "Tears of the Kingdom PC recompilation screenshot",
+        "credit": "Wccftech"
+      },
+      "source": {
+        "label": "Wccftech",
+        "url": "https://wccftech.com/zelda-tears-of-the-kingdom-native-pc-port-skybound-beta-fsr-ultrawide/"
+      },
+      "tags": [
+        "zelda",
+        "modding",
+        "pc"
+      ],
+      "whyItMatters": "Recompilation is quietly becoming the most interesting corner of game preservation.",
+      "aside": "Nintendo's lawyers are reading this story at this exact moment, professionally."
+    },
+    {
+      "id": "resident-evil-10-years",
+      "kind": "story",
+      "priority": 66,
+      "kicker": "GAMING · CAPCOM",
+      "headline": "Resident Evil's story will end within ten years, apparently",
+      "standfirst": "Capcom's executive producer says the narrative has a conclusion, and it is closer than you think.",
+      "body": [
+        "Jun Takeuchi told Yahoo Japan that the series' overarching narrative has a definite ending, and that end could arrive within the next decade. Multiple new games are still planned in the meantime.",
+        "That is a wild thing to say about a franchise on its ninth mainline entry and its thirtieth anniversary, and it is either a genuine plan or the most elegant way anyone has ever said 'we have not decided yet'.",
+        "Either way: a horror series with an actual ending is rare, and if Capcom pulls it off it will be the most interesting thing the studio has done since the RE Engine."
+      ],
+      "image": {
+        "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Resident-Evil-Requiem-Veronica-HD-1456x820.jpeg",
+        "alt": "Resident Evil Requiem key art",
+        "credit": "Wccftech"
+      },
+      "source": {
+        "label": "Wccftech",
+        "url": "https://wccftech.com/capcom-jun-takeuchi-resident-evil-next-10-years-conclusion-multiple-new-games/"
+      },
+      "tags": [
+        "resident-evil",
+        "capcom"
+      ],
+      "whyItMatters": "A long-running franchise committing to an ending changes how every future entry gets read.",
+      "aside": "Thirty years of Umbrella and it turns out there was a final page the whole time."
+    },
+    {
+      "id": "monarchs-at-play",
+      "kind": "story",
+      "priority": 62,
+      "kicker": "INDIE",
+      "headline": "Monarchs at Play is a 4X city-builder that respects your evening",
+      "standfirst": "Hex tiles, chaining combos, and a full run in about an hour. Rock Paper Shotgun is extremely into it.",
+      "body": [
+        "A 4X strategy city-builder built around chaining hexagonal tiles, designed to be finished in roughly an hour. RPS's write-up is partly a review and partly a lament about being an adult with laundry.",
+        "The pitch is genuinely appealing: all the satisfying combo-chaining of a big strategy game without the eight-hour commitment that makes you close the tab and feel guilty.",
+        "Worth a look if you like the idea of Civilization more than the reality of it on a Tuesday night."
+      ],
+      "image": {
+        "src": "https://assetsio.gnwcdn.com/monarchs-at-play.jpg?width=690&quality=85&format=jpg&auto=webp",
+        "alt": "Monarchs at Play screenshot showing hexagonal city tiles",
+        "credit": "Rock Paper Shotgun"
+      },
+      "source": {
+        "label": "Rock Paper Shotgun",
+        "url": "https://www.rockpapershotgun.com/monarchs-at-play-is-a-4x-strategy-city-builder-about-chaining-hexagonal-tiles-that-only-takes-an-hour-out-of-your-day"
+      },
+      "tags": [
+        "indie",
+        "strategy"
+      ],
+      "whyItMatters": "Short-form strategy is an underexploited niche and this one has a real hook.",
+      "aside": "An hour-long 4X game is either genius or a lie, and I would like to find out which."
+    },
+    {
+      "id": "discord-searchable",
+      "kind": "quick",
+      "priority": 55,
+      "kicker": "TECH",
+      "headline": "Discord messages in big public servers become Google-searchable in December",
+      "standfirst": "The forum replacement admits it replaced forums.",
+      "body": [
+        "Discord is creating specially designated channels in large public servers whose messages will show up in search engines from December. RPS immediately asked the only question that matters: what about AI training?"
+      ],
+      "image": null,
+      "source": {
+        "label": "PC Gamer",
+        "url": "https://www.pcgamer.com/software/platforms/messages-in-certain-large-public-discord-servers-will-be-searchable-on-the-web-after-december/"
+      },
+      "tags": [
+        "discord",
+        "tech"
+      ],
+      "whyItMatters": "Anything you posted in a public server in 2019 is about to become permanently findable.",
+      "aside": "Go delete the embarrassing stuff now, not in December."
+    },
+    {
+      "id": "mass-effect-n7",
+      "kind": "quick",
+      "priority": 50,
+      "kicker": "MUSIC · MASS EFFECT",
+      "headline": "The original Mass Effect composer is re-scoring the leaked ME5 trailer",
+      "standfirst": "Sam Hulick wants the trailer to represent his actual musical vision. For N7 Day.",
+      "body": [
+        "Sam Hulick — who scored the original Mass Effect — is putting together a re-scored version of the leaked Mass Effect 5 trailer for N7 Day. His stated reason is that he wants it to properly represent his musical vision for the cancelled game.",
+        "Fan projects that fix a publisher's own marketing are a strange genre, and this is one of the better ones."
+      ],
+      "image": {
+        "src": "https://cdn.mos.cms.futurecdn.net/Ejh4Z9YqLYB8hwzrfyYisK-1920-80.jpg",
+        "alt": "Mass Effect artwork",
+        "credit": "PC Gamer"
+      },
+      "source": {
+        "label": "PC Gamer",
+        "url": "https://www.pcgamer.com/games/mass-effect/mass-effect-composer-sam-hulick-is-working-on-a-re-scored-version-of-the-leaked-mass-effect-5-trailer-for-n7-day/"
+      },
+      "tags": [
+        "mass-effect",
+        "music"
+      ],
+      "whyItMatters": "The composer caring more than the publisher is the whole story of modern Mass Effect.",
+      "aside": "N7 Day is the closest thing this fanbase has to a religious holiday and honestly, fair."
+    },
+    {
+      "id": "waddle-world",
+      "kind": "quick",
+      "priority": 45,
+      "kicker": "AI · META",
+      "headline": "Meta made a Tamagotchi that is secretly a diary",
+      "standfirst": "Waddle World: 'a daily journal disguised as a pet.'",
+      "body": [
+        "Meta's newest AI product is a virtual pet app that it describes, with unusual honesty, as a daily journal disguised as a pet. You write to it, it responds as a small creature, and Meta gets engagement data."
+      ],
+      "image": {
+        "src": "https://www.engadget.com/img/gallery/metas-waddle-world-is-a-tamagotchi-like-ai-pet-app/l-intro-1793176733.jpg",
+        "alt": "Meta Waddle World app screenshot",
+        "credit": "Engadget"
+      },
+      "source": {
+        "label": "Engadget",
+        "url": "https://www.engadget.com/2299227/meta-tamagotchi-like-ai-digital-pet-app-waddle-world/"
+      },
+      "tags": [
+        "ai",
+        "meta",
+        "apps"
+      ],
+      "whyItMatters": "The 'AI companion' category is consolidating fast and Meta wants the default slot.",
+      "aside": "A journal that reports to shareholders. Charming."
+    }
+  ],
+  "quickHits": [
+    {
+      "text": "Interior Night's Charu Desodt is the new chair of the BAFTA Games Committee.",
+      "url": "https://www.gamesindustry.biz/interior-night-studio-head-charu-desodt-appointed-chair-of-bafta-games-committee"
+    },
+    {
+      "text": "Gamescom Asia posted record international attendance and showfloor size.",
+      "url": "https://www.gamesindustry.biz/gamescom-asia-touts-new-records-for-international-attendance-and-showfloor-size"
+    },
+    {
+      "text": "MeatCanyon's new one is called 'I Befriended A Serial Killer' and it is exactly what you expect.",
+      "url": "https://www.youtube.com/watch?v=DQJ3F4ZOkzk"
+    },
+    {
+      "text": "AngryJoe did a Rapid Fire Review of Valor Mortis.",
+      "url": "https://www.youtube.com/watch?v=WmaPWbOFT3I"
+    },
+    {
+      "text": "Corridor Crew broke down VFX from 1911. Yes, 1911.",
+      "url": "https://www.youtube.com/watch?v=NdScFyT1xjc"
+    },
+    {
+      "text": "Vsauce asked whether we used to think the Sun was cold. We did.",
+      "url": "https://www.youtube.com/watch?v=gNVj-FIxoe4"
+    }
+  ],
+  "signoff": "That is edition one. Eighty-one items were considered and politely declined. See you at three."
+}

@@ -1,14 +1,14 @@
 /* =============================================================================
    THE DAILY BEACON - style.css
 
-   One file, no webfonts, no CDN, no libraries. Dark paper, warm ink, hairlines.
-   Every selector below is emitted by build_edition.py (docs/SITE-CONTRACT.md).
+   A dark broadsheet for one reader, every morning. System fonts only: no
+   imports, no CDN, no external URL anywhere in this file. Every selector is
+   emitted by build_edition.py and named in docs/SITE-CONTRACT.md.
 
-   Sections:
-     1 tokens      2 reset      3 typography   4 masthead    5 toc
-     6 lead        7 story      8 media        9 pullquote  10 quick hits
-    11 colophon   12 progress/to-top         13 density
-    14 responsive 15 print     16 reduced motion
+   1 tokens      2 reset       3 typography   4 masthead     5 toc
+   6 lead        7 story       8 media        9 pullquote   10 quick hits
+   11 colophon  12 progress   13 density    14 responsive  15 print
+   16 hooks     17 reduced motion
    ============================================================================= */
 
 /* ---------------------------------------------------------------- 1. TOKENS */
@@ -19,15 +19,15 @@
   --paper-2:     #111114;
   --ink:         #ece7dd;
   --ink-muted:   #a8a29a;
-  --rule:        #2b2b32;
+  --rule:        #2b2b32;   /* hairline you feel more than see */
   --rule-strong: #4d4d57;
 
-  /* replaced by [data-accent="..."]; the default is the amber edition */
+  /* overwritten wholesale by [data-accent="..."] below */
   --accent:      #e8a33d;
   --accent-ink:  #0b0b0d;
 
-  --measure:       34rem;
-  --story-measure: 33rem;
+  --measure:       34rem;   /* lead body */
+  --story-measure: 33rem;   /* story body */
   --shell:         78rem;
   --pad:           clamp(1rem, 4vw, 2.5rem);
   --gap:           clamp(2.4rem, 5.2vw, 3.6rem);
@@ -40,18 +40,18 @@
   --mono:  ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas,
            "Liberation Mono", monospace;
 
-  /* scale-a defaults; .scale-b overrides the whole voice */
-  --lead-size:      clamp(2.9rem, 1.2rem + 6.2vw, 6.4rem);
+  /* scale-a defaults: a wide lead over modest story heads */
+  --lead-size:      clamp(2.5rem, 2.136rem + 1.822vw, 3.6rem);
   --lead-deck:      clamp(1.1rem, 0.95rem + 0.8vw, 1.5rem);
-  --story-size:     1.45rem;
-  --story-size-lg:  1.78rem;
-  --masthead-size:  clamp(1.6rem, 0.8rem + 4.1vw, 4.9rem);
+  --story-size:     1.5rem;
+  --story-size-lg:  1.8rem;
+  --masthead-size:  clamp(1.6rem, 1.4rem + 1.6vw, 3.6rem);
   --masthead-track: 0.02em;
   --display-track:  -0.02em;
   --pull-size:      clamp(1.55rem, 1.05rem + 2.2vw, 2.6rem);
 }
 
-/* eight verified accents, all >= 6.7:1 on --paper, all take dark ink */
+/* eight accents, all >= 6.7:1 on --paper, all accept dark ink on top */
 [data-accent="amber"] { --accent: #e8a33d; }
 [data-accent="coral"] { --accent: #ec7a5c; }
 [data-accent="rose"]  { --accent: #e88fa2; }
@@ -61,13 +61,27 @@
 [data-accent="gold"]  { --accent: #dcc36e; }
 [data-accent="clay"]  { --accent: #de9670; }
 
-/* scale-b: smaller lead, bigger stories, wider-tracked nameplate */
-.scale-b {
-  --lead-size:      clamp(2.55rem, 1.05rem + 5.3vw, 5.6rem);
+/* scale-a restated: :root carries the same ramp, so the pair stays symmetric */
+.scale-a {
+  --lead-size:      clamp(2.5rem, 2.136rem + 1.822vw, 3.6rem);
+  --lead-deck:      clamp(1.1rem, 0.95rem + 0.8vw, 1.5rem);
+  --story-size:     1.5rem;
+  --story-size-lg:  1.8rem;
+  --masthead-size:  clamp(1.6rem, 1.4rem + 1.6vw, 3.6rem);
+  --masthead-track: 0.02em;
+  --display-track:  -0.02em;
+  --pull-size:      clamp(1.55rem, 1.05rem + 2.2vw, 2.6rem);
+}
+
+/* scale-b: tighter nameplate, bigger story heads, wider tracking.
+   Also matched via data-scale so the class/data mirrors can never diverge. */
+.scale-b,
+:where(html[data-scale="b"]) {
+  --lead-size:      clamp(2.5625rem, 2.045rem + 2.35vw, 3.9rem);
   --lead-deck:      clamp(1.04rem, 0.92rem + 0.6vw, 1.32rem);
   --story-size:     1.6rem;
   --story-size-lg:  1.95rem;
-  --masthead-size:  clamp(1.42rem, 0.72rem + 3.7vw, 4.3rem);
+  --masthead-size:  clamp(1.42rem, 1.2rem + 1.72vw, 3.4rem);
   --masthead-track: 0.09em;
   --display-track:  -0.004em;
   --pull-size:      clamp(1.45rem, 0.95rem + 2vw, 2.3rem);
@@ -76,17 +90,14 @@
 /* ----------------------------------------------------------------- 2. RESET */
 *, *::before, *::after { box-sizing: border-box; }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
-}
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
 body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: clamp(1.0625rem, 1rem + 0.18vw, 1.125rem); /* 17 -> 18px */
+  font-size: clamp(1.0625rem, 1rem + 0.18vw, 1.125rem); /* 17 -> 18px, never 15 */
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -98,7 +109,7 @@ img { display: block; max-width: 100%; height: auto; }
 a { color: inherit; }
 button { font: inherit; color: inherit; }
 
-/* the sticky index is a bar; anchors must not land under it */
+/* the sticky index is ~3rem tall; anchors must clear it */
 [id] { scroll-margin-top: 4.75rem; }
 
 ::selection { background: var(--accent); color: var(--accent-ink); }
@@ -125,10 +136,7 @@ button { font: inherit; color: inherit; }
   background: var(--accent);
 }
 
-.lead__headline,
-.story__headline,
-.pullquote__text,
-.masthead__title {
+.lead__headline, .story__headline, .pullquote__text, .masthead__title {
   font-family: var(--serif);
   font-weight: 700;
   text-wrap: balance;
@@ -141,13 +149,8 @@ button { font: inherit; color: inherit; }
   line-height: 1.03;
   letter-spacing: var(--display-track);
 }
-.story__headline {
-  font-size: var(--story-size);
-  line-height: 1.12;
-  letter-spacing: -0.004em;
-}
-.lead__headline a,
-.story__headline a { text-decoration: none; }
+.story__headline { font-size: var(--story-size); line-height: 1.12; letter-spacing: -0.004em; }
+.lead__headline a, .story__headline a { text-decoration: none; }
 .lead__headline a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .story__headline a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
 
@@ -159,17 +162,9 @@ button { font: inherit; color: inherit; }
   color: var(--ink-muted);
   overflow-wrap: anywhere;
 }
-.lead > .standfirst {
-  max-width: 42ch;
-  font-size: var(--lead-deck);
-  line-height: 1.4;
-}
+.lead > .standfirst { max-width: 42ch; font-size: var(--lead-deck); line-height: 1.4; }
 
-.body {
-  max-width: var(--story-measure);
-  line-height: 1.65;
-  overflow-wrap: anywhere;
-}
+.body { max-width: var(--story-measure); line-height: 1.65; overflow-wrap: anywhere; }
 .body p + p { margin-top: 1em; }
 .body a {
   color: var(--ink);
@@ -180,10 +175,7 @@ button { font: inherit; color: inherit; }
 }
 .body a:hover { color: var(--accent); }
 
-.lead__body {
-  max-width: var(--measure);
-  line-height: 1.65;
-}
+.lead__body { max-width: var(--measure); line-height: 1.65; }
 
 .whymatters {
   max-width: var(--measure);
@@ -250,28 +242,23 @@ button { font: inherit; color: inherit; }
   text-align: center;
 }
 
-/* four rules, in DOM order: thick, hairline, hairline, thick */
-.masthead__rule {
-  grid-column: 1 / -1;
-  height: 1px;
-  background: var(--rule-strong);
-}
+/* four rules in DOM order: thick, hairline, hairline, thick */
+.masthead__rule { grid-column: 1 / -1; height: 1px; background: var(--rule-strong); }
 .masthead__rule + .masthead__rule { margin-top: 4px; }
 .masthead__rule--thick { height: 3px; background: var(--ink); }
 
 .masthead__ear {
   min-width: 0;
   margin: 0.55rem 0 0;
-  font-size: 0.66rem;
+  font-size: clamp(0.6rem, 0.52rem + 0.34vw, 0.72rem);
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
+  letter-spacing: clamp(0.03em, 0.01em + 0.26vw, 0.16em);
+  line-height: 1.3;
   color: var(--ink-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere; /* a long weekday never widens the page */
 }
-.masthead__ear--left  { grid-column: 1; justify-self: start; }
-.masthead__ear--right { grid-column: 2; justify-self: end; }
+.masthead__ear--left  { grid-column: 1; justify-self: stretch; text-align: left; }
+.masthead__ear--right { grid-column: 2; justify-self: stretch; text-align: right; }
 
 .masthead__title {
   grid-column: 1 / -1;
@@ -311,7 +298,7 @@ button { font: inherit; color: inherit; }
   align-items: stretch;
   gap: 0.2rem;
   padding-inline: var(--pad);
-  background: var(--paper); /* solid, never translucent */
+  background: var(--paper); /* solid colour, no translucency tricks */
   border-bottom: 1px solid var(--rule);
 }
 
@@ -375,6 +362,8 @@ button { font: inherit; color: inherit; }
   transition: color 120ms linear, border-color 120ms linear;
 }
 .density-toggle:hover { color: var(--ink); border-color: var(--accent); }
+
+/* is-scrolled shrinks the index; app.js only toggles the class */
 body.is-scrolled .toc__link { padding-block: 0.25rem; }
 body.is-scrolled .toc__label { font-size: 0.84rem; }
 
@@ -411,14 +400,12 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
 .story--brief { gap: 0.75rem; }
 .story--brief .body { max-width: var(--measure); }
 
-.card--video { border-top: 1px solid var(--rule-strong); }
+.card { border-top: 1px solid var(--rule-strong); }
 .card--video .media__box { border: 1px solid var(--rule); }
 
 /* ----------------------------------------------------------------- 8. MEDIA */
-.media {
-  margin: 0;
-  margin-inline: calc(-1 * var(--pad)); /* thumbs bleed on a phone */
-}
+/* thumbs bleed to the screen edge on a phone; reset at 760px */
+.media { margin: 0; margin-inline: calc(-1 * var(--pad)); }
 
 .media__box {
   position: relative;
@@ -427,12 +414,7 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   background: var(--paper-2);
   border-radius: 0;
 }
-.media__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
+.media__img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
 .media__credit {
   margin-top: 0.45rem;
@@ -452,8 +434,7 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   background-image: repeating-linear-gradient(135deg,
     transparent 0 9px, var(--rule) 9px 10px);
 }
-.media--failed .media__img,
-.media--failed .media__credit { display: none; }
+.media--failed .media__img, .media--failed .media__credit { display: none; }
 
 /* video cards: a drawn play mark, no icon font, no extra markup */
 .card--video .media__box::before {
@@ -481,28 +462,31 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
 }
 
 /* ------------------------------------------------------------- 9. PULLQUOTE */
+/* indented, hairline-bound, capped at 30ch - a quote, not a banner */
 .pullquote {
   margin: 0;
-  padding: clamp(1.3rem, 3vw, 2rem) clamp(0.5rem, 4vw, 2.5rem);
+  padding: clamp(1.2rem, 2.6vw, 1.9rem) 0 clamp(1.2rem, 2.6vw, 1.9rem)
+           clamp(1rem, 5vw, 3.5rem);
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
   border-radius: 0;
-  text-align: center;
+  text-align: left;
 }
 .pullquote::before {
   content: "\201C";
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.15rem;
   font-family: var(--serif);
-  font-size: 2.6rem;
-  line-height: 0.8;
+  font-size: 2.4rem;
+  line-height: 0.7;
   color: var(--accent);
 }
 .pullquote__text {
   max-width: 30ch;
-  margin-inline: auto;
   font-size: var(--pull-size);
-  line-height: 1.18;
+  line-height: 1.2;
+  text-wrap: pretty;
 }
 .pullquote__cite {
   margin-top: 0.9rem;
@@ -584,11 +568,7 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   letter-spacing: 0.04em;
   color: var(--ink-muted);
 }
-.colophon__meta li + li::before {
-  content: "\00B7";
-  margin: 0 0.5rem;
-  color: var(--rule-strong);
-}
+.colophon__meta li + li::before { content: "\00B7"; margin: 0 0.5rem; color: var(--rule-strong); }
 .colophon__signoff {
   max-width: 46ch;
   margin: 0 auto 1rem;
@@ -598,11 +578,7 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   text-align: center;
   color: var(--ink);
 }
-.colophon__archive {
-  font-size: 0.78rem;
-  text-align: center;
-  color: var(--ink-muted);
-}
+.colophon__archive { font-size: 0.78rem; text-align: center; color: var(--ink-muted); }
 .colophon__archive a {
   color: var(--ink);
   text-decoration: underline;
@@ -648,10 +624,7 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   color: var(--ink);
   overflow-wrap: anywhere;
 }
-.archive__link:hover .archive__head {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-}
+.archive__link:hover .archive__head { text-decoration: underline; text-decoration-thickness: 1px; }
 
 /* -------------------------------------------------- 12. PROGRESS + TO TOP */
 #progress {
@@ -662,10 +635,9 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   background: transparent;
   pointer-events: none;
 }
-#progress-bar,
-#progress > i {
+#progress-bar {
   display: block;
-  width: 0;
+  width: 0; /* app.js drives this inline */
   height: 100%;
   background: var(--accent);
   transition: width 90ms linear;
@@ -697,36 +669,20 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   transition: opacity 140ms linear, transform 140ms linear, color 140ms linear;
 }
 .to-top:hover { color: var(--ink); border-color: var(--accent); }
-body.is-scrolled .to-top {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-}
+body.is-scrolled .to-top { opacity: 1; visibility: visible; transform: none; }
 
 /* ---------------------------------------------------------------- 13. DENSE */
-body.dense,
-html[data-density="dense"] {
-  --gap: clamp(1.8rem, 3.9vw, 2.7rem);
-  --gap-s: clamp(0.8rem, 1.5vw, 1.1rem);
-}
-body.dense .lead__headline,
-[data-density="dense"] .lead__headline { font-size: calc(var(--lead-size) * 0.86); }
-body.dense .story__headline,
-[data-density="dense"] .story__headline { font-size: calc(var(--story-size) * 0.92); }
+body.dense { --gap: clamp(1.8rem, 3.9vw, 2.7rem); --gap-s: clamp(0.8rem, 1.5vw, 1.1rem); }
+body.dense .lead__headline { font-size: calc(var(--lead-size) * 0.86); }
+body.dense .story__headline { font-size: calc(var(--story-size) * 0.92); }
 body.dense .body,
-body.dense .lead__body,
-[data-density="dense"] .body,
-[data-density="dense"] .lead__body { font-size: 1rem; line-height: 1.55; }
-body.dense .media--lead .media__box,
-[data-density="dense"] .media--lead .media__box {
-  min-height: clamp(9rem, 22vh, 14rem);
-  max-height: 16rem;
-}
+body.dense .lead__body { font-size: 1rem; line-height: 1.55; }
+body.dense .media--lead .media__box { min-height: clamp(9rem, 22vh, 14rem); max-height: 16rem; }
 body.dense .masthead { padding-bottom: 0.8rem; }
 
 /* ----------------------------------------------------------- 14. RESPONSIVE */
 
-/* 760px: two columns for the story run */
+/* 760px: the story run goes to two columns */
 @media (min-width: 760px) {
   .paper {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -739,7 +695,6 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .media { margin-inline: 0; }
   .media__credit { padding-inline: 0; }
 
-  .masthead__ear { font-size: 0.72rem; letter-spacing: 0.16em; }
   .story__headline { font-size: var(--story-size-lg); }
 
   .toc__list { flex-wrap: wrap; justify-content: center; overflow: visible; }
@@ -751,7 +706,7 @@ body.dense .masthead { padding-bottom: 0.8rem; }
 /* 1024px: the three lead layouts */
 @media (min-width: 1024px) {
 
-  /* hero-left: picture column left, everything else right */
+  /* hero-left: picture column left, text column right */
   .layout-hero-left .lead {
     display: grid;
     grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
@@ -776,8 +731,12 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .layout-hero-left .lead > .whymatters      { grid-area: why; }
   .layout-hero-left .lead > .aside           { grid-area: aside; }
   .layout-hero-left .lead > .source-line     { grid-area: source; }
-  .layout-hero-left .media--lead .media__box {
-    min-height: clamp(18rem, 44vh, 31rem);
+  .layout-hero-left .media--lead .media__box { min-height: clamp(20rem, 52vh, 34rem); }
+
+  /* a lead with no figure must not keep a hollow picture column */
+  .layout-hero-left .lead:not(:has(> .media--lead)) {
+    display: flex;
+    flex-direction: column;
   }
 
   /* hero-centre: centred nameplate, wide picture beneath, narrow deck */
@@ -819,31 +778,26 @@ body.dense .masthead { padding-bottom: 0.8rem; }
     row-gap: 1rem;
     text-align: center;
   }
-  .layout-hero-stacked .lead > .media--lead {
-    grid-area: fig;
-    justify-self: stretch;
-  }
-  .layout-hero-stacked .lead > .kicker         { grid-area: kicker; }
+  .layout-hero-stacked .lead > .media--lead   { grid-area: fig; justify-self: stretch; }
+  .layout-hero-stacked .lead > .kicker        { grid-area: kicker; }
   .layout-hero-stacked .lead > .lead__headline { grid-area: headline; max-width: 22ch; }
-  .layout-hero-stacked .lead > .standfirst     { grid-area: deck; max-width: 44ch; }
-  .layout-hero-stacked .lead > .lead__body     { grid-area: body; text-align: left; }
-  .layout-hero-stacked .lead > .whymatters     { grid-area: why; }
-  .layout-hero-stacked .lead > .aside          { grid-area: aside; text-align: left; }
-  .layout-hero-stacked .lead > .source-line    { grid-area: source; justify-content: center; }
-  .layout-hero-stacked .media--lead .media__box {
-    min-height: clamp(20rem, 46vh, 34rem);
-    max-height: 40rem;
-  }
+  .layout-hero-stacked .lead > .standfirst    { grid-area: deck; max-width: 44ch; }
+  .layout-hero-stacked .lead > .lead__body    { grid-area: body; text-align: left; }
+  .layout-hero-stacked .lead > .whymatters    { grid-area: why; }
+  .layout-hero-stacked .lead > .aside         { grid-area: aside; text-align: left; }
+  .layout-hero-stacked .lead > .source-line   { grid-area: source; justify-content: center; }
+  .layout-hero-stacked .media--lead .media__box { min-height: clamp(20rem, 46vh, 34rem); max-height: 40rem; }
 
-  .story__headline { font-size: calc(var(--story-size-lg) * 1.1); }
+  .story__headline { font-size: var(--story-size-lg); }
   .body { font-size: 1.02em; }
+
+  .pullquote { padding-left: clamp(2rem, 6vw, 5rem); }
+  .pullquote::before { margin-left: -0.06em; }
 }
 
-/* 1180px: the stacked layout gets a right-hand rail */
+/* 1180px: the stacked layout earns a right-hand rail */
 @media (min-width: 1180px) {
-  .layout-hero-stacked .paper {
-    grid-template-columns: minmax(0, 1fr) 19rem;
-  }
+  .layout-hero-stacked .paper { grid-template-columns: minmax(0, 1fr) 19rem; }
   .layout-hero-stacked .paper > .lead { grid-column: 1 / -1; }
   .layout-hero-stacked .paper > .story,
   .layout-hero-stacked .paper > .pullquote { grid-column: 1; }
@@ -878,8 +832,19 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .masthead__rule { background: #999; }
   .masthead__rule--thick { background: #111; }
 
+  /* every grid collapses to plain flow on paper */
   .paper { display: block; }
-  .lead, .story, .pullquote, .quick-hits { display: block; border-radius: 0; }
+  .paper > .lead,
+  .paper > .story,
+  .paper > .pullquote,
+  .paper > .quick-hits,
+  .layout-hero-left .lead,
+  .layout-hero-centre .lead,
+  .layout-hero-stacked .lead { display: block; border-radius: 0; text-align: left; }
+  .layout-hero-left .lead > *,
+  .layout-hero-centre .lead > *,
+  .layout-hero-stacked .lead > * { max-width: none; margin-inline: 0; }
+  .media--lead .media__box { min-height: 0; max-height: none; }
   .lead > * + *, .story > * + * { margin-top: 0.55rem; }
 
   .media { margin-inline: 0; }
@@ -907,7 +872,21 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   p { orphans: 3; widows: 3; }
 }
 
-/* ------------------------------------------------------- 16. REDUCED MOTION */
+/* ------------------------------------------------- 16. PAGE + VARIANT HOOKS */
+/* the archive index reuses the whole shell; only its list differs */
+body.page-archive .paper { padding-block: var(--gap); }
+
+/* the edition page shares the shell too - declared so the hook resolves */
+body.page-edition .paper { padding-block: var(--gap) var(--gap); }
+
+/* .lead--{lead_layout} mirrors the <html> layout class; the layout itself is
+   carried by .layout-hero-* so the three variants cannot drift apart */
+.lead--hero-left, .lead--hero-centre, .lead--hero-stacked { display: flex; }
+
+/* Quick Hits is styled once, on .quick-hits, so it looks identical before the
+   first story (order-rail) and after the last (order-lead). No `order` here. */
+
+/* ------------------------------------------------------- 17. REDUCED MOTION */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

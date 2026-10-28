@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """yt_source.py - watched YouTube channels -> candidate videos inside the lookback window.
 
 Endpoints (both verified live from this machine on 2026-10-28):
@@ -146,7 +146,7 @@ def rss_channel(channel_id: str) -> list[dict] | None:
             {
                 "videoId": vid.group(1).strip(),
                 "title": html_unescape(title.group(1)),
-                "publishedAt": published.group(1).strip() if published else iso(now_local()),
+                "publishedAt": published.group(1).strip() if published else None,
                 "lengthSeconds": None,
                 "views": None,
                 "thumbnail": thumb.group(1) if thumb else None,
@@ -185,6 +185,10 @@ def collect(root: Path, hours: int, only_channel: str | None, no_shorts: bool, l
         print("yt_source: config/channels.json missing or empty", file=sys.stderr)
         raise SystemExit(1)
 
+    settings = load_settings(root)
+    short_max = int(settings.get("short_max_seconds") or DEFAULT_SHORT_MAX)
+    per_channel_cap = int(settings.get("max_videos_per_channel") or 3)
+
     window_start = now_local() - timedelta(hours=hours)
     picked = []
     ok = 0
@@ -222,15 +226,17 @@ def collect(root: Path, hours: int, only_channel: str | None, no_shorts: bool, l
 
         ok += 1
         count = 0
-        max_per = int(ch.get("max_per_run") or 3)
+        max_per = int(ch.get("max_per_run") or per_channel_cap)
         for v in raw:
-            published = parse_published(v["publishedAt"])
+            published = parse_published(v.get("publishedAt"))
             if published is None:
-                continue
+                # Undated entry cannot be window-filtered: keep it rather than hide content on
+                # missing metadata, and let it sort last.
+                pass
             if published < window_start:
                 break  # newest-first: everything after this is older
             length = v.get("lengthSeconds")
-            is_short = length is not None and length <= DEFAULT_SHORT_MAX
+            is_short = length is not None and length <= short_max
             if no_shorts and is_short:
                 continue
             if count >= max_per:

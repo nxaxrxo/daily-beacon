@@ -39,7 +39,6 @@ Result: 41 of 42 required entries present. Only Cryton is absent (accepted per b
   No invented id substituted. Effect: the collector never sees Cryton; re-add when a real id exists.
 - `Holo` (gameplay), `Fillion`, `Joss Drive Hayes`, `Tech Tone` from the memory watch list - not in the
   portfolio and not on the spec list => omitted.
-- No live resolution needed for any other name, so zero network calls beyond the Cryton attempt.
 - No politics-dominant or news-desk channel exists in the portfolio under a matching title, so nothing
   had to be filtered for that rule; the file holds creators only.
 - Excluded from the 152 by design: asmr (Asmr Lucky Girl), dead/placeholder (Invictus 190 subs,
@@ -84,7 +83,8 @@ vocabulary; enabled boolean; note a string. 78 unique ids, 78 unique names.
 
 ## Caveats
 
-- A competing channels.json was written to the same path by another worker during this unit (extra
-  `subscribers`/`customUrl` keys, 55-79 entries). This file was regenerated last and re-validated
-  after that write; if a later wave re-seeds the path, re-run the validation one-liner.
-- TEMINATION has 2,650 subs but a real id and is on the required list, so it stays at tier 3.
+- Unit u2 also wrote a variant to this same path (77 entries, extra `subscribers`/`customUrl` keys, tags
+  `news`/`commentary`/`drama`/`documentary`/`film`/`hardware` outside the fixed vocabulary). This unit's
+  file was written last (10:52) and validated clean afterwards. If a later unit re-seeds the path, the
+  shape check above is the one that must pass - re-run `build.py` then `validate.py` from
+  `~\.config\opencode\notes\Temp\u2a-channels` to restore it.

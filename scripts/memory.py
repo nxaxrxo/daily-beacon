@@ -703,7 +703,14 @@ def build_parser():
     p.add_argument("--selftest", action="store_true", help="alias for the selftest subcommand")
     sub = p.add_subparsers(dest="cmd")
 
-    f = sub.add_parser("filter", help="annotate candidates with seen/seen_reason/topic_hits")
+    # --root is also accepted AFTER the verb: callers (run_daily.py, scripts, humans) naturally
+    # write "memory.py filter ... --root X". argparse would reject that, so every subparser gets
+    # its own copy with SUPPRESS, which leaves the parent default untouched when it is absent.
+    def add_root(sp):
+        sp.add_argument("--root", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
+        return sp
+
+    f = add_root(sub.add_parser("filter", help="annotate candidates with seen/seen_reason/topic_hits"))
     f.add_argument("--candidates", required=True, help="candidates.json (array or {items:[...]})")
     f.add_argument("--out", required=True, help="filtered.json output path")
     f.add_argument("--suppressed", default=None,
@@ -713,26 +720,26 @@ def build_parser():
                         % DEFAULT_COOLDOWN_DAYS)
     f.set_defaults(func=cmd_filter)
 
-    m = sub.add_parser("mark", help="record an edition (idempotent)")
+    m = add_root(sub.add_parser("mark", help="record an edition (idempotent)"))
     m.add_argument("--edition", required=True, help="editions/<date>.json")
     m.add_argument("--date", default=None, help="override edition date (default: json date field)")
     m.set_defaults(func=cmd_mark)
 
-    q = sub.add_parser("query", help="when/how often a topic was covered")
+    q = add_root(sub.add_parser("query", help="when/how often a topic was covered"))
     q.add_argument("--topic", required=True, help="topic name (slugged)")
     q.add_argument("--days", type=int, default=60,
                    help="window in days for the editions list (default: 60)")
     q.set_defaults(func=cmd_query)
 
-    s = sub.add_parser("stats", help="counts, db size, last edition, top topics")
+    s = add_root(sub.add_parser("stats", help="counts, db size, last edition, top topics"))
     s.set_defaults(func=cmd_stats)
 
-    pr = sub.add_parser("prune", help="drop rows older than N days not referenced by a kept edition")
+    pr = add_root(sub.add_parser("prune", help="drop rows older than N days not referenced by a kept edition"))
     pr.add_argument("--days", type=int, default=400,
                     help="age in days; older unreferenced rows are deleted (default: 400)")
     pr.set_defaults(func=cmd_prune)
 
-    st = sub.add_parser("selftest", help="temp-db self test (prints SELFTEST PASS)")
+    st = add_root(sub.add_parser("selftest", help="temp-db self test (prints SELFTEST PASS)"))
     st.set_defaults(func=None)
     return p
 

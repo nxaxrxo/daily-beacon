@@ -41,4 +41,48 @@ One line each. Newest decisions at the bottom of their section.
 
 ## Runs (U9)
 
-- (recorded when the first real edition is built)
+- (recorded when the first real edition is built)## Backend (U1-U5, spec sections 2-5)
+
+### Scheduler formats (U1)
+- `days:N@HH:MM` keeps its phase on the record's `createdAt` (then `lastFiredAt`), so "every 3 days" does not drift to midnight across restarts; `anchorMs` in the spec is informational only.
+- `weekly:` keeps the old singular `dow` and adds `dows`; `computeDue` reads `dows || [dow]`, so every pre-existing single-day record parses and schedules exactly as before.
+- `weekly:` duplicates are deduped and the list sorted ascending rather than rejected, so `weekly:fri,mon` behaves like `weekly:mon,fri`.
+- `monthly:N@HH:MM` clamps N to the month length (31 -> 28/29 in February) instead of skipping the month.
+- `hourly:MM` rejects minute 60 and the `9:30` form; `days:` rejects 0 and anything over 365.
+- The plugin's own `USAGE` string and `tools/schedule.py`'s `ACCEPTED` string now list the same seven kinds; nothing else in `schedule.py` changed (still only writes request files, never `schedules.json`).
+- `scripts/test_scheduler_formats.mjs` imports the real plugin through `file:///...index.ts` (node 24 strips types) rather than a re-export shim, so the test cannot pass against a stale copy.
+
+### Config (U2/U3)
+- `settings.json` is the spec object verbatim, 13 keys, `site_base_url` left empty until the first deploy fills it.
+- `channels.json` carries exactly the six spec keys; `subscribers`/`customUrl` from the portfolio were dropped at build time because the spec fixed the element shape.
+- `channels.json` ships 78 channels; every id is a 24-char `UC...` copied verbatim from `channel_portfolio.json` except Cryton, whose id was resolved live from the channel page and cross-checked against the channel RSS.
+- Tiers not stated by the spec carry `"note":"tier guessed - confirm"`; shorts/clip/meme/podcast channels are tier 3.
+- `feeds.json` ships 21 feeds, every one verified live (HTTP 200 with entries) in the same session it was written; HTTP status and item count per feed are recorded in `docs/FEEDS-CHECK.md`.
+- `Feeds dropped after verification: VentureBeat AI (HTTP 429 on every URL variant) - AI coverage is carried by The Verge AI, TechCrunch AI, MIT Technology Review and Ars Technica.
+- `GameSpot` ships the `mashup` feed (news + reviews) rather than the news-only feed, because the news-only endpoint returned no entries on verification.
+- `config/feeds.json` weights: 3 for the three flagship gaming feeds, 1 for Kyiv Independent only, 2 for everything else - so the single awareness feed can never outrank gaming/AI on volume.
+
+### Memory (U3)
+- `state/seen.sqlite` is created on first use with the three spec tables plus the additive `topic_seen(topic, edition)` guard authorised by CONTRACTS.md; a `PRAGMA user_version` stamp makes a future schema bump explicit instead of a silent overwrite.
+- News items get two rows (`url:` and `title:`); a topic hit is report-only and never sets `seen`, per DECISIONS section "Memory".
+- `filter` on an unreadable candidates file exits 0 with an empty report rather than killing the nightly run; `run_daily.py` still treats that as a warning.
+- `prune` never touches rows referenced by a kept edition, even past the cutoff.
+
+### Sources (U4/U5)
+- `yt_source.py` prefers Invidious (it returns `lengthSeconds` + views in one call) and falls back to channel RSS; a channel that fails both is counted failed and never fatal. Live run: 34 videos from 77/77 channels, 0 failed.
+- Invidious reports `viewCount` as 0 for very fresh uploads; the value is stored as-is (0 is a real reading there, not "unknown"), while a genuinely absent field stays `null`.
+- `yt_source.py` applies `max_videos_per_channel` from settings (3) as the per-channel cap, and `short_max_seconds` for the shorts classification.
+- An RSS entry with no `<published>` is kept with `publishedAt: null` rather than dropped - hiding real content because of missing metadata is worse than an unsortable row.
+- `news_source.py` keeps undated entries too, dedupes by normalised title and url (weighted winner, others in `also_on`), caps 4 per source, and spends at most 10 `og:image` fetches per run.
+- `transcripts.py` is strictly sequential, checks `~\.config\opencode\notes\yt-cache` before any fetch, copies cache hits into the workpack rather than refetching, and records every failure in `transcripts/index.json` instead of aborting.
+- Trimming is head+tail with a literal `[... trimmed N chars ...]` marker so the 03:00 agent can read the argument and the conclusion without the filler.
+- `run_daily.py collect` degrades: a failed producer, filter or transcript batch is a WARN and the run continues to `packet.md`; only an unwritable `candidates.json` exits non-zero.
+- `run_daily.py` keeps `candidates.json` immutable after the caps and writes the image map to `images.json`, patching `thumb_local` into `filtered.json` only.
+
+### Verification
+- `node scripts/test_scheduler_formats.mjs` -> 71 assertions, `ALL FORMATS PASS`, exit 0 (both old and new kinds, valid/reject/catch-up).
+- `python scripts/memory.py selftest` -> `SELFTEST PASS`.
+- `python scripts/yt_source.py` live -> `yt_source done: 34 videos from 77/77 channels (0 failed)`.
+- `python scripts/news_source.py` live -> `news_source done: 60 articles from 21/21 feeds (0 failed)`.
+- `python scripts/transcripts.py --ids ...` -> cached path proven, trim marker proven.
+- `python scripts/run_daily.py collect` -> summary line and `packet.md` (recorded in docs/_parts/u5b-rundaily.md).

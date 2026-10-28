@@ -1,1764 +1,1134 @@
-#!/usr/bin/env python3
-"""build_edition.py - turn editions/YYYY-MM-DD.json into the Daily Beacon static site.
+"""Build the Daily Beacon static site from one edition JSON file.
 
-Pipeline
---------
-1. load + validate the edition JSON against the schema in docs/SPEC.md section 6
-2. resolve every image (download remote / read local), optimise to JPEG q82 max width 1400
-3. render one HTML document per edition (index.html + a dated archive snapshot)
-4. rebuild site/archive.html from the snapshots on disk
-5. self-check the generated HTML (tag balance, anchors, alt text, size)
+    python scripts/build_edition.py [--date YYYY-MM-DD] [--edition PATH] [--out-dir PATH]
+                                    [--root PATH] [--check] [--fixture] [--no-images] [--quiet]
 
-Exit codes: 0 success, 1 validation/build failure, 2 usage error.
+The edition is validated against SPEC.md section 6 and then rendered into
+`site/index.html`, a snapshot at `site/archive/<date>.html` and the archive index
+`site/archive.html`, with images optimised into `site/assets/<date>/`.
 
-Console output is ASCII only; every file is opened with an explicit UTF-8 encoding.
-Nothing here opens a browser, a window or a network call outside image downloads.
+docs/SITE-CONTRACT.md is the binding element/class/attribute contract: every tag,
+class and attribute below is emitted exactly as written there. Change the contract
+first, never this file alone.
+
+Markup is built in memory and installed through a .tmp file, so a failure never
+leaves a half-written page behind. Console output is ASCII only.
+
+Exit codes: 0 success (or CHECK OK), 1 validation or build failure.
 """
 
 from __future__ import annotations
 
 import argparse
 import hashlib
-import html
+import html as htmllib
+import io
 import json
 import re
-import shutil
-import subprocess
 import sys
-import time
-from datetime import date as _date
+from dataclasses import dataclass, field
+from datetime import date as date_cls
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable, Sequence
 
-# Optional third-party imports. The script degrades to a clear error instead of a traceback.
-try:  # pragma: no cover - environment dependent
+try:  # optional at import time so --help never dies on a broken environment
     import requests
-except Exception:  # noqa: BLE001
+except Exception:  # pragma: no cover - declared dependency
     requests = None  # type: ignore[assignment]
 
-try:  # pragma: no cover - environment dependent
-    from PIL import Image, ImageDraw
-except Exception:  # noqa: BLE001
+try:
+    from PIL import Image
+except Exception:  # pragma: no cover - declared dependency
     Image = None  # type: ignore[assignment]
-    ImageDraw = None  # type: ignore[assignment]
 
-
-# ---------------------------------------------------------------------------
-# constants
-# ---------------------------------------------------------------------------
-
-ROOT = Path(__file__).resolve().parents[1]
-EDITION_DIR = ROOT / "editions"
-SITE_DIR = ROOT / "site"
-SETTINGS_PATH = ROOT / "config" / "settings.json"
-FIXTURE_DIR = ROOT / "state" / "workpack" / "_fixture"
-FIXTURE_IMG_DIR = FIXTURE_DIR / "img"
-
-# Accent keys and the exact seed formulas are fixed by docs/SITE-CONTRACT.md section 3.
-ACCENTS = ["amber", "coral", "rose", "sage", "teal", "sky", "gold", "clay"]
-LAYOUTS = ["hero-left", "hero-centre", "hero-stacked"]
-
+ACCENTS = ("amber", "coral", "rose", "sage", "teal", "sky", "gold", "clay")
+LAYOUTS = ("hero-left", "hero-centre", "hero-stacked")
 KINDS = ("lead", "story", "video", "quick", "quote")
-REQUIRED_TOP_KEYS = ("date", "number", "generatedAt", "masthead", "tagline", "sections")
-
-# HTML elements that never take a closing tag.
-VOID_TAGS = {
-    "area", "base", "br", "col", "embed", "hr", "img", "input", "link",
-    "meta", "param", "source", "track", "wbr",
-}
-
-DEFAULT_SETTINGS = {
-    "edition_min_stories": 5,
-    "edition_max_stories": 14,
-    "keep_editions": 30,
-    "site_base_url": "",
-}
-
-MAX_IMAGE_BYTES = 8 * 1024 * 1024
-IMAGE_TIMEOUT = 25
-IMAGE_MAX_WIDTH = 1400
-IMAGE_QUALITY = 82
-MAX_HTML_BYTES = 3 * 1024 * 1024
-DARK_BACKDROP = (0x0B, 0x0B, 0x0D)
-
-BROWSER_UA = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+BODY_KINDS = ("lead", "story", "video", "quick")
+VOID_TAGS = frozenset("area base br col embed hr img input link meta param source track wbr".split())
+RAW_TEXT_TAGS = frozenset(("script", "style"))
+RESERVED_IDS = frozenset( {"top", "masthead", "paper", "progress", "progress-bar", "quick-hits", "quick-hits-title"}
+)
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+MAX_IMAGE_BYTES, MAX_IMAGE_WIDTH, JPEG_QUALITY = 8 * 1024 * 1024, 1400, 82
+MAX_HTML_BYTES, TOC_LABEL_MAX, ARCHIVE_HEAD_MAX, REQUEST_TIMEOUT = 3 * 1024 * 1024, 42, 120, 20
+USER_AGENT = ( "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
+DEFAULT_SETTINGS = {"edition_min_stories": 5, "edition_max_stories": 14, "keep_editions": 30}
 
-ID_RE = re.compile(r"^[a-z0-9-]+$")
-ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-LINK_INLINE_RE = re.compile(r"\[([^\[\]]+)\]\(([^()\s]*)\)")
+_LINK_RE = re.compile(r"\[([^\[\]\n]+)\]\(([^()\s]+)\)")
+_BOLD_RE = re.compile(r"\*\*([^\n]+?)\*\*")
+_ITAL_RE = re.compile(r"(?<!\*)\*([^*\n]+?)\*(?!\*)")
+_TAG_TOKEN = re.compile( r"<!--.*?-->|<!DOCTYPE[^>]*>|<\?[^>]*>"
+    r"|<(/?)([A-Za-z][A-Za-z0-9:-]*)((?:\"[^\"]*\"|'[^']*'|[^>\"'])*?)(/?)>", re.S | re.I,
+)
+_TAGS_ONLY = re.compile(r"<[^>]+>")
+_ANCHOR_LINK_RE = re.compile(r"<a\s[^>]*href=", re.I)
 
+WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+MONTHS = ( "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December", )
 
-# ---------------------------------------------------------------------------
-# console helpers
-# ---------------------------------------------------------------------------
+class MarkupError(ValueError):
+    """Raised when inline markup is unbalanced or unsafe."""
 
-def say(message: str) -> None:
-    """Print one line, forced to ASCII so a cp1252 console never dies."""
-    text = message.encode("ascii", "replace").decode("ascii")
-    print(text, flush=True)
+@dataclass
+class Issue:
+    hard: bool
+    message: str
 
+@dataclass
+class Asset:
+    rel: str
+    width: int
+    height: int
 
-def warn(message: str) -> None:
-    say("warning: " + message)
+@dataclass
+class Context:
+    root: Path
+    out_dir: Path
+    edition_path: Path
+    date_str: str
+    captured: date_cls
+    edition: dict[str, Any]
+    settings: dict[str, Any]
+    variant: tuple[str, str, str, str]
+    assets: dict[str, Asset] = field(default_factory=dict)
+    prefix: str = ""
+    css_q: str = ""
+    js_q: str = ""
+    no_images: bool = False
+    quiet: bool = False
+    stats: dict[str, int] = field(default_factory=lambda: {"covered": 0, "suppressed": 0})
 
+def _reconfigure_streams() -> None:
+    for name in ("stdout", "stderr"):
+        stream = getattr(sys, name, None)
+        if stream is None:
+            continue
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except Exception:
+            pass
 
-def fail(message: str, code: int = 1) -> "NoReturn":  # type: ignore[name-defined]
-    say("error: " + message)
-    raise SystemExit(code)
+def fail(message: str) -> int:
+    print(f"BUILD FAIL: {message}", file=sys.stderr)
+    return 1
 
+def warn(message: str, quiet: bool = False) -> None:
+    if not quiet:
+        print(f"WARN: {message}")
 
-def reconfigure_stdout() -> None:
-    """Best-effort UTF-8 stdout; guarded because sys.stdout can be None in a frozen exe."""
-    stream = sys.stdout
-    if stream is None:
-        return
-    try:
-        stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
-    except Exception:  # noqa: BLE001
-        pass
+def ascii_safe(value: str) -> str:
+    return value.encode("ascii", "replace").decode("ascii")
 
+def attr(value: Any) -> str:
+    return htmllib.escape("" if value is None else str(value), quote=True)
 
-# ---------------------------------------------------------------------------
-# small utilities
-# ---------------------------------------------------------------------------
+def text(value: Any) -> str:
+    return htmllib.escape("" if value is None else str(value), quote=False)
 
-def sha1_hex(data: bytes) -> str:
-    return hashlib.sha1(data).hexdigest()
+def is_http(url: str) -> bool:
+    return bool(re.match(r"^https?://[^\s]+$", url, re.I))
 
+def host_of(url: str) -> str:
+    match = re.match(r"^https?://([^/?#]+)", url, re.I)
+    return match.group(1) if match else ""
 
-def slugify(value: str, limit: int = 40) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
-    slug = slug[:limit].strip("-")
-    return slug or "image"
+def inline_errors(value: Any) -> list[str]:
+    """Reject unbalanced **bold**, *italic* and [text](url) markers."""
+    if not isinstance(value, str):
+        return ["not a string"]
+    problems: list[str] = []
+    if value.count("**") % 2:
+        problems.append("odd number of ** markers")
+    if value.replace("**", "").count("*") % 2:
+        problems.append("odd number of * markers")
+    links = _LINK_RE.findall(value)
+    if value.count("[") != len(links) or value.count("](") != len(links):
+        problems.append("[ without ](url)")
+    for _, url in links:
+        if not is_http(htmllib.unescape(url)):
+            problems.append(f"link is not http(s): {url[:50]}")
+    return problems
 
-
-def esc(value: Any) -> str:
-    """Escape a value for HTML text/attribute context."""
-    return html.escape("" if value is None else str(value), quote=True)
-
-
-def plain(value: Any) -> str:
-    """Drop inline markup markers, returning readable plain text."""
-    text = "" if value is None else str(value)
-    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
-    text = re.sub(r"\*(.+?)\*", r"\1", text)
-    text = LINK_INLINE_RE.sub(r"\1", text)
-    return text.strip()
-
-
-def truncate_str(text: Any, limit: int) -> str:
-    value = plain(text).replace("\n", " ").strip()
-    if len(value) <= limit:
-        return value
-    return value[: limit - 3].rstrip() + "..."
-
-
-def _human_date_portable(d: _date) -> str:
-    return f"{d.strftime('%A')} {d.day} {d.strftime('%B')} {d.year}"
-
-
-def human_date(iso_date: str) -> str:
-    """2026-10-28 -> 'Wednesday 28 October 2026'."""
-    try:
-        return _human_date_portable(datetime.strptime(iso_date, "%Y-%m-%d").date())
-    except ValueError:
-        return iso_date
-
-
-def human_timestamp(value: str) -> str:
-    """ISO timestamp -> '28 October 2026, 03:14' (falls back to the raw string)."""
-    if not value:
-        return ""
-    try:
-        stamp = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    except ValueError:
-        return str(value)
-    return f"{stamp.day} {stamp.strftime('%B')} {stamp.year}, {stamp.strftime('%H:%M')}"
-
-
-def seed_for(iso_date: str) -> int:
-    digits = re.sub(r"\D", "", iso_date)
-    return int(digits) if digits else 0
-
-
-def seed_variants(iso_date: str) -> dict[str, str]:
-    """Deterministic per-date design variant, exactly as SITE-CONTRACT section 3 prescribes."""
-    seed = seed_for(iso_date)
-    return {
-        "seed": str(seed),
-        "accent": ACCENTS[seed % 8],
-        "layout": LAYOUTS[(seed // 7) % 3],
-        "scale": "a" if (seed // 11) % 2 == 0 else "b",
-        "order": "lead" if (seed // 13) % 2 == 0 else "rail",
-    }
-
-
-def load_settings() -> dict[str, Any]:
-    settings = dict(DEFAULT_SETTINGS)
-    try:
-        with open(SETTINGS_PATH, "r", encoding="utf-8") as handle:
-            loaded = json.load(handle)
-        if isinstance(loaded, dict):
-            settings.update(loaded)
-    except Exception:  # noqa: BLE001 - settings are advisory, defaults keep the build alive
-        pass
-    return settings
-
-
-def file_version(path: Path) -> str:
-    """sha1[:8] of a static asset, 'dev' when the other worker has not written it yet."""
-    try:
-        return sha1_hex(path.read_bytes())[:8]
-    except Exception:  # noqa: BLE001
-        return "dev"
-
-
-def read_json(path: Path) -> Any:
-    with open(path, "r", encoding="utf-8") as handle:
-        return json.load(handle)
-
-
-def write_text(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", encoding="utf-8", newline="\n") as handle:
-        handle.write(text)
-
-# ---------------------------------------------------------------------------
-# inline markup: **bold**, *italic*, [text](url)
-# ---------------------------------------------------------------------------
-
-MARKUP_URL_OK = re.compile(r"^(?:https?://|\.{0,2}/|#)", re.IGNORECASE)
-
-
-def sanitise_url(raw: str) -> str | None:
-    """Return a safe href, or None when the URL scheme is not allowed."""
-    candidate = (raw or "").strip()
-    if not candidate:
-        return None
-    # Control characters and whitespace inside a URL are never legitimate here.
-    if any(ch in candidate for ch in ("\n", "\r", "\t", " ")):
-        return None
-    if MARKUP_URL_OK.match(candidate):
-        return candidate
-    return None
-
-
-def render_inline(text: Any) -> str:
-    """Escape every byte of HTML first, then layer the three allowed inline markers on top.
-
-    Because escaping happens first, no user-supplied angle bracket can ever become a tag, and
-    the regexes below can only match the literal marker characters we introduce ourselves.
-    """
-    safe = esc(text)
+def render_inline(value: Any, where: str = "") -> str:
+    """Escape everything first, then apply only the three allowed transforms."""
+    raw = "" if value is None else str(value)
+    problems = inline_errors(raw)
+    if problems:
+        raise MarkupError(f"{where}: {'; '.join(problems)}")
+    out = htmllib.escape(raw, quote=False)
+    out = _BOLD_RE.sub(r"<strong>\1</strong>", out)
+    out = _ITAL_RE.sub(r"<em>\1</em>", out)
 
     def _link(match: re.Match[str]) -> str:
-        label, href = match.group(1), match.group(2)
-        clean = sanitise_url(html.unescape(href))
-        if clean is None:
-            # Unsafe scheme: keep the words, drop the link. Never emit the bad URL.
-            return label
-        return f'<a href="{esc(clean)}" rel="noopener">{label}</a>'
+        label, url = match.group(1), match.group(2)
+        if not is_http(htmllib.unescape(url)):
+            raise MarkupError(f"{where}: link is not http(s): {url[:50]}")
+        return f'<a href="{attr(htmllib.unescape(url))}" rel="noopener">{label}</a>'
 
-    safe = LINK_INLINE_RE.sub(_link, safe)
-    safe = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", safe)
-    safe = re.sub(r"\*(.+?)\*", r"<em>\1</em>", safe)
-    return safe
+    return _LINK_RE.sub(_link, out)
 
+def plain_text(value: Any) -> str:
+    raw = "" if value is None else str(value)
+    raw = _LINK_RE.sub(lambda m: m.group(1), raw)
+    raw = _TAGS_ONLY.sub(" ", raw)
+    return re.sub(r"\s+", " ", raw.replace("**", "").replace("*", "")).strip()
 
-def render_paragraphs(body: Any) -> str:
-    """Body may be a list of paragraphs or a single string; each paragraph becomes a <p>."""
-    if body is None:
-        return ""
-    items = body if isinstance(body, list) else [body]
-    out: list[str] = []
-    for item in items:
-        if item is None:
-            continue
-        text = str(item).strip()
-        if not text:
-            continue
-        out.append(f"      <p>{render_inline(text)}</p>")
-    return "\n".join(out)
+def truncate(value: str, limit: int) -> str:
+    flat = re.sub(r"\s+", " ", value).strip()
+    if len(flat) <= limit:
+        return flat
+    return flat[: max(1, limit - 3)].rstrip(" ,.;:-") + "..."
 
+def slugify_id(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", ("" if value is None else str(value)).lower()).strip("-")
 
-# ---------------------------------------------------------------------------
-# validation
-# ---------------------------------------------------------------------------
+def priority_of(section: dict[str, Any]) -> float:
+    value = section.get("priority")
+    if isinstance(value, bool):
+        return 0.0
+    if isinstance(value, (int, float)):
+        return float(value)
+    try:
+        return float(str(value))
+    except (TypeError, ValueError):
+        return 0.0
 
-class Report:
-    """Collects violations with their JSON path so --check can print all of them at once."""
+def parse_date(value: Any) -> date_cls | None:
+    if not isinstance(value, str) or not DATE_RE.match(value):
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
 
-    def __init__(self) -> None:
-        self.errors: list[tuple[str, str]] = []
-        self.warnings: list[tuple[str, str]] = []
+def long_date(day: date_cls) -> str:
+    return f"{day.day} {MONTHS[day.month - 1]} {day.year}"
 
-    def error(self, path: str, message: str) -> None:
-        self.errors.append((path, message))
+def weekday_date(day: date_cls) -> str:
+    return f"{WEEKDAYS[day.weekday()]}, {long_date(day)}"
 
-    def warn(self, path: str, message: str) -> None:
-        self.warnings.append((path, message))
+def humanise_timestamp(value: Any) -> str:
+    if not isinstance(value, str) or not value.strip():
+        return "unknown"
+    try:
+        stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return value.strip()
+    return f"{stamp.day} {MONTHS[stamp.month - 1]} {stamp.year}, {stamp.hour:02d}:{stamp.minute:02d}"
 
-    @property
-    def ok(self) -> bool:
-        return not self.errors
+def variant_for(date_str: str) -> tuple[str, str, str, str]:
+    """The contract's date-seed rotation: accent, layout, scale, order."""
+    seed = int(date_str.replace("-", ""))
+    return ( ACCENTS[seed % len(ACCENTS)],
+        LAYOUTS[(seed // 7) % len(LAYOUTS)], "a" if (seed // 11) % 2 == 0 else "b",
+        "lead" if (seed // 13) % 2 == 0 else "rail", )
 
+def load_settings(root: Path) -> dict[str, Any]:
+    settings = dict(DEFAULT_SETTINGS)
+    try:
+        payload = json.loads((root / "config" / "settings.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return settings
+    if isinstance(payload, dict):
+        for key in DEFAULT_SETTINGS:
+            value = payload.get(key)
+            if isinstance(value, int) and not isinstance(value, bool):
+                settings[key] = value
+    return settings
 
-def _check_inline(report: Report, path: str, text: Any) -> None:
-    """Reject stray '<', unbalanced brackets and unclosed emphasis markers."""
-    if text is None:
-        return
-    value = str(text)
-    if "<" in value or ">" in value:
-        report.error(path, "raw angle bracket in text (HTML is escaped, use no tags at all)")
-    if value.count("**") % 2 != 0:
-        report.error(path, "unclosed '**' emphasis")
-    if value.replace("**", "").count("*") % 2 != 0:
-        report.error(path, "unclosed '*' emphasis")
-    if value.count("[") != value.count("]"):
-        report.error(path, "unbalanced square brackets")
-    if value.count("(") != value.count(")"):
-        report.error(path, "unbalanced parentheses")
-    for match in LINK_INLINE_RE.finditer(value):
-        href = match.group(2).strip()
-        if sanitise_url(href) is None:
-            report.error(path, f"disallowed link target '{truncate_str(href, 40)}' (http/https/relative only)")
+def load_edition(path: Path) -> tuple[dict[str, Any] | None, str | None]:
+    if not path.exists():
+        return None, f"edition not found: {path}"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        return None, f"cannot read {path}: {exc}"
+    except ValueError as exc:
+        return None, f"edition is not valid JSON: {path} ({exc})"
+    if not isinstance(payload, dict):
+        return None, f"edition root must be a JSON object: {path}"
+    return payload, None
 
+def read_memory_stats(root: Path) -> dict[str, int]:
+    """Best-effort counts from state/seen.sqlite; never fatal."""
+    db = root / "state" / "seen.sqlite"
+    stats = {"covered": 0, "suppressed": 0}
+    if not db.exists():
+        return stats
+    try:
+        import sqlite3
 
-def _check_body(report: Report, path: str, body: Any) -> int:
-    if body is None:
-        return 0
-    items = body if isinstance(body, list) else [body]
-    texts = [str(x).strip() for x in items if x is not None and str(x).strip()]
-    for index, text in enumerate(texts):
-        _check_inline(report, f"{path}[{index}]", text)
-    return len(texts)
+        with sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True, timeout=2) as conn:
+            row = conn.execute("SELECT COUNT(*) FROM items").fetchone()
+            stats["covered"] = int(row[0]) if row else 0
+            row = conn.execute("SELECT COUNT(*) FROM editions").fetchone()
+            stats["suppressed"] = int(row[0]) if row else 0
+    except Exception:
+        return {"covered": 0, "suppressed": 0}
+    return stats
 
+# ---------------------------------------------------------------- validation
 
-def _check_source(report: Report, path: str, source: Any, required: bool) -> None:
-    if not isinstance(source, dict):
+def _check_field(section: dict[str, Any], key: str, label: str, out: list[Issue], *, required: bool = False) -> None:
+    """Presence (when required) plus inline-markup validity for one string field."""
+    value = section.get(key)
+    if value is None:
         if required:
-            report.error(path, "missing source object with label + url")
+            out.append(Issue(True, f"{label}: missing required key '{key}'"))
         return
-    label = str(source.get("label") or "").strip()
-    url = str(source.get("url") or "").strip()
-    if required and not label:
-        report.error(f"{path}.label", "empty source label")
-    if required and not url:
-        report.error(f"{path}.url", "empty source url")
-    if url and sanitise_url(url) is None:
-        report.error(f"{path}.url", f"source url '{truncate_str(url, 50)}' is not http(s)")
+    if not isinstance(value, str):
+        out.append(Issue(True, f"{label}: '{key}' must be a string"))
+        return
+    if required and not value.strip():
+        out.append(Issue(True, f"{label}: missing required key '{key}'"))
+        return
+    for problem in inline_errors(value):
+        out.append(Issue(True, f"{label}: bad inline markup in '{key}' ({problem})"))
 
+def _check_body(section: dict[str, Any], kind: str, label: str, out: list[Issue]) -> None:
+    body = section.get("body")
+    if body is None:
+        if kind in BODY_KINDS:
+            out.append(Issue(True, f"{label}: missing required key 'body'"))
+        return
+    paragraphs = body if isinstance(body, list) else [body]
+    if kind in BODY_KINDS and not any(isinstance(p, str) and p.strip() for p in paragraphs):
+        out.append(Issue(True, f"{label}: empty body"))
+        return
+    for index, para in enumerate(paragraphs):
+        if not isinstance(para, str):
+            out.append(Issue(True, f"{label}: body[{index}] must be a string"))
+            continue
+        for problem in inline_errors(para):
+            out.append(Issue(True, f"{label}: bad inline markup in body[{index}] ({problem})"))
 
-def _check_image(report: Report, path: str, image: Any, edition_dir: Path) -> None:
+def _check_source(section: dict[str, Any], label: str, kind: str, out: list[Issue]) -> None:
+    sticker = kind in ("lead", "story", "video", "quote")
+    source = section.get("source")
+    if not isinstance(source, dict):
+        if sticker:
+            out.append(Issue(True, f"{label}: story has no source.url"))
+        return
+    url = source.get("url")
+    if not isinstance(url, str) or not url.strip():
+        if sticker:
+            out.append(Issue(True, f"{label}: story has no source.url"))
+        return
+    if not is_http(url):
+        out.append(Issue(True, f"{label}: source.url is not http(s): {url[:60]}"))
+    if "label" in source and not isinstance(source["label"], str):
+        out.append(Issue(True, f"{label}: source.label must be a string"))
+
+def _check_image(section: dict[str, Any], label: str, out: list[Issue]) -> None:
+    image = section.get("image")
     if image is None:
         return
     if not isinstance(image, dict):
-        report.error(path, "image must be an object with src + alt")
+        out.append(Issue(True, f"{label}: 'image' must be an object"))
         return
-    src = str(image.get("src") or "").strip()
-    if not src:
-        report.error(f"{path}.src", "empty image src")
-    alt = image.get("alt")
-    if alt is None or not str(alt).strip():
-        report.error(f"{path}.alt", "missing alt text (mandatory)")
-    if src:
-        if re.match(r"^https?://", src, re.IGNORECASE):
-            pass
+    src = image.get("src")
+    if not isinstance(src, str) or not src.strip():
+        out.append(Issue(True, f"{label}: image.src is empty"))
+
+def _check_quick_hits(edition: dict[str, Any], issues: list[Issue]) -> None:
+    hits = edition.get("quickHits")
+    if hits is None:
+        return
+    if not isinstance(hits, list):
+        issues.append(Issue(True, "edition 'quickHits' must be a list"))
+        return
+    for index, hit in enumerate(hits):
+        if not isinstance(hit, dict):
+            issues.append(Issue(True, f"quickHits[{index}] must be an object"))
+            continue
+        label = f"quickHits[{index}]"
+        if not isinstance(hit.get("text"), str) or not hit["text"].strip():
+            issues.append(Issue(True, f"{label}: missing 'text'"))
+        elif inline_errors(hit["text"]):
+            issues.append(Issue(True, f"{label}: bad inline markup in 'text'"))
+        if not isinstance(hit.get("url"), str) or not hit["url"].strip():
+            issues.append(Issue(True, f"{label}: missing 'url'"))
+        elif not is_http(hit["url"]):
+            issues.append(Issue(True, f"{label}: url is not http(s)"))
+
+def _check_sections(sections: list[Any], issues: list[Issue]) -> None:
+    seen: set[str] = set()
+    for index, section in enumerate(sections):
+        if not isinstance(section, dict):
+            issues.append(Issue(True, f"sections[{index}] must be an object"))
+            continue
+        sid = section.get("id")
+        label = f"sections[{index}]"
+        if not isinstance(sid, str) or not sid.strip():
+            issues.append(Issue(True, f"{label}: missing required key 'id'"))
         else:
-            local = Path(src)
-            if not local.is_absolute():
-                local = (edition_dir / local)
-            if not local.exists():
-                report.error(f"{path}.src", f"local image not found: {src}")
+            label = f"section '{sid}'"
+            if not ID_RE.match(sid):
+                issues.append(Issue(True, f"{label}: id must match [a-z0-9-]+"))
+            elif sid in RESERVED_IDS:
+                issues.append(Issue(True, f"{label}: id is reserved by the page skeleton"))
+            elif sid in seen:
+                issues.append(Issue(True, f"{label}: duplicate section id (anchors must be unique)"))
+            seen.add(sid if isinstance(sid, str) else "")
 
+        kind = section.get("kind")
+        if not isinstance(kind, str) or not kind.strip():
+            issues.append(Issue(True, f"{label}: missing required key 'kind'"))
+            continue
+        if kind not in KINDS:
+            issues.append(Issue(True, f"{label}: unknown kind '{kind}'"))
+            continue
+        _check_field(section, "headline", label, issues, required=kind in BODY_KINDS)
+        _check_field(section, "standfirst", label, issues, required=kind in ("lead", "story", "video"))
+        if kind == "quote":
+            body = section.get("body")
+            has_body = isinstance(body, list) and any(isinstance(p, str) and p.strip() for p in body)
+            if not isinstance(section.get("headline"), str) and not has_body:
+                issues.append(Issue(True, f"{label}: quote needs a headline or a body paragraph"))
+        for key in ("whyItMatters", "aside"):
+            _check_field(section, key, label, issues)
+        _check_body(section, kind, label, issues)
+        _check_source(section, label, kind, issues)
+        _check_image(section, label, issues)
 
-def validate_edition(edition: Any, edition_path: Path, settings: dict[str, Any]) -> Report:
-    """Full schema validation. Returns a Report; the caller decides whether to abort."""
-    report = Report()
-    if not isinstance(edition, dict):
-        report.error("$", "edition root must be a JSON object")
-        return report
+def validate_edition( edition: dict[str, Any], date_str: str, settings: dict[str, Any]
+) -> tuple[list[Issue], list[str]]:
+    """Return (issues, notes). Hard issues fail the build; notes only warn."""
+    issues: list[Issue] = []
+    notes: list[str] = []
 
-    for key in REQUIRED_TOP_KEYS:
-        if key not in edition:
-            report.error(f"$.{key}", "required key missing")
-
-    iso = str(edition.get("date") or "")
-    if not ISO_DATE_RE.match(iso):
-        report.error("$.date", "date must be YYYY-MM-DD")
-    else:
-        if edition_path.stem != iso:
-            report.error("$.date", f"date '{iso}' does not match filename '{edition_path.stem}'")
-        try:
-            datetime.strptime(iso, "%Y-%m-%d")
-        except ValueError:
-            report.error("$.date", "date is not a real calendar date")
-
-    number = edition.get("number")
-    if not isinstance(number, int) or number < 1:
-        report.error("$.number", "number must be a positive integer")
+    declared = edition.get("date")
+    if not isinstance(declared, str) or not declared.strip():
+        issues.append(Issue(True, "edition is missing the 'date' field"))
+    elif parse_date(declared) is None:
+        issues.append(Issue(True, f"edition date is not YYYY-MM-DD: {declared}"))
+    elif declared != date_str:
+        issues.append(Issue(True, f"date field '{declared}' disagrees with the edition date '{date_str}'"))
 
     for key in ("masthead", "tagline"):
-        if not str(edition.get(key) or "").strip():
-            report.error(f"$.{key}", "must be a non-empty string")
-
-    if "generatedAt" in edition:
-        try:
-            datetime.fromisoformat(str(edition.get("generatedAt")).replace("Z", "+00:00"))
-        except ValueError:
-            report.error("$.generatedAt", "not an ISO 8601 timestamp")
-
-    if "weatherStrip" in edition:
-        _check_inline(report, "$.weatherStrip", edition.get("weatherStrip"))
-    if "signoff" in edition:
-        _check_inline(report, "$.signoff", edition.get("signoff"))
+        if not isinstance(edition.get(key), str) or not edition[key].strip():
+            issues.append(Issue(True, f"edition is missing '{key}'"))
+    if not isinstance(edition.get("number"), int) or isinstance(edition.get("number"), bool):
+        notes.append("edition 'number' missing or not an integer - using 0")
+    for key in ("weatherStrip", "signoff"):
+        value = edition.get(key)
+        if value is None:
+            continue
+        if not isinstance(value, str):
+            issues.append(Issue(True, f"edition '{key}' must be a string"))
+        else:
+            for problem in inline_errors(value):
+                issues.append(Issue(True, f"edition: bad inline markup in '{key}' ({problem})"))
 
     sections = edition.get("sections")
     if not isinstance(sections, list) or not sections:
-        report.error("$.sections", "must be a non-empty array")
-        return report
+        issues.append(Issue(True, "edition has no sections"))
+        return issues, notes
+    _check_sections(sections, issues)
 
-    seen_ids: set[str] = set()
-    lead_count = 0
-    counted = 0
-    edition_dir = edition_path.parent
+    leads = [s for s in sections if isinstance(s, dict) and s.get("kind") == "lead"]
+    if len(leads) > 1:
+        issues.append(Issue(True, f"{len(leads)} sections are kind 'lead' - exactly one is allowed"))
+    elif not leads:
+        notes.append("no lead section - promoting the highest-priority section")
+        candidates = [ s for s in order_sections(sections)
+            if isinstance(s, dict) and s.get("kind") in ("story", "video")
+        ]
+        if candidates:
+            candidates[0]["kind"] = "lead"
 
-    for index, section in enumerate(sections):
-        base = f"$.sections[{index}]"
-        if not isinstance(section, dict):
-            report.error(base, "section must be an object")
-            continue
+    _check_quick_hits(edition, issues)
 
-        raw_id = str(section.get("id") or "")
-        if not raw_id:
-            report.error(f"{base}.id", "missing id")
-        elif not ID_RE.match(raw_id):
-            report.error(f"{base}.id", f"id '{raw_id}' must match [a-z0-9-]+")
-        elif raw_id in seen_ids:
-            report.error(f"{base}.id", f"duplicate id '{raw_id}'")
-        else:
-            seen_ids.add(raw_id)
+    low = int(settings.get("edition_min_stories") or 0)
+    high = int(settings.get("edition_max_stories") or 0)
+    count = len(sections)
+    if low and count < low:
+        notes.append(f"only {count} sections, below edition_min_stories ({low})")
+    if high and count > high:
+        notes.append(f"{count} sections, above edition_max_stories ({high})")
+    return issues, notes
 
-        kind = str(section.get("kind") or "")
-        if kind not in KINDS:
-            report.error(f"{base}.kind", f"kind '{kind}' not one of {', '.join(KINDS)}")
-        if kind == "lead":
-            lead_count += 1
-        if kind in ("lead", "story", "video"):
-            counted += 1
+def order_sections(sections: Sequence[Any]) -> list[dict[str, Any]]:
+    """Priority descending, ties keep the original array order."""
+    indexed = [(priority_of(s), -i, s) for i, s in enumerate(sections) if isinstance(s, dict)]
+    indexed.sort(key=lambda triple: (triple[0], triple[1]), reverse=True)
+    return [item for _, _, item in indexed]
 
-        if not str(section.get("kicker") or "").strip():
-            report.error(f"{base}.kicker", "missing kicker")
-        else:
-            _check_inline(report, f"{base}.kicker", section.get("kicker"))
+def lead_of(sections: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
+    return next((s for s in sections if s.get("kind") == "lead"), None)
 
-        headline = str(section.get("headline") or "").strip()
-        if not headline:
-            report.error(f"{base}.headline", "missing headline")
-        else:
-            _check_inline(report, f"{base}.headline", headline)
+# ------------------------------------------------------------------- images
 
-        for field in ("standfirst", "whyItMatters", "aside"):
-            if section.get(field) is not None:
-                _check_inline(report, f"{base}.{field}", section.get(field))
-
-        body_paragraphs = _check_body(report, f"{base}.body", section.get("body"))
-        if kind == "quote":
-            if body_paragraphs == 0 and not headline:
-                report.error(f"{base}.body", "quote needs a quote line (body) or a headline")
-        elif kind != "quick":
-            if body_paragraphs == 0:
-                report.error(f"{base}.body", "non-empty body required")
-
-        _check_source(report, f"{base}.source", section.get("source"), required=kind != "quick")
-        _check_image(report, f"{base}.image", section.get("image"), edition_dir)
-
-        tags = section.get("tags")
-        if tags is not None and not isinstance(tags, list):
-            report.error(f"{base}.tags", "tags must be an array")
-
-    # exactly one lead; zero is repairable, two is a hard failure
-    if lead_count > 1:
-        report.error("$.sections", f"{lead_count} sections of kind 'lead' (exactly one allowed)")
-    elif lead_count == 0:
-        report.warn("$.sections", "no 'lead' section; the highest-priority section will be promoted")
-
-    quick_hits = edition.get("quickHits")
-    if quick_hits is not None:
-        if not isinstance(quick_hits, list):
-            report.error("$.quickHits", "must be an array")
-        else:
-            for index, hit in enumerate(quick_hits):
-                base = f"$.quickHits[{index}]"
-                if isinstance(hit, dict):
-                    if not str(hit.get("text") or "").strip():
-                        report.error(f"{base}.text", "missing text")
-                    else:
-                        _check_inline(report, f"{base}.text", hit.get("text"))
-                    url = str(hit.get("url") or "").strip()
-                    if url and sanitise_url(url) is None:
-                        report.error(f"{base}.url", "url must be http(s)")
-                elif isinstance(hit, str):
-                    _check_inline(report, base, hit)
-                else:
-                    report.error(base, "quick hit must be a string or {text,url}")
-
-    minimum = int(settings.get("edition_min_stories", 5) or 5)
-    maximum = int(settings.get("edition_max_stories", 14) or 14)
-    if counted < minimum:
-        report.warn("$.sections", f"{counted} stories, below edition_min_stories={minimum}")
-    elif counted > maximum:
-        report.warn("$.sections", f"{counted} stories, above edition_max_stories={maximum}")
-
-    return report
-
-# ---------------------------------------------------------------------------
-# lead promotion + section ordering
-# ---------------------------------------------------------------------------
-
-def promote_lead(edition: dict[str, Any]) -> bool:
-    """If no section is a lead, promote the highest-priority one. Returns True when it changed."""
-    sections = edition.get("sections") or []
-    if any(str(s.get("kind")) == "lead" for s in sections if isinstance(s, dict)):
-        return False
-    candidates = [s for s in sections if isinstance(s, dict) and str(s.get("kind")) in ("story", "video")]
-    if not candidates:
-        return False
-    best = max(candidates, key=lambda s: (int(s.get("priority") or 0)))
-    best["kind"] = "lead"
-    return True
-
-
-def order_sections(edition: dict[str, Any]) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
-    """Split the lead out and sort the remainder so the reading order is stable per edition.
-
-    The JSON `order` field wins when present; otherwise priority descending, then declaration order.
-    """
-    sections = [s for s in (edition.get("sections") or []) if isinstance(s, dict)]
-    lead = next((s for s in sections if str(s.get("kind")) == "lead"), None)
-    rest = [s for s in sections if s is not lead]
-
-    def key(item: tuple[int, dict[str, Any]]) -> tuple[int, int, int]:
-        index, section = item
-        explicit = section.get("order")
-        if isinstance(explicit, int):
-            return (0, explicit, index)
-        return (1, -int(section.get("priority") or 0), index)
-
-    ordered = [s for _, s in sorted(enumerate(rest), key=key)]
-    return lead, ordered
-
-
-# ---------------------------------------------------------------------------
-# images
-# ---------------------------------------------------------------------------
-
-class ImageBudget:
-    """Resolves each image exactly once per build, caching by source string."""
-
-    def __init__(self, out_dir: Path, iso_date: str) -> None:
-        self.out_dir = out_dir
-        self.asset_dir = out_dir / "assets" / iso_date
-        self.asset_dir.mkdir(parents=True, exist_ok=True)
-        self.cache: dict[str, dict[str, Any] | None] = {}
-        self.count = 0
-        self.failures = 0
-
-    def resolve(self, src: str, edition_dir: Path) -> dict[str, Any] | None:
-        key = str(src or "").strip()
-        if not key:
-            return None
-        if key in self.cache:
-            return self.cache[key]
-        try:
-            resolved = self._resolve(key, edition_dir)
-        except Exception as exc:  # noqa: BLE001 - one bad image never kills a build
-            say(f"image skipped: {truncate_str(key, 60)} ({type(exc).__name__})")
-            self.failures += 1
-            resolved = None
-        self.cache[key] = resolved
-        if resolved:
-            self.count += 1
-        return resolved
-
-    # -- internals ---------------------------------------------------------
-
-    def _fetch(self, url: str) -> tuple[bytes, str]:
-        if requests is None:
-            raise RuntimeError("requests is not installed")
-        response = requests.get(
-            url,
-            timeout=IMAGE_TIMEOUT,
-            headers={"User-Agent": BROWSER_UA, "Accept": "image/*,*/*;q=0.8"},
-            stream=True,
-        )
-        response.raise_for_status()
-        chunks: list[bytes] = []
-        total = 0
-        for chunk in response.iter_content(65536):
-            if not chunk:
-                continue
-            total += len(chunk)
-            if total > MAX_IMAGE_BYTES:
-                raise ValueError("image larger than 8 MB")
-            chunks.append(chunk)
-        return b"".join(chunks), url
-
-    def _optimise(self, raw: bytes, slug: str) -> dict[str, Any]:
-        if Image is None:
-            raise RuntimeError("Pillow is not installed")
-        import io
-
-        with Image.open(io.BytesIO(raw)) as probe:
-            probe.verify()
-        with Image.open(io.BytesIO(raw)) as image:
-            image.load()
-            image = _to_rgb(image)
-            width, height = image.size
-            if width > IMAGE_MAX_WIDTH:
-                ratio = IMAGE_MAX_WIDTH / float(width)
-                image = image.resize((IMAGE_MAX_WIDTH, max(1, int(round(height * ratio)))), Image.LANCZOS)
-                width, height = image.size
-            buffer = io.BytesIO()
-            image.save(buffer, format="JPEG", quality=IMAGE_QUALITY, optimize=True, progressive=True)
-            payload = buffer.getvalue()
-
-        filename = f"{slug}-{sha1_hex(payload)[:8]}.jpg"
-        target = self.asset_dir / filename
-        if not target.exists():
-            with open(target, "wb") as handle:
-                handle.write(payload)
-        return {"file": filename, "width": width, "height": height}
-
-    def _resolve(self, src: str, edition_dir: Path) -> dict[str, Any] | None:
-        if re.match(r"^https?://", src, re.IGNORECASE):
-            raw, _ = self._fetch(src)
-        else:
-            local = Path(src)
-            if not local.is_absolute():
-                local = edition_dir / local
-            if not local.exists():
-                say(f"image skipped: missing local file {truncate_str(str(src), 60)}")
-                self.failures += 1
-                return None
-            raw = local.read_bytes()
-            if len(raw) > MAX_IMAGE_BYTES:
-                say(f"image skipped: {truncate_str(str(src), 60)} is larger than 8 MB")
-                self.failures += 1
-                return None
-        slug = slugify(Path(src.split("?")[0]).stem or "image")
-        return self._optimise(raw, slug)
-
-
-def _to_rgb(image: "Image.Image") -> "Image.Image":
-    """Flatten any mode onto the near-black paper so a transparent PNG keeps the dark look."""
-    if image.mode == "RGB":
-        return image
-    if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
-        rgba = image.convert("RGBA")
-        backdrop = Image.new("RGB", rgba.size, DARK_BACKDROP)
-        backdrop.paste(rgba, mask=rgba.split()[-1])
-        return backdrop
-    if image.mode == "P":
-        return image.convert("RGB")
-    if image.mode in ("L", "1"):
-        return image.convert("RGB")
-    return image.convert("RGB")
-
-# ---------------------------------------------------------------------------
-# HTML fragments
-# ---------------------------------------------------------------------------
-
-def render_figure(section: dict[str, Any], image: dict[str, Any] | None,
-                  prefix: str, kind: str) -> str:
-    """One <figure class="media"> block, or '' when the image could not be resolved."""
-    if not image:
-        return ""
-    alt = str((section.get("image") or {}).get("alt") or "").strip()
-    if not alt:
-        return ""
-    credit = str((section.get("image") or {}).get("credit") or "").strip()
-    width, height = image["width"], image["height"]
-    extra = " media--lead" if kind == "lead" else ""
-    src = f"{prefix}assets/{image['date']}/{image['file']}"
-    credit_html = f'\n        <figcaption class="media__credit">{esc(credit)}</figcaption>' if credit else ""
-    return f'''      <figure class="media{extra}">
-        <div class="media__box" style="--ar:{width}/{height};aspect-ratio:{width}/{height}">
-          <img class="media__img" src="{esc(src)}" alt="{esc(alt)}" loading="lazy" decoding="async" width="{width}" height="{height}">
-        </div>{credit_html}
-      </figure>'''
-
-
-def render_kicker(section: dict[str, Any]) -> str:
-    kicker = str(section.get("kicker") or "").strip()
-    return f'      <p class="kicker">{render_inline(kicker)}</p>' if kicker else ""
-
-
-def render_whymatters(section: dict[str, Any]) -> str:
-    value = str(section.get("whyItMatters") or "").strip()
-    if not value:
-        return ""
-    return ('      <p class="whymatters"><span class="whymatters__label">Why it matters</span> '
-            f"{render_inline(value)}</p>")
-
-
-def render_aside(section: dict[str, Any]) -> str:
-    value = str(section.get("aside") or "").strip()
-    if not value:
-        return ""
-    return f'      <p class="aside">{render_inline(value)}</p>'
-
-
-def render_source_line(section: dict[str, Any], prefix: str = "") -> str:
-    source = section.get("source") or {}
-    url = sanitise_url(str(source.get("url") or ""))
-    label = str(source.get("label") or "").strip()
-    if not url or not label:
-        return ""
-    return (f'      <p class="source-line"><a class="source" href="{esc(url)}" '
-            f'target="_blank" rel="noopener">{esc(label)}</a></p>')
-
-
-def render_lead(section: dict[str, Any], image: dict[str, Any] | None, prefix: str,
-                layout: str) -> str:
-    headline = str(section.get("headline") or "")
-    source = section.get("source") or {}
-    url = sanitise_url(str(source.get("url") or ""))
-    inner = esc(plain(headline))
-    title = (f'<a href="{esc(url)}" target="_blank" rel="noopener">{inner}</a>' if url else inner)
-    standfirst = str(section.get("standfirst") or "").strip()
-    stand_html = f'\n      <p class="standfirst">{render_inline(standfirst)}</p>' if standfirst else ""
-    body = render_paragraphs(section.get("body"))
-    body_html = f'\n      <div class="lead__body body">\n{body}\n      </div>' if body else ""
-    parts = [
-        f'    <article class="lead lead--{layout}" id="{esc(section.get("id"))}">',
-        render_kicker(section),
-        f'      <h2 class="lead__headline">{title}</h2>',
-    ]
-    if stand_html:
-        parts.append(stand_html.strip("\n"))
-    figure = render_figure(section, image, prefix, "lead")
-    if figure:
-        parts.append(figure)
-    if body_html:
-        parts.append(body_html.strip("\n"))
-    for block in (render_whymatters(section), render_aside(section), render_source_line(section, prefix)):
-        if block:
-            parts.append(block)
-    parts.append("    </article>")
-    return "\n".join(parts)
-
-
-def render_story(section: dict[str, Any], image: dict[str, Any] | None, prefix: str) -> str:
-    kind = str(section.get("kind") or "story")
-    classes = "story"
-    if kind == "video":
-        classes += " card card--video"
-    elif kind == "quick":
-        classes += " story--brief"
-    headline = str(section.get("headline") or "")
-    source = section.get("source") or {}
-    url = sanitise_url(str(source.get("url") or ""))
-    inner = esc(plain(headline))
-    title = (f'<a href="{esc(url)}" target="_blank" rel="noopener">{inner}</a>' if url else inner)
-    standfirst = str(section.get("standfirst") or "").strip()
-    stand_html = f'      <p class="standfirst">{render_inline(standfirst)}</p>' if standfirst else ""
-    body = render_paragraphs(section.get("body"))
-    body_html = f'      <div class="body">\n{body}\n      </div>' if body else ""
-    parts = [f'    <article class="{classes}" id="{esc(section.get("id"))}">', render_kicker(section)]
-    parts.append(f'      <h2 class="story__headline">{title}</h2>')
-    for block in (stand_html, render_figure(section, image, prefix, kind), body_html,
-                  render_whymatters(section), render_aside(section), render_source_line(section, prefix)):
-        if block:
-            parts.append(block)
-    parts.append("    </article>")
-    return "\n".join(parts)
-
-
-def render_quote(section: dict[str, Any], prefix: str) -> str:
-    body = section.get("body") or []
-    items = body if isinstance(body, list) else [body]
-    quote = next((str(x).strip() for x in items if x is not None and str(x).strip()), "")
-    if not quote:
-        quote = str(section.get("headline") or "")
-    source = section.get("source") or {}
-    cite = str(source.get("label") or "").strip()
-    url = sanitise_url(str(source.get("url") or ""))
-    if cite and url:
-        cite_html = f'<a class="source" href="{esc(url)}" target="_blank" rel="noopener">{esc(cite)}</a>'
-    else:
-        cite_html = esc(cite)
-    footer = f'\n      <footer class="pullquote__cite">{cite_html}</footer>' if cite else ""
-    return (f'    <blockquote class="pullquote" id="{esc(section.get("id"))}">\n'
-            f'      <p class="pullquote__text">{render_inline(quote)}</p>{footer}\n'
-            f'    </blockquote>')
-
-
-def render_quick_hits(edition: dict[str, Any]) -> str:
-    hits = edition.get("quickHits") or []
-    if not hits:
-        return ""
-    lines: list[str] = []
-    for hit in hits:
-        if isinstance(hit, dict):
-            text = str(hit.get("text") or "").strip()
-            url = sanitise_url(str(hit.get("url") or ""))
-        else:
-            text, url = str(hit).strip(), None
-        if not text:
-            continue
-        inner = render_inline(text)
-        if url:
-            lines.append(f'        <li><a href="{esc(url)}" target="_blank" rel="noopener">{inner}</a></li>')
-        else:
-            lines.append(f"        <li>{inner}</li>")
-    if not lines:
-        return ""
-    return ('    <aside class="quick-hits" id="quick-hits" aria-labelledby="quick-hits-title">\n'
-            '      <h2 class="quick-hits__title" id="quick-hits-title">Quick Hits</h2>\n'
-            '      <ul class="quick-hits__list">\n'
-            + "\n".join(lines) + "\n      </ul>\n    </aside>")
-
-# ---------------------------------------------------------------------------
-# colophon counts (memory.py is optional)
-# ---------------------------------------------------------------------------
-
-def memory_counts() -> dict[str, int] | None:
-    """Ask scripts/memory.py for its counts. None when absent, slow or failing - never fatal."""
-    script = ROOT / "scripts" / "memory.py"
-    if not script.exists():
+def _measure(path: Path) -> tuple[int, int] | None:
+    if Image is None:
         return None
     try:
-        proc = subprocess.run(
-            [sys.executable, str(script), "stats"],
-            cwd=str(ROOT),
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=8,
-        )
-    except Exception:  # noqa: BLE001 - timeout, permissions and missing modules all read the same
+        with Image.open(path) as probe:
+            return probe.width, probe.height
+    except Exception:
         return None
-    if proc.returncode != 0:
+
+def _optimise(raw: bytes) -> tuple[bytes, int, int] | None:
+    """Verify, flatten to RGB, cap width at 1400 without upscaling, JPEG q82."""
+    if Image is None:
         return None
-    combined = (proc.stdout or "") + "\n" + (proc.stderr or "")
-    counts: dict[str, int] = {}
-    for label, pattern in (
-        ("items", r"(?:items?|tracked)\s*[:=]?\s*(\d+)"),
-        ("suppressed", r"(?:suppressed|topics?)\s*[:=]?\s*(\d+)"),
-    ):
-        match = re.search(pattern, combined, re.IGNORECASE)
-        if match:
-            counts[label] = int(match.group(1))
-    return counts or None
+    try:
+        with Image.open(io.BytesIO(raw)) as probe:
+            probe.verify()
+        with Image.open(io.BytesIO(raw)) as source:
+            source.load()
+            frame = source
+            if frame.mode in ("RGBA", "LA", "P", "PA"):
+                rgba = frame.convert("RGBA")
+                canvas = Image.new("RGB", rgba.size, (11, 11, 13))
+                canvas.paste(rgba, mask=rgba.split()[-1])
+                frame = canvas
+            elif frame.mode != "RGB":
+                frame = frame.convert("RGB")
+            if frame.width > MAX_IMAGE_WIDTH:
+                height = max(1, round(frame.height * MAX_IMAGE_WIDTH / frame.width))
+                frame = frame.resize((MAX_IMAGE_WIDTH, height), Image.LANCZOS)
+            buffer = io.BytesIO()
+            frame.save(buffer, "JPEG", quality=JPEG_QUALITY, optimize=True, progressive=True)
+            return buffer.getvalue(), frame.width, frame.height
+    except Exception:
+        return None
 
+def _download(url: str) -> tuple[bytes | None, str | None]:
+    if requests is None:
+        return None, "requests is not installed"
+    try:
+        response = requests.get( url,
+            timeout=REQUEST_TIMEOUT, stream=True,
+            headers={"User-Agent": USER_AGENT, "Accept": "image/*,*/*;q=0.8"}, )
+    except Exception as exc:
+        return None, f"request failed ({type(exc).__name__})"
+    with response:
+        if response.status_code != 200:
+            return None, f"http {response.status_code}"
+        declared = response.headers.get("Content-Length", "")
+        if declared.isdigit() and int(declared) > MAX_IMAGE_BYTES:
+            return None, "larger than 8 MB"
+        chunks: list[bytes] = []
+        total = 0
+        try:
+            for chunk in response.iter_content(65536):
+                total += len(chunk)
+                if total > MAX_IMAGE_BYTES:
+                    return None, "larger than 8 MB"
+                chunks.append(chunk)
+        except Exception as exc:
+            return None, f"download aborted ({type(exc).__name__})"
+    if not chunks:
+        return None, "empty response body"
+    return b"".join(chunks), None
 
-# ---------------------------------------------------------------------------
-# page assembly (docs/SITE-CONTRACT.md section 2 - element order is the contract)
-# ---------------------------------------------------------------------------
+def _source_bytes(src: str, edition_dir: Path) -> tuple[bytes | None, str | None]:
+    if is_http(src):
+        return _download(src)
+    local = (edition_dir / src).resolve()
+    if not local.exists():
+        return None, "local file not found"
+    if local.stat().st_size > MAX_IMAGE_BYTES:
+        return None, "larger than 8 MB"
+    try:
+        return local.read_bytes(), None
+    except OSError as exc:
+        return None, f"cannot read local file ({type(exc).__name__})"
 
-def build_masthead(edition: dict[str, Any], heading_tag: str = "h1") -> str:
-    iso = str(edition.get("date") or "")
-    weather = str(edition.get("weatherStrip") or "").strip()
-    title = esc(edition.get("masthead") or "THE DAILY BEACON")
-    parts = [
-        '  <header class="masthead" id="masthead">',
-        '    <div class="masthead__rule masthead__rule--thick"></div>',
-        '    <div class="masthead__rule"></div>',
-        '    <p class="masthead__ear masthead__ear--left">No. %s</p>' % esc(edition.get("number")),
-        '    <p class="masthead__ear masthead__ear--right">%s</p>' % esc(human_date(iso)),
-        '    <%s class="masthead__title">%s</%s>' % (heading_tag, title, heading_tag),
-        '    <p class="masthead__tagline">%s</p>' % esc(edition.get("tagline") or ""),
-        '    <div class="masthead__rule"></div>',
-        '    <div class="masthead__rule masthead__rule--thick"></div>',
+def build_assets(ctx: Context) -> None:
+    """Resolve every section image into assets/<date>/; a failure only warns."""
+    if ctx.no_images:
+        return
+    assets_dir = ctx.out_dir / "assets" / ctx.date_str
+    for section in ctx.edition.get("sections", []):
+        if not isinstance(section, dict):
+            continue
+        image = section.get("image")
+        if not isinstance(image, dict):
+            continue
+        src = image.get("src")
+        if not isinstance(src, str) or not src.strip():
+            continue
+        sid = str(section.get("id") or "")
+        slug = slugify_id(image.get("slug") or sid or "image") or "image"
+        key = src if is_http(src) else str((ctx.edition_path.parent / src).resolve())
+        digest = hashlib.sha1(key.encode("utf-8")).hexdigest()[:8]
+        target = assets_dir / f"{slug}-{digest}.jpg"
+        if target.exists():  # same source already cached on disk: no download
+            size = _measure(target)
+            if size:
+                ctx.assets[sid] = Asset(f"assets/{ctx.date_str}/{target.name}", *size)
+                continue
+        raw, problem = _source_bytes(src, ctx.edition_path.parent)
+        if raw is None:
+            warn(f"image skipped {sid or slug}: {problem}", ctx.quiet)
+            continue
+        optimised = _optimise(raw)
+        if optimised is None:
+            warn(f"image skipped {sid or slug}: not a valid image", ctx.quiet)
+            continue
+        payload, width, height = optimised
+        try:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            tmp = target.with_suffix(".jpg.tmp")
+            tmp.write_bytes(payload)
+            tmp.replace(target)
+        except OSError as exc:
+            warn(f"image skipped {sid or slug}: cannot write asset ({type(exc).__name__})", ctx.quiet)
+            continue
+        ctx.assets[sid] = Asset(f"assets/{ctx.date_str}/{target.name}", width, height)
+
+def asset_query(path: Path) -> str:
+    try:
+        return hashlib.sha1(path.read_bytes()).hexdigest()[:8]
+    except OSError:
+        return ""
+
+# ------------------------------------------------------------------ render
+
+def render_masthead(ctx: Context, *, title: str | None = None, tagline: str | None = None) -> str:
+    edition = ctx.edition
+    number = edition.get("number") if isinstance(edition.get("number"), int) else 0
+    bits = [ '<header class="masthead" id="masthead">',
+        '<div class="masthead__rule masthead__rule--thick"></div>', '<div class="masthead__rule"></div>',
+        f'<p class="masthead__ear masthead__ear--left">No. {number}</p>',
+        f'<p class="masthead__ear masthead__ear--right">{text(weekday_date(ctx.captured))}</p>',
+        f'<h1 class="masthead__title">{text(title or edition.get("masthead") or "THE DAILY BEACON")}</h1>',
+        f'<p class="masthead__tagline">{text(tagline or edition.get("tagline"))}</p>',
+        '<div class="masthead__rule"></div>', '<div class="masthead__rule masthead__rule--thick"></div>',
     ]
-    if weather:
-        parts.append('    <p class="masthead__weather">%s</p>' % render_inline(weather))
-    parts.append("  </header>")
-    return "\n".join(parts)
+    weather = edition.get("weatherStrip")
+    if title is None and isinstance(weather, str) and weather.strip():
+        bits.append(f'<p class="masthead__weather">{text(weather)}</p>')
+    bits.append("</header>")
+    return "\n".join(bits)
 
-
-def build_toc(sections: list[dict[str, Any]]) -> str:
-    rows: list[str] = []
-    for index, section in enumerate(sections, start=1):
-        kicker = plain(section.get("kicker") or "")
-        label = truncate_str(section.get("headline") or "", 42)
-        rows.append(
-            '      <li><a class="toc__link" href="#%s">'
-            '<span class="toc__kicker">%02d / %s</span>'
-            '<span class="toc__label">%s</span></a></li>'
-            % (esc(section.get("id")), index, esc(kicker), esc(label))
+def render_toc(ordered: Sequence[dict[str, Any]]) -> str:
+    items = []
+    for section in ordered:
+        kicker = section.get("kicker")
+        kicker_text = kicker if isinstance(kicker, str) and kicker.strip() else str(section.get("kind", ""))
+        label = truncate(plain_text(section.get("headline")), TOC_LABEL_MAX)
+        items.append(
+            f'<li><a class="toc__link" href="#{attr(section.get("id"))}">'
+            f'<span class="toc__kicker">{text(kicker_text)}</span>'
+            f'<span class="toc__label">{text(label)}</span></a></li>'
         )
-    return ('  <nav class="toc" aria-label="In this edition">\n'
-            '    <ul class="toc__list">\n' + "\n".join(rows) + "\n    </ul>\n"
-            '    <button class="density-toggle" type="button" aria-pressed="false">Dense</button>\n'
-            '  </nav>')
-
-
-def build_colophon(edition: dict[str, Any], sections: list[dict[str, Any]],
-                   counts: dict[str, int] | None, prefix: str) -> str:
-    story_count = sum(1 for s in sections if str(s.get("kind")) in ("lead", "story", "video"))
-    hit_count = len(edition.get("quickHits") or [])
-    if counts:
-        count_line = "%d items tracked, %d suppressed today" % (
-            counts.get("items", 0), counts.get("suppressed", 0))
-    else:
-        count_line = "counts unavailable"
-    signoff = str(edition.get("signoff") or "").strip()
-    signoff_html = ('\n    <p class="colophon__signoff">%s</p>' % render_inline(signoff)) if signoff else ""
-    meta = [
-        '      <li>Edition %s</li>' % esc(edition.get("number")),
-        '      <li>Generated %s</li>' % esc(human_timestamp(str(edition.get("generatedAt") or ""))),
-        '      <li>%d stories, %d quick hits</li>' % (story_count, hit_count),
-        '      <li>%s</li>' % esc(count_line),
-    ]
-    return ('  <footer class="colophon">\n'
-            '    <div class="colophon__rule"></div>\n'
-            '    <ul class="colophon__meta">\n' + "\n".join(meta) + "\n    </ul>" + signoff_html + "\n"
-            '    <p class="colophon__archive">Previous 30 editions are archived at '
-            '<a href="' + prefix + 'archive.html">archive.html</a>.</p>\n'
-            '    <p class="colophon__fine">Compiled automatically at 03:00 from public feeds and '
-            "creators' uploads. No story is invented; every item links to its source.</p>\n"
-            '  </footer>')
-
-
-def build_head(edition: dict[str, Any], variants: dict[str, str], prefix: str,
-               css_v: str, body_class: str) -> str:
-    iso = str(edition.get("date") or "")
-    masthead = esc(edition.get("masthead") or "THE DAILY BEACON")
-    tagline = esc(edition.get("tagline") or "")
-    page_title = "%s - %s" % (masthead, esc(human_date(iso)))
-    html_class = "layout-%s scale-%s order-%s" % (
-        variants["layout"], variants["scale"], variants["order"])
-    return (
-        "<!DOCTYPE html>\n"
-        '<html lang="en" data-accent="%s" data-layout="%s" data-scale="%s" data-emphasis="%s" '
-        'data-seed="%s" class="%s">\n'
-        "<head>\n"
-        '  <meta charset="utf-8">\n'
-        '  <meta name="viewport" content="width=device-width,initial-scale=1">\n'
-        '  <meta name="color-scheme" content="dark light">\n'
-        '  <meta name="theme-color" content="#0b0b0d">\n'
-        "  <title>%s</title>\n"
-        '  <meta name="description" content="%s">\n'
-        '  <link rel="stylesheet" href="%sstyle.css?v=%s">\n'
-        '  <meta property="og:title" content="%s">\n'
-        '  <meta property="og:description" content="%s">\n'
-        '  <meta property="og:type" content="website">\n'
-        "</head>\n"
-        '<body id="top" class="%s">\n'
-        '  <div id="progress" aria-hidden="true"><span id="progress-bar"></span></div>'
-        % (variants["accent"], variants["layout"], variants["scale"], variants["order"],
-           variants["seed"], html_class, page_title, tagline,
-           prefix, css_v, page_title, tagline, body_class)
+    return ( '<nav class="toc" aria-label="In this edition">\n<ul class="toc__list">\n'
+        + "\n".join(items)
+        + "\n</ul>\n"
+        '<button class="density-toggle" type="button" aria-pressed="false">Dense</button>\n</nav>'
     )
 
-
-def render_page(edition: dict[str, Any], images: dict[str, dict[str, Any] | None],
-                prefix: str, out_dir: Path, counts: dict[str, int] | None) -> str:
-    """Render one complete document. prefix is '' for index.html and '../' for snapshots."""
-    variants = seed_variants(str(edition.get("date") or ""))
-    lead, rest = order_sections(edition)
-    sections_all = ([lead] if lead else []) + rest
-
-    css_v = file_version(out_dir / "style.css")
-    js_v = file_version(out_dir / "app.js")
-
-    parts: list[str] = [
-        build_head(edition, variants, prefix, css_v, "page-edition"),
-        "",
-        build_masthead(edition),
-        "",
-        build_toc(sections_all),
-        "",
-        '  <main class="paper" id="paper">',
+def render_media(ctx: Context, section: dict[str, Any], lead: bool = False) -> str:
+    if ctx.no_images:
+        return ""
+    asset = ctx.assets.get(str(section.get("id")))
+    if asset is None:
+        return ""
+    image = section.get("image") if isinstance(section.get("image"), dict) else {}
+    alt = image.get("alt")
+    if not isinstance(alt, str) or not alt.strip():
+        alt = plain_text(section.get("headline")) or "Illustration for this story"
+    classes = "media media--lead" if lead else "media"
+    parts = [ f'<figure class="{classes}">',
+        f'<div class="media__box" style="--ar:{asset.width}/{asset.height}">',
+        f'<img class="media__img" src="{attr(ctx.prefix + asset.rel)}" alt="{attr(alt)}" '
+        f'loading="lazy" decoding="async" width="{asset.width}" height="{asset.height}">', "</div>",
     ]
+    credit = image.get("credit")
+    if isinstance(credit, str) and credit.strip():
+        parts.append(f'<figcaption class="media__credit">{text(credit)}</figcaption>')
+    parts.append("</figure>")
+    return "\n".join(parts)
 
+def render_body_block(section: dict[str, Any], css_class: str = "body") -> str:
+    body = section.get("body")
+    paragraphs = body if isinstance(body, list) else [body] if body else []
+    rendered = [ f"<p>{render_inline(para, 'body')}</p>"
+        for para in paragraphs
+        if isinstance(para, str) and para.strip()
+    ]
+    if not rendered:
+        return ""
+    return f'<div class="{css_class}">\n' + "\n".join(rendered) + "\n</div>"
+
+def render_tail(section: dict[str, Any], body_class: str = "body") -> list[str]:
+    """Body, whymatters, aside, source line - the exact contract order."""
+    out = []
+    body = render_body_block(section, body_class)
+    if body:
+        out.append(body)
+    why = section.get("whyItMatters")
+    if isinstance(why, str) and why.strip():
+        out.append( '<p class="whymatters"><span class="whymatters__label">Why it matters</span> '
+            f"{render_inline(why, 'whyItMatters')}</p>"
+        )
+    aside = section.get("aside")
+    if isinstance(aside, str) and aside.strip():
+        out.append(f'<p class="aside">{render_inline(aside, "aside")}</p>')
+    source = render_source_line(section)
+    if source:
+        out.append(source)
+    return out
+
+def render_source_line(section: dict[str, Any]) -> str:
+    source = section.get("source") if isinstance(section.get("source"), dict) else {}
+    url = source.get("url")
+    if not isinstance(url, str) or not url.strip():
+        return ""
+    label = source.get("label")
+    if not isinstance(label, str) or not label.strip():
+        label = host_of(url) or "Source"
+    return ( f'<p class="source-line"><a class="source" href="{attr(url)}" '
+        f'target="_blank" rel="noopener">{text(label)}</a></p>'
+    )
+
+def _kicker(section: dict[str, Any]) -> str:
+    kicker = section.get("kicker")
+    return f'<p class="kicker">{text(kicker)}</p>' if isinstance(kicker, str) and kicker.strip() else ""
+
+def _headline(section: dict[str, Any], tag: str, css: str, *, new_tab: bool = True) -> str:
+    source = section.get("source") if isinstance(section.get("source"), dict) else {}
+    url = source.get("url") if isinstance(source.get("url"), str) else ""
+    label = render_inline(section.get("headline"), "headline")
+    if not url:
+        return f'<{tag} class="{css}">{label}</{tag}>'
+    extra = ' target="_blank" rel="noopener"' if new_tab else ""
+    return f'<{tag} class="{css}"><a href="{attr(url)}"{extra}>{label}</a></{tag}>'
+
+def render_article(ctx: Context, section: dict[str, Any], *, lead: bool = False) -> str:
+    """One article. The contract fixes the order of its children per kind."""
+    kind = section.get("kind")
+    sid = attr(section.get("id"))
     if lead:
-        parts.append(render_lead(lead, images.get(str(lead.get("id"))), prefix,
-                                 variants["layout"]))
+        classes = f"lead lead--{ctx.variant[1]}"
+    elif kind == "video":
+        classes = "story card card--video"
+    elif kind == "quick":
+        classes = "story story--brief"
+    else:
+        classes = "story"
+    kicker = section.get("kicker")
+    parts = [f'<article class="{classes}" id="{sid}">']
+    if isinstance(kicker, str) and kicker.strip():
+        parts.append(f'<p class="kicker">{text(kicker)}</p>')
+    if lead:  # the lead headline is the in-page hero, so it does not open a new tab
+        parts.append(_headline(section, "h2", "lead__headline", new_tab=False))
+    elif kind == "video":  # media first, headline links straight to the video
+        media = render_media(ctx, section)
+        if media:
+            parts.append(media)
+        parts.append(_headline(section, "h2", "story__headline"))
+    else:
+        parts.append(_headline(section, "h2", "story__headline"))
+    standfirst = section.get("standfirst")
+    if isinstance(standfirst, str) and standfirst.strip():
+        parts.append(f'<p class="standfirst">{render_inline(standfirst, "standfirst")}</p>')
+    if not lead and kind != "video":
+        media = render_media(ctx, section)
+        if media:
+            parts.append(media)
+    if lead:
+        media = render_media(ctx, section, lead=True)
+        if media:
+            parts.append(media)
+    parts += render_tail(section, "lead__body body" if lead else "body")
+    parts.append("</article>")
+    return "\n".join(parts)
 
-    quick_block = render_quick_hits(edition)
-    if quick_block and variants["order"] == "rail":
-        parts.append(quick_block)
+def render_quote(section: dict[str, Any]) -> str:
+    body = section.get("body")
+    paragraph = ""
+    if isinstance(body, list):
+        paragraph = next((item for item in body if isinstance(item, str) and item.strip()), "")
+    elif isinstance(body, str):
+        paragraph = body
+    headline = section.get("headline") if isinstance(section.get("headline"), str) else ""
+    quote_text = headline.strip() or paragraph.strip()
+    source = section.get("source") if isinstance(section.get("source"), dict) else {}
+    cite = source.get("label") if isinstance(source.get("label"), str) else ""
+    cite = cite or host_of(str(source.get("url", "")))
+    parts = [ f'<blockquote class="pullquote" id="{attr(section.get("id"))}">',
+        f'<p class="pullquote__text">{render_inline(quote_text, "quote")}</p>', ]
+    if cite:
+        parts.append(f'<footer class="pullquote__cite">{text(cite)}</footer>')
+    parts.append("</blockquote>")
+    return "\n".join(parts)
 
-    for section in rest:
-        if str(section.get("kind")) == "quote":
-            parts.append(render_quote(section, prefix))
-        else:
-            parts.append(render_story(section, images.get(str(section.get("id"))), prefix))
+def render_quick_hits(edition: dict[str, Any]) -> str:
+    hits = edition.get("quickHits")
+    if not isinstance(hits, list):
+        return ""
+    # The list item already carries the anchor, so hit text is flat: no nested <a>.
+    items = [ f'<li><a href="{attr(hit.get("url"))}" target="_blank" rel="noopener">'
+        f'{text(plain_text(hit.get("text")))}</a></li>'
+        for hit in hits
+        if isinstance(hit, dict) and isinstance(hit.get("url"), str)
+    ]
+    if not items:
+        return ""
+    return ( '<aside class="quick-hits" id="quick-hits" aria-labelledby="quick-hits-title">\n'
+        '<h2 class="quick-hits__title" id="quick-hits-title">Quick Hits</h2>\n'
+        '<ul class="quick-hits__list">\n' + "\n".join(items) + "\n</ul>\n</aside>"
+    )
 
-    if quick_block and variants["order"] == "lead":
-        parts.append(quick_block)
-
-    parts.extend([
-        "  </main>",
-        "",
-        build_colophon(edition, sections_all, counts, prefix),
-        "",
-        '  <a class="to-top" href="#top" aria-label="Back to top">Top</a>',
-        '  <script src="%sapp.js?v=%s" defer></script>' % (prefix, js_v),
-        "</body></html>",
-    ])
-    return "\n".join(parts) + "\n"
-
-
-# ---------------------------------------------------------------------------
-# archive index (site/archive.html)
-# ---------------------------------------------------------------------------
-
-def gather_archive(out_dir: Path) -> list[dict[str, Any]]:
-    """Scan snapshots on disk; enrich from editions/<date>.json when it still exists.
-
-    A snapshot whose edition JSON was moved to editions/archive/ or deleted must still be listed,
-    so every row degrades to a labelled fallback instead of disappearing.
-    """
-    archive_dir = out_dir / "archive"
-    rows: list[dict[str, Any]] = []
-    if not archive_dir.exists():
-        return rows
-    for snapshot in sorted(archive_dir.glob("*.html"), reverse=True):
-        day = snapshot.stem
-        if not ISO_DATE_RE.match(day):
+def render_main(ctx: Context) -> str:
+    ordered = order_sections(ctx.edition.get("sections", []))
+    lead = lead_of(ordered)
+    bodies: list[str] = []
+    if lead is not None:
+        bodies.append(render_article(ctx, lead, lead=True))
+    rail = ctx.variant[3] == "rail"
+    hits = render_quick_hits(ctx.edition)
+    if rail and hits:  # order-rail puts Quick Hits before the first non-lead story
+        bodies.append(hits)
+        hits = ""
+    for section in ordered:
+        if section is lead:
             continue
-        row: dict[str, Any] = {
-            "date": day,
-            "headline": f"Edition for {day}",
-            "number": "",
-            "stories": "",
-        }
-        for candidate in (EDITION_DIR / f"{day}.json", EDITION_DIR / "archive" / f"{day}.json",
-                          FIXTURE_DIR / f"{day}.json"):
-            if not candidate.exists():
+        if section.get("kind") == "quote":
+            bodies.append(render_quote(section))
+        elif section.get("kind") in ("story", "video", "quick"):
+            bodies.append(render_article(ctx, section))
+    if hits:
+        bodies.append(hits)
+    return '<main class="paper" id="paper">\n' + "\n\n".join(bodies) + "\n</main>"
+
+def render_colophon(ctx: Context, *, prefix: str | None = None) -> str:
+    edition = ctx.edition
+    sections = [s for s in edition.get("sections", []) if isinstance(s, dict)]
+    stories = sum(1 for s in sections if s.get("kind") in ("lead", "story", "video"))
+    hits = edition.get("quickHits")
+    quick_count = len(hits) if isinstance(hits, list) else 0
+    number = edition.get("number") if isinstance(edition.get("number"), int) else 0
+    keep = int(ctx.settings.get("keep_editions") or 30)
+    base = ctx.prefix if prefix is None else prefix
+    parts = [ '<footer class="colophon">',
+        '<div class="colophon__rule"></div>', '<ul class="colophon__meta">',
+        f"<li>Edition {number}</li>", f"<li>Generated {text(humanise_timestamp(edition.get('generatedAt')))}</li>",
+        f"<li>{stories} stories, {quick_count} quick hits</li>",
+        f"<li>{ctx.stats['covered']} items tracked, {ctx.stats['suppressed']} suppressed today</li>", "</ul>",
+    ]
+    signoff = edition.get("signoff")
+    if isinstance(signoff, str) and signoff.strip():
+        parts.append(f'<p class="colophon__signoff">{render_inline(signoff, "signoff")}</p>')
+    parts += [ '<p class="colophon__archive">Previous '
+        f'{keep} editions are archived at <a href="{attr(base)}archive.html">archive.html</a>.</p>',
+        '<p class="colophon__fine">Compiled automatically at 03:00 from public feeds and '
+        "creators' uploads. No story is invented; every item links to its source.</p>", "</footer>",
+    ]
+    return "\n".join(parts)
+
+def document( *,
+    title: str, accent: str,
+    classes: str, header: str,
+    nav: str, main: str,
+    colophon: str, body_class: str,
+    css_url: str, js_url: str,
+    description: str, og_image: str = "",
+) -> str:
+    """Assemble one complete page. Element order follows SITE-CONTRACT section 2."""
+    body_attr = f' class="{body_class}"' if body_class else ""
+    meta = [ f'<meta property="og:title" content="{attr(title)}">',
+        f'<meta property="og:description" content="{attr(description)}">',
+        '<meta property="og:type" content="website">', ]
+    if og_image:
+        meta.append(f'<meta property="og:image" content="{attr(og_image)}">')
+    chunks = [ "<!DOCTYPE html>",
+        f'<html lang="en" data-accent="{accent}" class="{classes}">', "<head>",
+        '<meta charset="utf-8">', '<meta name="viewport" content="width=device-width,initial-scale=1">',
+        '<meta name="color-scheme" content="dark light">', f"<title>{text(title)}</title>",
+        f'<meta name="description" content="{attr(description)}">', f'<link rel="stylesheet" href="{attr(css_url)}">',
+        *meta, "</head>",
+        f'<body id="top"{body_attr}>', '<div id="progress" aria-hidden="true"><span id="progress-bar"></span></div>',
+        "", header,
+        "", nav,
+        "", main,
+        "", colophon,
+        "",
+        '<a class="to-top" href="#top" aria-label="Back to top">Top</a>',
+        f'<script src="{attr(js_url)}" defer></script>', "</body>",
+        "</html>", "",
+    ]
+    return "\n".join(chunk for chunk in chunks if chunk != "")
+
+def build_page(ctx: Context, *, prefix: str) -> str:
+    ctx.prefix = prefix
+    edition = ctx.edition
+    accent, layout, scale, order = ctx.variant
+    ordered = order_sections(edition.get("sections", []))
+    css_url = prefix + ("style.css?v=" + ctx.css_q if ctx.css_q else "style.css")
+    js_url = prefix + ("app.js?v=" + ctx.js_q if ctx.js_q else "app.js")
+    og = ""
+    lead = lead_of(ordered)
+    if lead is not None:
+        image = lead.get("image")
+        if isinstance(image, dict) and isinstance(image.get("src"), str) and is_http(image["src"]):
+            og = image["src"]
+    return document( title=f'{edition.get("masthead") or "THE DAILY BEACON"} - {long_date(ctx.captured)}',
+        accent=accent, classes=f"layout-{layout} scale-{scale} order-{order}",
+        header=render_masthead(ctx), nav=render_toc(ordered),
+        main=render_main(ctx), colophon=render_colophon(ctx),
+        body_class="", css_url=css_url,
+        js_url=js_url, description=str(edition.get("tagline") or ""),
+        og_image=og, )
+
+def lead_headline_of(markup: str) -> str:
+    """Tolerant scrape of the first lead headline from a snapshot."""
+    match = re.search(r'<h2 class="lead__headline">(.*?)</h2>', markup, re.S | re.I)
+    if not match:
+        return "Edition"
+    flat = re.sub(r"\s+", " ", htmllib.unescape(_TAGS_ONLY.sub(" ", match.group(1)))).strip()
+    return truncate(flat, ARCHIVE_HEAD_MAX) or "Edition"
+
+def collect_archive(out_dir: Path, current: str, current_html: str) -> list[tuple[str, str]]:
+    seen: dict[str, str] = {}
+    folder = out_dir / "archive"
+    if folder.is_dir():
+        for path in folder.glob("*.html"):
+            if parse_date(path.stem) is None:
                 continue
             try:
-                edition = read_json(candidate)
-            except Exception:  # noqa: BLE001 - a broken JSON must not hide the snapshot
-                continue
-            lead, rest = order_sections(edition)
-            headline = ""
-            if lead:
-                headline = truncate_str(lead.get("headline") or "", 90)
-                if not headline:
-                    headline = truncate_str((lead.get("body") or [""])[0], 90)
-            else:
-                headline = "Untitled edition"
-            sections = [s for s in (edition.get("sections") or []) if isinstance(s, dict)]
-            count = sum(1 for s in sections if str(s.get("kind")) in ("lead", "story", "video"))
-            row.update({
-                "headline": headline or f"Edition for {day}",
-                "number": str(edition.get("number") or ""),
-                "stories": str(count),
-            })
-            break
-        rows.append(row)
-    return rows
+                seen[path.stem] = lead_headline_of(path.read_text(encoding="utf-8", errors="replace"))
+            except OSError:
+                seen[path.stem] = "Edition"
+    seen[current] = lead_headline_of(current_html)
+    return sorted(seen.items(), key=lambda pair: pair[0], reverse=True)
 
-
-def render_archive_page(rows: list[dict[str, Any]], out_dir: Path, settings: dict[str, Any]) -> str:
-    css_v = file_version(out_dir / "style.css")
-    js_v = file_version(out_dir / "app.js")
-    variants = seed_variants(datetime.now().strftime("%Y-%m-%d"))
-    title = "THE DAILY BEACON"
-    items: list[str] = []
-    for row in rows:
-        number = f"No. {row['number']} - " if row["number"] else ""
-        items.append(
-            '      <li class="archive__item">'
-            f'<a class="archive__link" href="archive/{esc(row["date"])}.html">'
-            f'<span class="archive__date">{esc(row["date"])}</span>'
-            f'<span class="archive__head">{esc(row["headline"])}</span></a></li>'
+def render_archive_page(ctx: Context, entries: Sequence[tuple[str, str]], *, prefix: str) -> str:
+    accent, layout, scale, order = ctx.variant
+    css_url = prefix + ("style.css?v=" + ctx.css_q if ctx.css_q else "style.css")
+    js_url = prefix + ("app.js?v=" + ctx.js_q if ctx.js_q else "app.js")
+    items = []
+    for day, headline in entries:
+        stamp = parse_date(day)
+        label = weekday_date(stamp) if stamp else day
+        items.append( f'<li class="archive__item"><a class="archive__link" '
+            f'href="{attr(prefix)}archive/{attr(day)}.html">'
+            f'<span class="archive__date">{text(label)}</span>'
+            f'<span class="archive__head">{text(headline)}</span></a></li>'
         )
     if not items:
-        items.append('      <li class="archive__item"><span class="archive__head">'
-                     "No editions archived yet.</span></li>")
-    keep = int(settings.get("keep_editions") or 30)
-    return f'''<!DOCTYPE html>
-<html lang="en" data-accent="{variants["accent"]}" data-seed="{variants["seed"]}" class="layout-{variants["layout"]} scale-{variants["scale"]} order-{variants["order"]}">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="dark light">
-  <meta name="theme-color" content="#0b0b0d">
-  <title>{esc(title)} - Archive</title>
-  <meta name="description" content="Every archived edition of {esc(title)}.">
-  <link rel="stylesheet" href="style.css?v={css_v}">
-  <meta property="og:title" content="{esc(title)} - Archive">
-  <meta property="og:description" content="Every archived edition of {esc(title)}.">
-  <meta property="og:type" content="website">
-</head>
-<body id="top" class="page-archive">
-  <div id="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+        items.append( '<li class="archive__item"><span class="archive__head">No editions archived yet.</span></li>'
+        )
+    main = '<main class="paper archive">\n<ul class="archive__list">\n' + "\n".join(items) + "\n</ul>\n</main>"
+    return document( title="THE DAILY BEACON - Archive",
+        accent=accent, classes=f"layout-{layout} scale-{scale} order-{order}",
+        header=render_masthead(ctx, title="THE DAILY BEACON", tagline="Archive"), nav="",
+        main=main, colophon=render_colophon(ctx, prefix=prefix),
+        body_class="page-archive", css_url=css_url,
+        js_url=js_url, description="Every archived Daily Beacon edition, newest first.",
+    )
 
-  <header class="masthead" id="masthead">
-    <div class="masthead__rule masthead__rule--thick"></div>
-    <div class="masthead__rule"></div>
-    <p class="masthead__ear masthead__ear--left">Archive</p>
-    <p class="masthead__ear masthead__ear--right">{esc(human_date(datetime.now().strftime("%Y-%m-%d")))}</p>
-    <h1 class="masthead__title">{esc(title)}</h1>
-    <p class="masthead__tagline">Archive</p>
-    <div class="masthead__rule"></div>
-    <div class="masthead__rule masthead__rule--thick"></div>
-  </header>
-
-  <main class="paper archive" id="paper">
-    <ul class="archive__list">
-{chr(10).join(items)}
-    </ul>
-  </main>
-
-  <footer class="colophon">
-    <div class="colophon__rule"></div>
-    <ul class="colophon__meta">
-      <li>{len(rows)} editions archived</li>
-      <li>Previous {keep} editions kept on disk</li>
-    </ul>
-    <p class="colophon__archive">Back to <a href="index.html">today's edition</a>.</p>
-    <p class="colophon__fine">Compiled automatically at 03:00 from public feeds and creators' uploads.</p>
-  </footer>
-
-  <a class="to-top" href="#top" aria-label="Back to top">Top</a>
-  <script src="app.js?v={js_v}" defer></script>
-</body>
-</html>
-'''
-
-# ---------------------------------------------------------------------------
-# HTML self-check (tag balance, anchors, alt text, size)
-# ---------------------------------------------------------------------------
-
-TAG_SCAN = re.compile(r"<(/?)([A-Za-z][A-Za-z0-9-]*)([^>]*?)(/?)>", re.DOTALL)
-
-
-def check_html(markup: str, label: str) -> tuple[bool, str]:
-    """Validate the generated document. Returns (ok, human summary)."""
-    problems: list[str] = []
-
-    # 1. tag balance -------------------------------------------------------
-    # Raw-text element bodies (script/style) are blanked first: their contents are not markup.
-    scan = re.sub(r"(<(script|style)\b[^>]*>).*?(</\2>)", r"\1\3", markup, flags=re.DOTALL | re.IGNORECASE)
+def check_tag_balance(markup: str) -> str | None:
+    """Stack check over the emitted markup; returns an error string or None."""
     stack: list[str] = []
-    for match in TAG_SCAN.finditer(scan):
-        closing, name, _attrs, self_closed = match.groups()
+    skip_until = ""
+    for match in _TAG_TOKEN.finditer(markup):
+        closing, name, _, self_closing = match.groups()
+        if name is None:
+            continue
         tag = name.lower()
-        if tag in VOID_TAGS or self_closed:
+        if skip_until:
+            if closing and tag == skip_until:
+                skip_until = ""
+                if stack and stack[-1] == tag:
+                    stack.pop()
+            continue
+        if tag in RAW_TEXT_TAGS and not closing:
+            skip_until = tag
+            stack.append(tag)
+            continue
+        if tag in VOID_TAGS or self_closing:
             continue
         if closing:
             if not stack:
-                problems.append(f"stray </{tag}>")
-            elif stack[-1] != tag:
-                problems.append(f"unexpected </{tag}> (open: <{stack[-1]}>)")
-                if tag in stack:
-                    while stack and stack.pop() != tag:
-                        pass
-            else:
-                stack.pop()
+                return f"unbalanced tag </{tag}> with no opener"
+            opened = stack.pop()
+            if opened != tag:
+                return f"unbalanced tag: <{opened}> closed by </{tag}>"
         else:
             stack.append(tag)
-    if stack:
-        problems.append("unclosed " + ", ".join(f"<{t}>" for t in reversed(stack)))
+    return f"unbalanced tag: <{stack[-1]}> never closed" if stack else None
 
-    # 2. anchors resolve ---------------------------------------------------
-    ids = set(re.findall(r'\bid="([^"]+)"', markup))
-    for target in set(re.findall(r'href="#([^"]*)"', markup)):
-        if target and target not in ids:
-            problems.append(f"href='#{target}' has no matching id")
-
-    # 3. every image carries alt ------------------------------------------
-    for tag in re.findall(r"<img\b[^>]*>", markup, re.IGNORECASE):
-        alt = re.search(r'\balt="([^"]*)"', tag)
-        if not alt or not alt.group(1).strip():
-            problems.append("img without non-empty alt")
-
-    # 4. size --------------------------------------------------------------
+def verify_markup(markup: str, sections: Sequence[dict[str, Any]]) -> str | None:
+    """Tag balance, unique section anchors, resolving toc links, size ceiling."""
+    problem = check_tag_balance(markup)
+    if problem:
+        return problem
+    for section in sections:
+        sid = str(section.get("id"))
+        count = len(re.findall(rf'id="{re.escape(sid)}"', markup))
+        if count != 1:
+            return f"section id '{sid}' appears {count} times (expected exactly once)"
+    for href in re.findall(r'href="#([^"]+)"', markup):
+        if href != "top" and not re.search(rf'id="{re.escape(href)}"', markup):
+            return f"toc href '#{href}' has no matching id"
     size = len(markup.encode("utf-8"))
-    if size >= MAX_HTML_BYTES:
-        problems.append(f"document is {size / 1024 / 1024:.2f} MB (limit 3 MB)")
+    if size > MAX_HTML_BYTES:
+        return f"html is {size} bytes without images, limit is {MAX_HTML_BYTES}"
+    return None
 
-    if problems:
-        for item in problems[:12]:
-            say(f"html: {label}: {item}")
-        return False, f"{label}: {len(problems)} html problem(s)"
-
-    summary = (
-        "check: ok (%d ids, %d anchors, %d imgs, %d KB)"
-        % (len(ids), len(set(re.findall('href="#([^"]*)"', markup))), imgs_count(markup), size // 1024)
-    )
-    return True, summary
-
-
-def imgs_count(markup: str) -> int:
-    """Count <img> occurrences in a document."""
-    return len(re.findall("<img[ >]", markup, re.IGNORECASE))
-
-
-# ---------------------------------------------------------------------------
-# fixture edition (no network, images generated with Pillow)
-# ---------------------------------------------------------------------------
-
-FIXTURE_ISO = datetime.now().strftime("%Y-%m-%d")
-
-
-def _fixture_palettes() -> list[tuple[tuple[int, int, int], tuple[int, int, int]]]:
-    """One distinct duotone per fixture image (six images, six looks)."""
-    return [
-        ((232, 163, 61), (28, 20, 10)),
-        ((111, 195, 186), (8, 26, 28)),
-        ((236, 122, 92), (32, 14, 10)),
-        ((130, 182, 232), (10, 20, 32)),
-        ((166, 196, 138), (14, 24, 12)),
-        ((232, 143, 162), (30, 12, 18)),
-    ]
-
-
-def make_fixture_images() -> list[Path]:
-    """Draw abstract duotone gradients under state/workpack/_fixture/img/. No text, no network."""
-    FIXTURE_IMG_DIR.mkdir(parents=True, exist_ok=True)
-    paths: list[Path] = []
-    sizes = [(1400, 788), (800, 450), (1400, 788), (800, 450), (1400, 788), (800, 450)]
-    for index, (width, height) in enumerate(sizes):
-        palettes = _fixture_palettes()
-        bright, dark = palettes[index % len(palettes)]
-        target = FIXTURE_IMG_DIR / f"fixture-{index + 1}.jpg"
-        if not target.exists():
-            if Image is None or ImageDraw is None:
-                continue
-            image = Image.new("RGB", (width, height), DARK_BACKDROP)
-            draw = ImageDraw.Draw(image, "RGBA")
-            # diagonal bands: cheap, deterministic, and reads as a photo thumbnail at small size
-            steps = 26
-            for step in range(steps):
-                frac = step / float(steps - 1)
-                shade = tuple(int(dark[i] + (bright[i] - dark[i]) * (frac ** 1.7)) for i in range(3))
-                alpha = 46 + int(150 * frac)
-                skew = 0.72 + 0.09 * (index % 4)
-                x0 = int(width * (frac * skew - 0.35))
-                draw.polygon(
-                    [(x0, height), (x0 + width // 3, 0), (x0 + width // 3 + width // 2, 0), (x0 + width // 2, height)],
-                    fill=shade + (alpha,),
-                )
-            draw.rectangle([0, int(height * 0.62), width, height], fill=DARK_BACKDROP + (150,))
-            image.save(target, format="JPEG", quality=88, optimize=True)
-        paths.append(target)
-    return paths
-
-
-def build_fixture_edition(images: list[Path]) -> dict[str, Any]:
-    """A realistic 12-section edition: 1 lead, 3 videos, 5 stories, 2 quotes, 1 quick + quickHits."""
-    def img(index: int, alt: str, credit: str) -> dict[str, Any] | None:
-        if index >= len(images):
-            return None
-        return {"src": str(images[index]), "alt": alt, "credit": credit}
-
-    sections: list[dict[str, Any]] = [
-        {
-            "id": "lead-source-2-engine",
-            "kind": "lead",
-            "priority": 100,
-            "kicker": "the big one",
-            "headline": "Source 2 engine ships, and half the modding scene breathes again",
-            "standfirst": "Valve quietly pushed the **Source 2** toolchain to everyone, and the first "
-                          "wave of ports landed inside 48 hours.",
-            "body": [
-                "For years the community treated *Source 2* as a rumour with a beta attached. That "
-                "changed overnight: the toolchain is now part of the default install, and three "
-                "high-profile mods published playable builds before lunch.",
-                "The interesting part is not the renderer. It is the **[Hammer editor](https://developer.valvesoftware.com/wiki/Hammer)** "
-                "workflow: map files are now plain assets, so a workshop upload no longer needs a "
-                "custom launcher.",
-                "Modders are already reporting *dramatically* shorter iteration loops. One mapper "
-                "timed a full rebuild at 40 seconds, down from nine minutes on the same machine.",
-            ],
-            "image": img(0, "Abstract duotone gradient standing in for the Source 2 announcement art",
-                         "Fixture / generated art"),
-            "source": {"label": "PC Gamer", "url": "https://www.pcgamer.com/"},
-            "tags": ["source2", "modding"],
-            "whyItMatters": "The modding pipeline is the reason half these games still have players.",
-            "aside": "Nine minutes to 40 seconds. Somewhere a mapper is crying into a warm energy drink.",
-        },
-        {
-            "id": "video-df-steam-machine",
-            "kind": "video",
-            "priority": 92,
-            "kicker": "hardware",
-            "headline": "Digital Foundry tears down the new console-handheld hybrid",
-            "standfirst": "A 30-minute technical autopsy, and the thermals are the story.",
-            "body": [
-                "The teardown is worth the watch for the cooling design alone: a vapour chamber "
-                "roughly the size of a phone, ducted toward a single rear vent.",
-                "Sustained clocks hold up better than the launch firmware suggested, though the "
-                "fan curve is described as *enthusiastic*.",
-            ],
-            "image": img(1, "Abstract duotone gradient standing in for the handheld teardown thumbnail",
-                         "YouTube / Digital Foundry"),
-            "source": {"label": "Digital Foundry", "url": "https://www.eurogamer.net/digitalfoundry"},
-            "tags": ["hardware"],
-            "whyItMatters": "Thermals decide whether this thing is a console or a hand warmer.",
-        },
-        {
-            "id": "story-ai-agents",
-            "kind": "story",
-            "priority": 88,
-            "kicker": "ai",
-            "headline": "Agent frameworks converge on the same boring answer: files and logs",
-            "standfirst": "Three vendors, one architecture, zero magic.",
-            "body": [
-                "The newest generation of agent tooling dropped the orchestration graph and kept the "
-                "filesystem. State lives in a directory; the model reads it, writes it, and every step "
-                "is a line in a log.",
-                "It is less impressive in a keynote and *far* more debuggable at 3am, which is the only "
-                "review that matters here.",
-            ],
-            "source": {"label": "The Verge", "url": "https://www.theverge.com/ai-artificial-intelligence"},
-            "tags": ["ai", "agents"],
-            "whyItMatters": "Boring architectures survive contact with production.",
-        },
-        {
-            "id": "quote-night-shift",
-            "kind": "quote",
-            "priority": 80,
-            "kicker": "from the transcript",
-            "headline": "We are not shipping a game, we are shipping a patch pipeline with a game attached.",
-            "body": ["We are not shipping a game, we are shipping a patch pipeline with a game attached."],
-            "source": {"label": "GDC talk, 2026", "url": "https://gdconf.com/"},
-            "tags": ["gamedev"],
-        },
-        {
-            "id": "story-godot-4-6",
-            "kind": "story",
-            "priority": 76,
-            "kicker": "gamedev",
-            "headline": "Godot 4.6 lands with a renderer that finally stops surprising people",
-            "standfirst": "Fewer knobs, better defaults, and a migration path that mostly works.",
-            "body": [
-                "The headline feature is restraint: the forward+ renderer now picks sane defaults "
-                "instead of exposing twelve switches nobody understood.",
-                "Projects ported cleanly in our test, with the usual caveat that custom shaders still "
-                "need a pass.",
-                "The release notes are unusually honest about the rough edges, which is worth more "
-                "than the feature list.",
-            ],
-            "image": img(2, "Abstract duotone gradient standing in for the Godot release header",
-                         "Fixture / generated art"),
-            "source": {"label": "Godot Engine", "url": "https://godotengine.org/blog"},
-            "tags": ["godot", "gamedev"],
-            "whyItMatters": "Default quality is what most small teams actually ship with.",
-        },
-        {
-            "id": "video-asmongold-reaction",
-            "kind": "video",
-            "priority": 70,
-            "kicker": "reaction",
-            "headline": "A 40-minute reaction that accidentally becomes an industry post-mortem",
-            "standfirst": "Half rant, half surprisingly sharp analysis of studio closures.",
-            "body": [
-                "The clip starts as a reaction and ends somewhere close to a lecture on runway "
-                "economics. The middle third is the part worth clipping.",
-            ],
-            "image": img(4, "Abstract duotone gradient standing in for the reaction stream thumbnail",
-                         "YouTube / Asmongold TV"),
-            "source": {"label": "Asmongold TV", "url": "https://www.youtube.com/@AsmongoldTV"},
-            "tags": ["youtube", "industry"],
-            "whyItMatters": "The reaction economy is how a lot of people actually follow this industry.",
-        },
-        {
-            "id": "story-steam-deck-price",
-            "kind": "story",
-            "priority": 64,
-            "kicker": "business",
-            "headline": "Handheld prices drift upward, and the second-hand market notices",
-            "standfirst": "Nothing dramatic, just a slow squeeze that is now visible in listings.",
-            "body": [
-                "Component pricing moved first; retail followed three weeks later. The used market "
-                "is now the cheapest way into the category, which is a strange sentence to write.",
-                "Analysts expect the correction to hold through the next hardware cycle.",
-            ],
-            "source": {"label": "GamesIndustry.biz", "url": "https://www.gamesindustry.biz/"},
-            "tags": ["hardware", "business"],
-            "whyItMatters": "Price floors decide who can join the hobby.",
-        },
-        {
-            "id": "quick-directive",
-            "kind": "quick",
-            "priority": 60,
-            "kicker": "quick",
-            "headline": "Short version: the patch is 11 GB and it fixes the crashing",
-            "body": ["Short version: the patch is 11 GB and it fixes the crashing."],
-            "source": {"label": "Steam news", "url": "https://store.steampowered.com/news/"},
-            "tags": ["patch"],
-        },
-        {
-            "id": "video-meatcanyon-short",
-            "kind": "video",
-            "priority": 56,
-            "kicker": "animation",
-            "headline": "A four-minute short that nails the exact texture of a 2004 tutorial CD",
-            "standfirst": "Uncomfortably accurate, as usual.",
-            "body": [
-                "Every frame is a reference, from the compression artefacts to the cursor trail. "
-                "Watch it on a big screen if you can.",
-            ],
-            "image": img(3, "Abstract duotone gradient standing in for the animation thumbnail",
-                         "YouTube / MeatCanyon"),
-            "source": {"label": "MeatCanyon", "url": "https://www.youtube.com/@MeatCanyon"},
-            "tags": ["animation", "youtube"],
-            "whyItMatters": "Craft this specific is worth ten trend-chasing uploads.",
-        },
-        {
-            "id": "story-roblox-scale",
-            "kind": "story",
-            "priority": 48,
-            "kicker": "platforms",
-            "headline": "Roblox publishes the boring numbers, and they are the interesting ones",
-            "standfirst": "Session length down, creator payouts up.",
-            "body": [
-                "The quarterly numbers show engagement flattening while payouts rose. That is either "
-                "maturity or a plateau, and the deck argues hard for the first.",
-                "Creator tooling got the largest single line item, which is a notable shift.",
-            ],
-            "image": img(5, "Abstract duotone gradient standing in for the platform report art",
-                         "Fixture / generated art"),
-            "source": {"label": "Game Developer", "url": "https://www.gamedeveloper.com/"},
-            "tags": ["roblox", "platforms"],
-            "whyItMatters": "Where the money goes tells you what the platform thinks it is.",
-        },
-        {
-            "id": "quote-small-team",
-            "kind": "quote",
-            "priority": 40,
-            "kicker": "from the interview",
-            "headline": "We had four people and a deadline. The deadline had more people.",
-            "body": ["We had four people and a deadline. The deadline had more people."],
-            "source": {"label": "Interview, Game Developer", "url": "https://www.gamedeveloper.com/"},
-            "tags": ["gamedev"],
-        },
-        {
-            "id": "story-ukraine-tech",
-            "kind": "story",
-            "priority": 32,
-            "kicker": "world",
-            "headline": "A studio relocates twice and keeps shipping, on generators",
-            "standfirst": "The logistics story behind a studio that never missed a patch window.",
-            "body": [
-                "Two relocations, a generator budget, and a build pipeline mirrored across three "
-                "countries. The engineering is unglamorous and completely effective.",
-                "The team's public post is a practical checklist for anyone planning for outages.",
-            ],
-            "source": {"label": "Kyiv Independent", "url": "https://kyivindependent.com/"},
-            "tags": ["world", "gamedev"],
-            "whyItMatters": "Resilience is a build-system feature, not a personality trait.",
-        },
-    ]
-
-    return {
-        "date": FIXTURE_ISO,
-        "number": 1,
-        "generatedAt": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "masthead": "THE DAILY BEACON",
-        "tagline": "Your 3am briefing, slightly unhinged",
-        "weatherStrip": "Overcast with a chance of patch notes.",
-        "sections": sections,
-        "quickHits": [
-            {"text": "Steam Next Fest dates confirmed for February.", "url": "https://store.steampowered.com/"},
-            {"text": "A 12-year-old MMO got a new renderer and it looks great.", "url": "https://www.pcgamer.com/"},
-            {"text": "Open-source audio tool hits 1.0 after nine years.", "url": "https://github.com/"},
-            {"text": "The weekend's biggest trailer was 40 seconds of fog.", "url": "https://www.youtube.com/"},
-        ],
-        "signoff": "Sleep well. The feeds will still be there in the morning.",
-    }
-
-# ---------------------------------------------------------------------------
-# build pipeline
-# ---------------------------------------------------------------------------
-
-def resolve_images(edition: dict[str, Any], edition_path: Path, out_dir: Path,
-                   iso_date: str) -> tuple[dict[str, dict[str, Any] | None], int, int]:
-    """Resolve every section image once. Returns (by section id, ok count, fail count)."""
-    budget = ImageBudget(out_dir, iso_date)
-    # Assets for one date are fully deterministic, so stale files from an earlier run are removed
-    # first: a rebuild never leaves orphans behind, and hash names cannot collide by accident.
-    for stale in budget.asset_dir.glob("*.jpg"):
-        try:
-            stale.unlink()
-        except OSError:
-            pass
-    resolved: dict[str, dict[str, Any] | None] = {}
-    for section in edition.get("sections") or []:
-        if not isinstance(section, dict):
-            continue
-        section_id = str(section.get("id") or "")
-        image = section.get("image")
-        if not isinstance(image, dict) or not str(image.get("src") or "").strip():
-            resolved[section_id] = None
-            continue
-        asset = budget.resolve(str(image["src"]), edition_path.parent)
-        if asset:
-            asset = dict(asset)
-            asset["date"] = iso_date
-        resolved[section_id] = asset
-    return resolved, budget.count, budget.failures
-
-
-def build_edition_file(edition_path: Path, out_dir: Path, settings: dict[str, Any],
-                       counts: dict[str, int] | None, stamp: bool = True) -> dict[str, Any]:
-    """Validate, render and write index.html + the dated snapshot. Returns build stats."""
-    started = time.perf_counter()
-    edition = read_json(edition_path)
-    report = validate_edition(edition, edition_path, settings)
-
-    for path, message in report.warnings:
-        warn(f"{path}: {message}")
-    if not report.ok:
-        say(f"validation failed: {edition_path.name}")
-        for path, message in report.errors:
-            say(f"  {path}: {message}")
-        raise SystemExit(1)
-
-    if promote_lead(edition):
-        say(f"warning: no lead in {edition_path.name}; promoted the highest-priority section")
-
-    iso = str(edition.get("date"))
-    images, ok_images, failed_images = resolve_images(edition, edition_path, out_dir, iso)
-
-    index_html = render_page(edition, images, "", out_dir, counts)
-    snapshot_html = render_page(edition, images, "../", out_dir, counts)
-
-    ok, message = check_html(index_html, "index.html")
-    if not ok:
-        raise SystemExit(1)
-    say(message)
-
-    ok2, message2 = check_html(snapshot_html, "archive/" + iso + ".html")
-    if not ok2:
-        raise SystemExit(1)
-
-    index_path = out_dir / "index.html"
-    snapshot_path = out_dir / "archive" / f"{iso}.html"
-    write_text(index_path, index_html)
-
-    # --fixture keeps snapshots out of the real archive unless it writes to the real site root
-    write_text(snapshot_path, snapshot_html)
-
-    elapsed = time.perf_counter() - started
-    size_kb = len(index_html.encode("utf-8")) / 1024.0
-    sections = [s for s in (edition.get("sections") or []) if isinstance(s, dict)]
-    try:
-        rel_index = index_path.relative_to(index_path.parent.parent).as_posix()
-    except ValueError:  # site root, no parent to speak of
-        rel_index = index_path.name
-    return {
-        "edition": edition,
-        "index": index_path,
-        "rel_index": rel_index,
-        "snapshot": snapshot_path,
-        "sections": len(sections),
-        "images": ok_images,
-        "image_failures": failed_images,
-        "kb": size_kb,
-        "seconds": elapsed,
-        "number": edition.get("number"),
-        "date": iso,
-    }
-
-
-def rebuild_archive(out_dir: Path, settings: dict[str, Any]) -> Path:
-    """Regenerate archive.html from the snapshots present on disk."""
-    rows = gather_archive(out_dir)
-    page = render_archive_page(rows, out_dir, settings)
-    ok, message = check_html(page, "archive.html")
-    if not ok:
-        raise SystemExit(1)
-    target = out_dir / "archive.html"
-    write_text(target, page)
-    return target
-
-
-def newest_edition_path() -> Path | None:
-    """Newest editions/YYYY-MM-DD.json, ignoring anything that is not a real date."""
-    candidates: list[Path] = []
-    for path in EDITION_DIR.glob("*.json"):
-        if ISO_DATE_RE.match(path.stem):
-            candidates.append(path)
-    return max(candidates, key=lambda p: p.stem) if candidates else None
-
-
-def summary_line(stats: dict[str, Any]) -> str:
-    return (
-        f"built: edition {stats['number']} ({stats['date']}) -> "
-        f"{stats['rel_index']}, {stats['sections']} sections, "
-        f"{stats['images']} images, {stats['kb']:.1f} KB html, {stats['seconds']:.1f}s"
-    )
-
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
-
-def cmd_check(target: str | None, settings: dict[str, Any]) -> int:
-    """Validate one or all editions; print every violation with its JSON path."""
-    if target and target != "today":
-        path = EDITION_DIR / f"{target}.json"
-        if not path.exists():
-            fixture_path = FIXTURE_DIR / f"{target}.json"
-            if fixture_path.exists():
-                path = fixture_path
-        if not path.exists():
-            say(f"error: edition not found: {EDITION_DIR / (target + '.json')}")
-            return 1
-        paths = [path]
-    else:
-        paths = sorted(p for p in EDITION_DIR.glob("*.json") if ISO_DATE_RE.match(p.stem))
-        if not paths:
-            say("error: no editions found")
-            return 1
-
-    total_errors = 0
-    for path in paths:
-        try:
-            edition = read_json(path)
-        except Exception as exc:  # noqa: BLE001
-            say(f"{path.name}: invalid JSON ({type(exc).__name__})")
-            total_errors += 1
-            continue
-        report = validate_edition(edition, path, settings)
-        for where, message in report.warnings:
-            say(f"{path.name}: warning: {where}: {message}")
-        for where, message in report.errors:
-            say(f"{path.name}: {where}: {message}")
-        total_errors += len(report.errors)
-        if not report.errors:
-            sections = [s for s in (edition.get("sections") or []) if isinstance(s, dict)]
-            say(f"{path.name}: ok ({len(sections)} sections)")
-
-    if total_errors:
-        say(f"check: failed ({total_errors} violation(s))")
-        return 1
-    say("check: ok")
-    return 0
-
-
-def cmd_fixture(args: argparse.Namespace, settings: dict[str, Any],
-                counts: dict[str, int] | None) -> int:
-    """Build the built-in fixture edition without touching the network or editions/."""
-    out_dir = Path(args.out).resolve() if args.out else SITE_DIR
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    images = make_fixture_images()
-    if not images:
-        say("error: fixture images could not be generated (Pillow missing?)")
-        return 1
-    edition = build_fixture_edition(images)
-
-    FIXTURE_DIR.mkdir(parents=True, exist_ok=True)
-    edition_path = FIXTURE_DIR / f"{edition['date']}.json"
-    write_text(edition_path, json.dumps(edition, indent=2, ensure_ascii=False))
-
-    report = validate_edition(edition, edition_path, settings)
-    for where, message in report.warnings:
-        warn(f"{where}: {message}")
-    if not report.ok:
-        for where, message in report.errors:
-            say(f"  {where}: {message}")
-        say("error: built-in fixture edition is invalid")
-        return 1
-
-    stats = build_edition_file(edition_path, out_dir, settings, counts)
-    rebuild_archive(out_dir, settings)
-    say(summary_line(stats))
-    return 0
-
-
-def cmd_build(args: argparse.Namespace, settings: dict[str, Any],
-              counts: dict[str, int] | None) -> int:
-    iso = args.date or datetime.now().strftime("%Y-%m-%d")
-    if not ISO_DATE_RE.match(iso):
-        say(f"error: --date must be YYYY-MM-DD, got '{iso}'")
-        return 2
-    edition_path = EDITION_DIR / f"{iso}.json"
-    if not edition_path.exists():
-        archived = EDITION_DIR / "archive" / f"{iso}.json"
-        if archived.exists():
-            edition_path = archived
-        else:
-            say(f"error: edition not found: {edition_path}")
-            return 1
-
-    out_dir = Path(args.out).resolve() if args.out else SITE_DIR
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    stats = build_edition_file(edition_path, out_dir, settings, counts)
-    rebuild_archive(out_dir, settings)
-    say(summary_line(stats))
-    return 0
-
-
-def cmd_all(args: argparse.Namespace, settings: dict[str, Any],
-            counts: dict[str, int] | None) -> int:
-    """Rebuild index.html from the newest edition and refresh archive.html from all snapshots."""
-    out_dir = Path(args.out).resolve() if args.out else SITE_DIR
-    out_dir.mkdir(parents=True, exist_ok=True)
-    newest = newest_edition_path()
-    if newest is None:
-        say("error: no editions available to rebuild from")
-        return 1
-    stats = build_edition_file(newest, out_dir, settings, counts)
-    rebuild_archive(out_dir, settings)
-    say(summary_line(stats))
-    return 0
-
+def write_text(path: Path, payload: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(payload, encoding="utf-8", newline="\n")
+    tmp.replace(path)
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="build_edition.py",
-        description="Build the Daily Beacon static site from an edition JSON file.",
-        epilog="Exit codes: 0 ok, 1 validation/build failure, 2 usage error.",
-    )
-    parser.add_argument("--date", metavar="YYYY-MM-DD", help="edition date to build (default: today)")
-    parser.add_argument("--check", nargs="?", const="today", metavar="DATE",
-                        help="validate only; exit 1 on any violation")
-    parser.add_argument("--fixture", action="store_true",
-                        help="build the built-in 12-section fixture (no network)")
-    parser.add_argument("--all", action="store_true",
-                        help="rebuild index from the newest edition and refresh archive.html")
-    parser.add_argument("--open", action="store_true", help="ignored (headless-only policy)")
-    parser.add_argument("--out", metavar="DIR", help="output directory (default: site)")
+    parser = argparse.ArgumentParser( prog="build_edition.py",
+        description="Build the Daily Beacon static site from one edition JSON file.",
+        epilog="Exit codes: 0 success or CHECK OK, 1 validation or build failure.", )
+    parser.add_argument("--date", help="edition date, YYYY-MM-DD (default: today, local)")
+    parser.add_argument("--edition", help="path to the edition JSON (default: editions/<date>.json)")
+    parser.add_argument("--out-dir", help="site output directory (default: site)")
+    parser.add_argument("--root", default=str(Path(__file__).resolve().parents[1]), help="project root")
+    parser.add_argument("--check", action="store_true", help="validate only, write nothing")
+    parser.add_argument("--fixture", action="store_true", help="build fixtures/edition-fixture.json")
+    parser.add_argument("--no-images", action="store_true", help="emit no figure elements at all")
+    parser.add_argument("--quiet", action="store_true", help="suppress WARN lines")
     return parser
 
+def resolve_targets(args: argparse.Namespace) -> tuple[Path, Path, str] | None:
+    """(edition path, out dir, date string) or None when the arguments are unusable."""
+    root = Path(args.root).resolve()
+    date_str = args.date or date_cls.today().isoformat()
+    if args.date and parse_date(args.date) is None:
+        fail(f"--date must be YYYY-MM-DD, got '{args.date}'")
+        return None
 
-def main(argv: list[str] | None = None) -> int:
-    reconfigure_stdout()
-    parser = build_parser()
-    args = parser.parse_args(argv)
-    settings = load_settings()
+    if args.fixture:
+        edition_path = Path(args.edition) if args.edition else root / "fixtures" / "edition-fixture.json"
+        out_dir = Path(args.out_dir) if args.out_dir else root / "site" / "_fixture"
+        if not edition_path.exists():
+            fail(f"fixture edition not found: {edition_path}")
+            return None
+        if not args.date:  # take the fixture's own date so the filename check passes
+            payload, problem = load_edition(edition_path)
+            declared = payload.get("date") if problem is None and payload else None
+            if parse_date(declared):
+                date_str = str(declared)
+    else:
+        edition_path = Path(args.edition) if args.edition else root / "editions" / f"{date_str}.json"
+        out_dir = Path(args.out_dir) if args.out_dir else root / "site"
 
-    if args.open:
-        say("open: skipped (headless-only policy)")
+    if not edition_path.is_absolute():
+        edition_path = (Path.cwd() / edition_path).resolve()
+    if not out_dir.is_absolute():
+        out_dir = (root / out_dir).resolve()
+    return edition_path, out_dir, date_str
+
+def run_check(edition: dict[str, Any], issues: Sequence[Issue], notes: Sequence[str]) -> int:
+    hard = [issue for issue in issues if issue.hard]
+    for issue in hard:
+        print(f"CHECK FAIL: {ascii_safe(issue.message)}")
+    for note in notes:
+        print(f"WARN: {ascii_safe(note)}")
+    if hard:
+        print(f"CHECK FAILED: {len(hard)} problems")
+        return 1
+    sections = edition.get("sections")
+    hits = edition.get("quickHits")
+    print( f"CHECK OK: {len(sections) if isinstance(sections, list) else 0} sections, "
+        f"{len(hits) if isinstance(hits, list) else 0} quick hits"
+    )
+    return 0
+
+def make_context( root: Path,
+    edition_path: Path, out_dir: Path,
+    date_str: str, edition: dict[str, Any],
+    settings: dict[str, Any], args: argparse.Namespace,
+) -> Context:
+    ctx = Context( root=root,
+        out_dir=out_dir, edition_path=edition_path,
+        date_str=date_str, captured=parse_date(date_str) or date_cls.today(),
+        edition=edition, settings=settings,
+        variant=variant_for(date_str), no_images=args.no_images,
+        quiet=args.quiet, )
+    ctx.css_q = asset_query(out_dir / "style.css")
+    ctx.js_q = asset_query(out_dir / "app.js")
+    ctx.stats = read_memory_stats(root)
+    return ctx
+
+def report(ctx: Context, markup: str, archived: int) -> int:
+    sections = [s for s in ctx.edition.get("sections", []) if isinstance(s, dict)]
+    hits = ctx.edition.get("quickHits")
+    if not ctx.quiet:
+        print( f"variant: accent={ctx.variant[0]} layout={ctx.variant[1]} "
+            f"scale={ctx.variant[2]} order={ctx.variant[3]}"
+        )
+        print(f"archive: {archived} snapshots indexed in archive.html")
+    print( f"build done: {ctx.date_str} - {len(sections)} sections, {len(ctx.assets)} images, "
+        f"{(ctx.out_dir / 'index.html').stat().st_size} bytes, "
+        f"{len(_ANCHOR_LINK_RE.findall(markup))} links"
+    )
+    return 0
+
+def build_site(args: argparse.Namespace) -> int:
+    targets = resolve_targets(args)
+    if targets is None:
+        return 1
+    edition_path, out_dir, date_str = targets
+    root = Path(args.root).resolve()
+
+    edition, problem = load_edition(edition_path)
+    if edition is None:
+        return fail(problem or "cannot load edition")
+
+    settings = load_settings(root)
+    issues, notes = validate_edition(edition, date_str, settings)
+    if args.check:
+        return run_check(edition, issues, notes)
+    hard = [issue for issue in issues if issue.hard]
+    if hard:
+        for issue in hard:
+            print(f"CHECK FAIL: {ascii_safe(issue.message)}", file=sys.stderr)
+        return fail(f"{len(hard)} validation problems in {edition_path.name}")
+    for note in notes:
+        warn(note, args.quiet)
+
+    ctx = make_context(root, edition_path, out_dir, date_str, edition, settings, args)
+    build_assets(ctx)
+    sections = [s for s in edition.get("sections", []) if isinstance(s, dict)]
+    try:
+        live_html = build_page(ctx, prefix="")
+        snapshot_html = build_page(ctx, prefix="../")
+    except MarkupError as exc:
+        return fail(f"bad inline markup - {exc}")
+
+    for label, markup in (("index.html", live_html), ("snapshot", snapshot_html)):
+        problem = verify_markup(markup, sections)
+        if problem:
+            return fail(f"{label} self-check failed: {problem}")
+
+    entries = collect_archive(out_dir, date_str, live_html)
+    archive_html = render_archive_page(ctx, entries, prefix="")
+    problem = check_tag_balance(archive_html)
+    if problem:
+        return fail(f"archive.html self-check failed: {problem}")
 
     try:
-        if args.check is not None:
-            target = None if args.check == "today" else args.check
-            return cmd_check(target, settings)
+        write_text(out_dir / "archive" / f"{date_str}.html", snapshot_html)
+        write_text(out_dir / "index.html", live_html)
+        write_text(out_dir / "archive.html", archive_html)
+    except OSError as exc:
+        return fail(f"cannot write site files: {exc}")
+    return report(ctx, live_html, len(entries))
 
-        counts = memory_counts()
-        if args.fixture:
-            return cmd_fixture(args, settings, counts)
-        if args.all:
-            return cmd_all(args, settings, counts)
-        return cmd_build(args, settings, counts)
-    except SystemExit:
-        raise
-    except FileNotFoundError as exc:
-        say(f"error: {exc}")
-        return 1
+def main(argv: Sequence[str] | None = None) -> int:
+    _reconfigure_streams()
+    try:
+        return build_site(build_parser().parse_args(argv))
     except KeyboardInterrupt:
-        say("error: interrupted")
-        return 1
-
+        return fail("interrupted")
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
