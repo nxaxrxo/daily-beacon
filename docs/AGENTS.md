@@ -55,27 +55,25 @@ It writes, under `state/workpack/<date>/`:
 
 | File | What it is |
 |---|---|
-| `yt.json` / `news.json` | raw YouTube items from every channel; raw RSS items from every feed |
+| `yt.json` / `news.json` | raw YouTube items per channel; raw RSS items per feed |
 | `candidates.json` | both normalised into the canonical item shape |
-| `filtered.json` | the same, annotated by `memory.py filter` with `seen`, `seen_reason`, `topic_hits` |
+| `filtered.json` | the same, annotated with `seen`, `seen_reason`, `topic_hits` |
 | `suppressed.json` | items dropped as repeats, with the reason |
-| `transcripts/<videoId>.txt` + `index.json` | trimmed transcripts, and which ids fetched / cached / failed |
-| `img/` | downloaded, Pillow-verified thumbnails |
-| `packet.md` | the briefing you read first |
+| `transcripts/` | `<videoId>.txt` slices plus `index.json` (fetched / cached / failed) |
+| `img/`, `packet.md` | downloaded Pillow-verified thumbnails; the briefing you read first |
 
 Then:
 
 1. **Read `state/workpack/<date>/packet.md` in full.** Counts, top videos, top articles, what is
    cooling down, next commands. Trust its ordering, not its judgement - you judge.
-2. **Read 3-8 transcripts, in slices.** `state/workpack/<date>/transcripts/<videoId>.txt` is trimmed
-   head+tail, so head and tail carry the argument and the middle is filler. Read `offset`/`limit`
-   slices of about 150 lines; never load a whole 24,000-character transcript in one read. **Budget:
-   at most 8 transcripts**, and only ones you intend to use.
+2. **Read 3-8 transcripts, in slices.** Each `transcripts/<videoId>.txt` is trimmed head+tail, so the
+   argument and conclusion sit at the ends and the middle is filler. Read `offset`/`limit` slices of
+   about 150 lines and never load a whole 24,000-character transcript in one read. **Budget: at most 8
+   transcripts**, and only ones you intend to use.
 3. **Judge everything else from title + channel/source + thumbnail + length.** You do not need a
    transcript to know that a 14-minute video called "the patch that broke everything" is worth a look.
-4. **Use image paths verbatim** from the packet or `images.json` - they point into
-   `state/workpack/<date>/img/`. Never invent an image path; a missing image is a text-only section,
-   which is legal, while a broken path is not.
+4. **Use image paths verbatim** from the packet or `images.json`, into `state/workpack/<date>/img/`.
+   Never invent one; a missing image is a legal text-only section, a broken path is not.
 
 > NOTE: a healthy run can still print `youtube: 0 videos | producer did not report a summary` and
 > `warnings: yt_source exit 4294967295` - that is the producer's summary channel failing on Windows
@@ -117,15 +115,13 @@ One real-shaped morning, components in rubric order, penalties applied once each
 
 Read the table as the rules, not as an example:
 
-- **#1 wins the lead** on 100. #2 also clears 80, but there is one lead - highest takes it, #2 becomes
-  the strongest story with its own image. Two leads is a validation failure; zero makes the builder
-  promote the first section.
+- **#1 wins the lead** on 100. #2 clears 80 too, but there is one lead - highest takes it and #2 becomes
+  the strongest story with its own image. Two leads fails validation; zero makes the builder promote #1.
 - **Format value is why #3 sits under #2** despite double the source weight: a routine let's play is
-  worth 5, a documentary-grade explainer is worth 25. Commentary and documentary outrank gameplay
-  because that is what the reader actually respects.
-- **#5 is an honest topic return**: 40 days out. Inside 21 days it would have been -25 and -45, i.e.
-  dead. It is a `quick` brief, not a comeback.
-- **The suppressed row is arithmetic.** Same item, `seen` set, -45: it does not matter how good it is.
+  worth 5, a documentary-grade explainer 25. Commentary outranks gameplay because he respects it.
+- **#5 is an honest topic return** at 40 days out; inside 21 it would be -25 and -45, i.e. dead, so it
+  ships as a `quick` brief and not a comeback. **The suppressed row is arithmetic**, not a judgement:
+  `seen` set, -45, however good the item is.
 - **Six candidates gave six usable slots plus one suppression.** A normal night. If the best item
   scores under 60, publish five thin honest stories anyway.
 
@@ -215,8 +211,7 @@ Rules the builder enforces, so learn them once:
   "standfirst": "Fourteen minutes of commentary later, the interesting part is how fast the community rebuilt the announcement themselves.",
   "body": [
     "The teaser ran eleven seconds, showed **a logo and a date**, and the studio's own channel pinned a comment promising a full reveal in seven days.",
-    "By the evening the subreddit had taken the frame apart: the reflection in the logo plate is a known engine screenshot, and the date matches a storefront listing that has been live since spring. [The thread](https://example.com/thread) is the actual coverage of this thing.",
-    "None of that is a leak. It is a studio announcing an announcement and an audience that has learned to read the pixels."
+    "By the evening the subreddit had taken the frame apart: the reflection in the logo plate is a known engine screenshot, and the date matches a storefront listing live since spring. [The thread](https://example.com/thread) is the actual coverage of this thing - a studio announcing an announcement to an audience that has learned to read the pixels."
   ],
   "image": {"src": "../state/workpack/2026-10-28/img/9f2a11c04b7de833.jpg", "alt": "A dark studio logo plate with a faint reflection of a game environment", "credit": "YouTube / Asmongold TV"},
   "source": {"label": "Asmongold TV", "url": "https://www.youtube.com/watch?v=XEOzMFZHdcU"},
@@ -320,18 +315,17 @@ These four, in this exact order, one at a time, reading the last line of each.
 Observed `build_edition.py` flags (do not guess others): `--date`, `--edition`, `--out-dir`, `--root`,
 `--check`, `--fixture`, `--no-images`, `--quiet`. Exit 0 on success or `CHECK OK`, 1 on failure.
 
-- **`--check`** validates only and writes nothing: missing keys, two leads, an empty body, bad inline
-  markup, a non-quick section with no source, a missing image credit. Runs before publish, always.
+- **`--check`** validates only, writes nothing: missing keys, two leads, an empty body, bad inline
+  markup, a non-quick section with no source, a missing image credit. Before publish, always.
 - **`--date`** writes `site/index.html`, `site/archive/<date>.html`, `site/archive.html` and
-  `site/assets/<date>/`. Success is exit 0 **plus** a rewritten `site/index.html`. A build can exit 0
-  while one remote image is skipped (`WARN: image skipped <id>: http 404`), which is acceptable as long
-  as the section still reads.
-- **`publish.py`** commits and pushes, then prints the live URL. Variants: `publish: nothing to
-  commit`, `publish: no site built - run build_edition.py first`, `publish: BLOCKED - possible secret
-  in <file>`, `publish: pushed to origin/<branch>, live url not set ...`. It never force-pushes.
+  `site/assets/<date>/`. Success is exit 0 **plus** a rewritten `site/index.html`; a build can exit 0
+  with one remote image skipped (`WARN: image skipped <id>: http 404`), which is fine if it still reads.
+- **`publish.py`** commits, pushes, prints the live URL. Variants: `publish: nothing to commit`,
+  `publish: no site built - run build_edition.py first`, `publish: BLOCKED - possible secret in
+  <file>`, `... live url not set ...`. It never force-pushes.
 - **`--verify`** GETs the live URL and requires HTTP 200 plus the masthead. Only after a push.
-- **`memory.py mark`** is idempotent: twice prints the same shape of line, adds nothing the second time.
-  Skipping it is what makes tomorrow repeat today.
+- **`memory.py mark`** is idempotent: twice prints the same shape of line and adds nothing. Skipping it
+  is what makes tomorrow repeat today.
 
 > NOTE: SPEC section 7 still shows `--open`, but the current builder has no such flag - passing it is
 > an argparse error. Build, then verify headlessly (exit code, file size, `--check`); never open a

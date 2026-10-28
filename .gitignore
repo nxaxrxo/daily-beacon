@@ -25,3 +25,6 @@ desktop.ini
 
 # Tracked on purpose: state/seen.sqlite (memory) and editions/*.json (content)
 !state/seen.sqlite
+# sqlite sidecar files (state churn, never tracked)
+state/*.sqlite-wal
+state/*.sqlite-shm
