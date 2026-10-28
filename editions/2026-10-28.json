@@ -11,12 +11,12 @@
       "kind": "lead",
       "priority": 100,
       "kicker": "GAMING · LABOUR",
-      "headline": "Rockstar workers vote to unionise during GTA 6's launch week",
-      "standfirst": "The biggest game in history is being shipped by people who just scheduled a ballot in the middle of shipping it.",
+      "headline": "Rockstar's UK staff will vote on a union in the middle of GTA 6's launch week",
+      "standfirst": "The ballot runs from 12 to 26 November - either side of the biggest launch in the industry's history - and if it passes it becomes the largest recognised games union in the UK.",
       "body": [
-        "A date is locked. Rockstar Games employees in the UK will vote next month on whether to recognise their developer union — and the ballot lands right inside Grand Theft Auto 6's release window. Not before it. Not after it. *On top of it.*",
-        "If it passes it becomes the largest recognised union in the entire UK games industry. Not a small studio, not an indie collective — the people currently assembling the most expensive entertainment product ever made.",
-        "There is something deeply, darkly funny about the timing, and also something genuinely good: the workers chose the moment when management has the least room to say no."
+        "A date is locked. Rockstar Games employees in the UK will vote from **12 to 26 November** on whether the company should formally recognise the Rockstar Game Workers Union - a ballot that lands either side of Grand Theft Auto 6's release. Not before it. Not after it. *On top of it.*",
+        "If it passes it becomes the largest recognised union in the entire UK games industry. Not a small studio, not an indie collective - the people currently assembling the most expensive entertainment product ever made.",
+        "The timing is not an accident of the calendar. It also arrives alongside an employment tribunal over the dismissal of more than 30 staff, which the union calls union busting and Rockstar calls gross misconduct. Either way, November is the month the company answers the question in public."
       ],
       "image": {
         "src": "https://assetsio.gnwcdn.com/grand-theft-auto-6-sharing-beer-on-boat.png?width=690&quality=85&format=jpg&auto=webp",
@@ -33,7 +33,7 @@
         "unions",
         "industry"
       ],
-      "whyItMatters": "If the largest studio in the industry unionises during its biggest launch, the rest of the UK sector has a template.",
+      "whyItMatters": "If the largest studio in the industry recognises a union during its biggest launch, the rest of the UK sector has a template.",
       "aside": "Somewhere a Rockstar HR manager read this headline and aged four years."
     },
     {
@@ -98,11 +98,12 @@
       "kind": "video",
       "priority": 86,
       "kicker": "GAMING · VIDEOGAMEDUNKEY",
-      "headline": "Dunkey reviewed Call of Duty 24 and the number is not a joke",
-      "standfirst": "Modern Warfare 4, the twenty-fourth entry, and the man has opinions about the arithmetic.",
+      "headline": "Dunkey spent a Call of Duty 24 match narrating a bag of chips",
+      "standfirst": "The game is called Modern Warfare 4 and it is the twenty-fourth one. He noticed. He also noticed some bagel chips.",
       "body": [
-        "Twenty-four Call of Duty games. Let that settle. There are adults who have never lived in a world without an annual Call of Duty release.",
-        "Dunkey's review is out and it is the usual mix of precise comic timing and one or two observations that accidentally cut deeper than intended."
+        "Twenty-four Call of Duty games. There are adults who have never lived in a world without an annual one, and the twenty-fourth has a talking gun named Gunny, which is either a bold creative choice or a cry for help.",
+        "Dunkey's video is less a review than a match-long bit about everything around the shooting: the chips scattered on the map, an attachment that would quadruple shotgun damage, and a reload that he performs in real time, at length, as a joke.",
+        "The precise comic timing is the usual. The accidental insight is that a game this enormous now ships with so much texture in the margins that the margins are the interesting part."
       ],
       "image": {
         "src": "https://i.ytimg.com/vi/-Y6Cp6e-VbI/hqdefault.jpg",
@@ -269,12 +270,12 @@
       "kind": "story",
       "priority": 66,
       "kicker": "GAMING · CAPCOM",
-      "headline": "Resident Evil's story will end within ten years, apparently",
-      "standfirst": "Capcom's executive producer says the narrative has a conclusion, and it is closer than you think.",
+      "headline": "Capcom says Resident Evil's story has an ending - the internet heard 'in ten years'",
+      "standfirst": "Jun Takeuchi talked about a 10-year branding plan and fans heard a countdown. Wccftech read it the other way: a chapter closing, not the franchise.",
       "body": [
-        "Jun Takeuchi told Yahoo Japan that the series' overarching narrative has a definite ending, and that end could arrive within the next decade. Multiple new games are still planned in the meantime.",
-        "That is a wild thing to say about a franchise on its ninth mainline entry and its thirtieth anniversary, and it is either a genuine plan or the most elegant way anyone has ever said 'we have not decided yet'.",
-        "Either way: a horror series with an actual ending is rare, and if Capcom pulls it off it will be the most interesting thing the studio has done since the RE Engine."
+        "Jun Takeuchi, Capcom's executive producer, gave an interview to Yahoo Japan for the series' 30th anniversary and mentioned a **ten-year branding strategy** put together around the RE2 remake. Several outlets reported that the story would conclude within a decade.",
+        "Wccftech went back through the quote and concluded that is not what he said: he appears to be describing a specific chapter of the plot reaching its end, not the series. He also confirmed multiple new games are planned, without saying how many.",
+        "So the accurate version is smaller and more interesting than the headline version: a 30-year-old horror franchise is, for the first time, admitting it has a shape and an ending somewhere in it."
       ],
       "image": {
         "src": "https://cdn.wccftech.com/wp-content/uploads/2026/10/Resident-Evil-Requiem-Veronica-HD-1456x820.jpeg",
@@ -289,8 +290,8 @@
         "resident-evil",
         "capcom"
       ],
-      "whyItMatters": "A long-running franchise committing to an ending changes how every future entry gets read.",
-      "aside": "Thirty years of Umbrella and it turns out there was a final page the whole time."
+      "whyItMatters": "A long-running franchise committing to an ending changes how every future entry gets read - even when the commitment is smaller than the headline.",
+      "aside": "Thirty years of Umbrella and the most surprising thing is that someone has a plan."
     },
     {
       "id": "monarchs-at-play",
@@ -374,10 +375,11 @@
       "kind": "quick",
       "priority": 45,
       "kicker": "AI · META",
-      "headline": "Meta made a Tamagotchi that is secretly a diary",
+      "headline": "Meta's AI Tamagotchi is a diary with a beak, and it is Philippines-only for now",
       "standfirst": "Waddle World: 'a daily journal disguised as a pet.'",
       "body": [
-        "Meta's newest AI product is a virtual pet app that it describes, with unusual honesty, as a daily journal disguised as a pet. You write to it, it responds as a small creature, and Meta gets engagement data."
+        "Meta's Waddle World is a 16-bit virtual pet that the company describes, with unusual honesty, as **\"a daily journal disguised as a pet\"**. You write to it, it responds as a small creature, and you play mini-games to buy it food and toys.",
+        "It launched in the Philippines in late September, and it is the softest of soft launches - which is how companion apps always start."
       ],
       "image": {
         "src": "https://www.engadget.com/img/gallery/metas-waddle-world-is-a-tamagotchi-like-ai-pet-app/l-intro-1793176733.jpg",

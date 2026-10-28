@@ -884,7 +884,10 @@ body.page-edition .paper { padding-block: var(--gap) var(--gap); }
 .lead--hero-left, .lead--hero-centre, .lead--hero-stacked { display: flex; }
 
 /* Quick Hits is styled once, on .quick-hits, so it looks identical before the
-   first story (order-rail) and after the last (order-lead). No `order` here. */
+   first story (order-rail) and after the last (order-lead). No `order` here:
+   the builder owns reading order, CSS only gives the rail its entry point. */
+.order-rail .quick-hits { border-top-width: 3px; }
+.order-lead .quick-hits { margin-top: var(--gap-s); }
 
 /* ------------------------------------------------------- 17. REDUCED MOTION */
 @media (prefers-reduced-motion: reduce) {

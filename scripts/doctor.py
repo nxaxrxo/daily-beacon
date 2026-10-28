@@ -3,17 +3,18 @@
 
     python scripts/doctor.py [--offline] [--quick] [--keep] [--root PATH] [--json]
 
-Twelve checks, one PASS/FAIL/WARN line each, in order: settings.json keys and types;
-channels.json shape (id/name/tier/enabled, tier 1..3, UC ids); feeds.json shape (https urls);
-interests.md size; AGENTS.md size; writable editions/site/site/assets/state; Python >= 3.11
-plus requests/feedparser/bs4/PIL; state/seen.sqlite tables (items, topics, editions); three
-network endpoints (one feed, one channel RSS, github.com); site/style.css + app.js + index.html;
-a fixture build whose HTML is structurally audited; and a final summary line.
+Twelve checks, one PASS/FAIL/WARN line each, in order: settings.json keys and types; channels.json
+shape (id/name/tier/enabled, tier 1..3, UC ids); feeds.json shape (https urls); interests.md size;
+AGENTS.md size; writable editions/site/site/assets/state; Python >= 3.11 plus
+requests/feedparser/bs4/PIL; state/seen.sqlite tables (items, topics, editions); three network
+endpoints (one feed, one channel RSS, github.com); site/style.css + app.js + index.html; a fixture
+build whose HTML is structurally audited; the summary line and exit code.
 
 Only `state/doctor-fixture` is written, and it is deleted again unless --keep.
 Exit codes: 0 nothing failed (warnings allowed), 1 at least one FAIL, 2 usage error.
 Console output is ASCII only. No token or credential is read or printed.
 """
+
 from __future__ import annotations
 
 import argparse, importlib, json, re, shutil, sqlite3, subprocess, sys, tempfile
@@ -65,9 +66,7 @@ def load_json(path):
         return None, "file not found"
     except json.JSONDecodeError as exc:
         return None, "invalid JSON at line %d column %d" % (exc.lineno, exc.colno)
-    except UnicodeDecodeError:
-        return None, "not UTF-8"
-    except OSError as exc:
+    except (UnicodeDecodeError, OSError) as exc:
         return None, "cannot read (%s)" % exc.__class__.__name__
 
 def is_int(value):
@@ -97,8 +96,8 @@ class Doctor:
         self._record(FAIL, name, detail)
 
     def _fail_many(self, name, problems):
-        return self.failed(name, "%d problem(s): %s"
-                           % (len(problems), "; ".join(str(part) for part in problems[:6])))
+        return self.failed(name, "%d problem(s): %s" % (len(problems),
+                           "; ".join(str(part) for part in problems[:6])))
 
     def check_settings(self):
         """1. Every SPEC section 3 key, present and correctly typed."""
@@ -189,10 +188,10 @@ class Doctor:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError as exc:
             return self.failed(name, "cannot read (%s)" % exc.__class__.__name__)
-        lines = len(text.splitlines())
-        if lines < min_lines:
-            return self.warned(name, "%d lines, expected more than %d" % (lines, min_lines))
-        return self.passed(name, "%d lines, %d bytes" % (lines, len(text.encode("utf-8"))))
+        count = len(text.splitlines())
+        if count < min_lines:
+            return self.warned(name, "%d lines, expected more than %d" % (count, min_lines))
+        return self.passed(name, "%d lines, %d bytes" % (count, len(text.encode("utf-8"))))
 
     def check_interests(self):
         return self._text_file("config/interests.md", "config/interests.md", 40)
@@ -227,8 +226,7 @@ class Doctor:
         return self.passed(name, "%d/4 directories exist and accept a temp file" % writable)
 
     def check_runtime(self):
-        name = "runtime"
-        version = "%d.%d.%d" % sys.version_info[:3]
+        name, version = "runtime", "%d.%d.%d" % sys.version_info[:3]
         if sys.version_info < (3, 11):
             return self.failed(name, "Python %s, need 3.11 or newer" % version)
         missing = []
@@ -238,22 +236,20 @@ class Doctor:
             except Exception as exc:
                 missing.append("%s (%s)" % (module, exc.__class__.__name__))
         if missing:
-            return self.failed(name, "Python %s, cannot import: %s" % (version, ", ".join(missing)))
+            return self.failed(name, "Python %s, cannot import: %s"
+                               % (version, ", ".join(missing)))
         return self.passed(name, "Python %s, requests/feedparser/bs4/PIL all import" % version)
 
     def check_memory(self):
         name, path = "state/seen.sqlite", self.root / "state" / "seen.sqlite"
         if not path.is_file():
             return self.warned(name, "absent - no edition has been marked yet")
-        connection = None
         try:
-            connection = sqlite3.connect("file:%s?mode=ro" % path.as_posix(), uri=True, timeout=5)
-            rows = connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+            with sqlite3.connect("file:%s?mode=ro" % path.as_posix(), uri=True, timeout=5) as link:
+                rows = link.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'").fetchall()
         except sqlite3.Error as exc:
             return self.failed(name, "cannot open read-only (%s)" % exc.__class__.__name__)
-        finally:
-            if connection is not None:
-                connection.close()
         tables = set(row[0] for row in rows)
         missing = [table for table in REQUIRED_TABLES if table not in tables]
         if missing:
@@ -268,17 +264,16 @@ class Doctor:
             for entry in data if isinstance(data, list) else []:
                 if not (isinstance(entry, dict) and entry.get("enabled") is True):
                     continue
-                url, channel_id = entry.get("url"), entry.get("id")
+                url, channel = entry.get("url"), entry.get("id")
                 if kind == "feed" and isinstance(url, str) and url.startswith("https://"):
                     found.append(("feed %s" % ascii_text(entry.get("name"), 30), url))
                     break
-                if kind == "channel" and isinstance(channel_id, str) \
-                        and CHANNEL_ID_RE.match(channel_id):
+                if kind == "channel" and isinstance(channel, str) \
+                        and CHANNEL_ID_RE.match(channel):
                     found.append(("youtube rss", "https://www.youtube.com/feeds/videos.xml"
-                                                 "?channel_id=" + channel_id))
+                                                 "?channel_id=" + channel))
                     break
-        found.append(("github.com", "https://github.com"))
-        return found
+        return found + [("github.com", "https://github.com")]
 
     def _probe(self, url):
         request = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
@@ -296,22 +291,20 @@ class Doctor:
     def check_network(self):
         if self.offline:
             return
-        name, parts, failures, endpoints = "network", [], 0, self._endpoints()
+        name, endpoints = "network", self._endpoints()
+        parts, failures = [], 0
         for label, url in endpoints:
             ok, detail = self._probe(url)
             parts.append("%s %s" % (label, "ok" if ok else detail))
             failures += 0 if ok else 1
+        summary = "%d/%d ok: %s" % (len(endpoints) - failures, len(endpoints), "; ".join(parts))
         if failures == len(endpoints):
             return self.failed(name, "all %d endpoints failed: %s"
                                % (len(endpoints), "; ".join(parts)))
-        if failures:
-            return self.warned(name, "%d/%d failed: %s"
-                               % (failures, len(endpoints), "; ".join(parts)))
-        return self.passed(name, "%d/%d ok: %s"
-                           % (len(endpoints), len(endpoints), "; ".join(parts)))
+        return self.warned(name, summary) if failures else self.passed(name, summary)
 
     def check_static(self):
-        name, bad, sizes = "site static assets", [], {}
+        name, bad, sizes = "site static assets", [], []
         for rel in ("site/style.css", "site/app.js"):
             path = self.root / rel
             if not path.is_file():
@@ -319,31 +312,30 @@ class Doctor:
             elif path.stat().st_size == 0:
                 bad.append(rel + " is empty")
             else:
-                sizes[rel] = path.stat().st_size
+                sizes.append(path.stat().st_size)
         if bad:
             return self._fail_many(name, bad)
-        base = "style.css %d B, app.js %d B" % (sizes["site/style.css"], sizes["site/app.js"])
+        base = "style.css %d B, app.js %d B" % (sizes[0], sizes[1])
         index = self.root / "site" / "index.html"
         if not index.is_file():
             return self.warned(name, base + "; site/index.html not built yet")
         return self.passed(name, "%s, index.html %d B" % (base, index.stat().st_size))
 
     def _run_fixture(self, script, out_dir):
-        base = [sys.executable, str(script), "--fixture"]
         last = (1, "", "not run")
         for flag in ("--out", "--out-dir"):
             try:
-                done = subprocess.run(base + [flag, str(out_dir)], cwd=str(self.root),
-                                      capture_output=True, text=True, encoding="utf-8",
-                                      errors="replace", timeout=FIXTURE_TIMEOUT)
+                done = subprocess.run([sys.executable, str(script), "--fixture", flag,
+                                       str(out_dir)], cwd=str(self.root), capture_output=True,
+                                      text=True, encoding="utf-8", errors="replace",
+                                      timeout=FIXTURE_TIMEOUT)
             except subprocess.TimeoutExpired:
                 return 124, "", "timed out after %d s" % FIXTURE_TIMEOUT
             except OSError as exc:
                 return 126, "", "cannot start build_edition.py (%s)" % exc.__class__.__name__
-            if done.returncode == 0:
-                return 0, done.stdout or "", done.stderr or ""
             last = (done.returncode, done.stdout or "", done.stderr or "")
-            if done.returncode != 2 or "unrecognized arguments" not in last[1] + last[2]:
+            if done.returncode == 0 or done.returncode != 2 \
+                    or "unrecognized arguments" not in last[1] + last[2]:
                 break
         return last
 
@@ -445,16 +437,12 @@ def check_html(path):
                     pass
     if stack:
         problems.append("unclosed tag(s): %s" % ", ".join("<%s>" % tag for tag in stack[-4:]))
-    ids = set()
-    for match in ANY_TAG_RE.finditer(cleaned):
-        value = attribute(match.group(0)[1:-1], "id")
-        if value:
-            ids.add(value)
+    ids = set(filter(None, (attribute(m.group(0)[1:-1], "id")
+                            for m in ANY_TAG_RE.finditer(cleaned))))
     missing = []
     for match in ANCHOR_RE.finditer(cleaned):
-        target = match.group(1)
-        if target and target not in ids and target not in missing:
-            missing.append(target)
+        if match.group(1) and match.group(1) not in ids and match.group(1) not in missing:
+            missing.append(match.group(1))
     if missing:
         problems.append('href="#..." with no matching id: %s'
                         % ", ".join("#" + item for item in missing[:5]))
@@ -468,15 +456,13 @@ def check_html(path):
             break
     return problems
 
-# ---------------------------------------------------------------------- CLI
-
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="doctor.py",
         description="Self-check the Daily Beacon project: config, writable paths, memory DB, "
                     "network, static assets and a fixture build.",
-        epilog="Checks 1-12 run in order. Exit 0 when nothing FAILed (WARN is fine), "
-               "1 when at least one check failed, 2 on a usage error.")
+        epilog="Checks 1-12 run in order: exit 0 when nothing FAILed (WARN is fine), 1 when at "
+               "least one check failed, 2 on a usage error.")
     parser.add_argument("--offline", action="store_true", help="skip the network check (9)")
     parser.add_argument("--quick", action="store_true",
                         help="skip the fixture build (11); writes nothing to state/")
