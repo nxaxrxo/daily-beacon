@@ -17,7 +17,7 @@ Decisions the contract leaves open, and how they are settled here:
   - De-duplication matches on the memory.py canonical-url family, so the url keys written here are
     the same keys memory.py derives from the item url later.
 
-CLI: python scripts/news_source.py --out state/workpack/<date>/news.json [--hours 26] [--limit N] [--root PATH]
+CLI: python scripts/news_source.py --out state/workpack/<date>/news.json [--hours 50] [--limit N] [--root PATH]
 Last stdout line: news_source done: <n> articles from <ok>/<total> feeds (<failed> failed)
 Exit 0 when at least one feed works; non-zero + one stderr line only when feeds.json is unreadable or
 every feed fails. No image is downloaded here - run_daily.py owns that.
@@ -59,7 +59,7 @@ HEADERS = {
 FEED_TIMEOUT = 20
 OG_TIMEOUT = 8
 OG_BUDGET = 10
-DEFAULT_HOURS = 26
+DEFAULT_HOURS = 50
 DEFAULT_MAX_NEWS = 60
 MAX_PER_SOURCE = 4
 SUMMARY_MAX = 600
@@ -453,7 +453,7 @@ def main(argv=None) -> int:
         description="Collect news items from config/feeds.json into the canonical news item shape.",
     )
     ap.add_argument("--out", required=True, help="output json path (relative paths resolve against --root)")
-    ap.add_argument("--hours", type=int, default=0, help="lookback window in hours (default: settings lookback_hours, else 26)")
+    ap.add_argument("--hours", type=int, default=0, help="lookback window in hours (default: settings lookback_hours, else 50)")
     ap.add_argument("--limit", type=int, default=0, help="overall cap (default: settings max_news_items, else 60)")
     ap.add_argument("--root", default=None, help="project root (default: parent of scripts/)")
     ap.add_argument("--print-first", type=int, default=0, metavar="N", help="debug: print the first N titles")

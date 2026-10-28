@@ -862,5 +862,73 @@
     ],
     "enabled": false,
     "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
+  },
+  {
+    "id": "UC3nPaf5MeeDTHA2JN7clidg",
+    "name": "Bellular News",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "news",
+      "industry"
+    ],
+    "enabled": false,
+    "note": "PROPOSED by the agent - verified live 2026-10-28, awaiting owner's yes/no"
+  },
+  {
+    "id": "UCZ7AeeVbyslLM_8-nVy2B8Q",
+    "name": "Skill Up",
+    "tier": 1,
+    "tags": [
+      "gaming",
+      "review",
+      "news"
+    ],
+    "enabled": false,
+    "note": "PROPOSED by the agent - verified live 2026-10-28, awaiting owner's yes/no"
+  },
+  {
+    "id": "UCGhs9S33RAeT5DEuKTO4Oew",
+    "name": "Force Gaming",
+    "tier": 2,
+    "tags": [
+      "gaming",
+      "news"
+    ],
+    "enabled": false,
+    "note": "PROPOSED by the agent - verified live 2026-10-28, awaiting owner's yes/no"
+  },
+  {
+    "id": "UCXJL3ST-O0J3nqzQyPJtpNg",
+    "name": "Preach Gaming",
+    "tier": 3,
+    "tags": [
+      "mmo",
+      "gaming"
+    ],
+    "enabled": false,
+    "note": "PROPOSED by the agent - verified live 2026-10-28, awaiting owner's yes/no"
+  },
+  {
+    "id": "UCRl31PWkfF0a3j3hiDRaCGA",
+    "name": "Rhykker",
+    "tier": 3,
+    "tags": [
+      "mmo",
+      "arpg"
+    ],
+    "enabled": false,
+    "note": "PROPOSED by the agent - verified live 2026-10-28, awaiting owner's yes/no"
+  },
+  {
+    "id": "UCZcV8AWZ_nQvx0Yvnmy7aHw",
+    "name": "MrLlamaSC",
+    "tier": 3,
+    "tags": [
+      "mmo",
+      "arpg"
+    ],
+    "enabled": false,
+    "note": "PROPOSED by the agent - verified live 2026-10-28, awaiting owner's yes/no"
   }
 ]

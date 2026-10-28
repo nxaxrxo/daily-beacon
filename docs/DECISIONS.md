@@ -191,3 +191,37 @@ Also hardened: \--db\ is accepted after the verb as well as before it, matching 
 
 Day-to-day variety was proven, not assumed: building the same edition under five consecutive dates
 produced five distinct looks (teal/sky/gold/clay/sky, with the hero layout changing twice).
+
+
+## 2026-10-28 - owner brief: cadence, channel policy, and the 50-hour window
+
+The owner answered the open questions directly: every **second** day at 03:00 rather than daily
+(24 hours is too thin to make a paper), channels restricted to **gaming news, AI, MMORPGs and
+documentaries/long-form essays**, and explicitly *not* pure branded entertainment, gameplay or
+let's-play uploads, music artists, meme/shorts farms, clip channels or podcasts.
+
+1. **Channel list cut 79 -> 48 enabled** (tier 1: 26, tier 2: 13, tier 3: 9; 31 disabled). Every
+   disabled record carries a note naming the reason, so a later pass cannot quietly re-enable one.
+   Backup kept at config/channels.json.bak-tierpass.
+2. **config/interests.md gained a ## CHANNEL POLICY section** that *outranks* the LOVES list,
+   because the memory-derived rubric still named Papa Meat, Flashgitz and Viva La Dirt League as
+   loves. The owner's live instruction wins over an inferred preference, and the precedence is
+   written down so the 03:00 agent is not handed contradictory orders.
+3. **The window had to grow with the cadence: 26h -> 50h.** This is the non-obvious consequence of
+   the 48-hour schedule. A 26-hour lookback on a every-second-day run drops everything published on
+   the off day, silently - the paper would simply have been half as full and nobody would have known
+   why. Caps raised with it (max_videos_total 40 -> 55, max_news_items 60 -> 90).
+4. **The freshness scale had to grow with the window too.** It was < 6h = 15, < 12h = 12,
+   < 18h = 8, < 26h = 5, older = 0, so at a 50-hour window every off-day story scored **zero** on
+   freshness and the lower half of the window became unselectable. Now < 30h = 5, < 50h = 3: a
+   two-day-old story still scores, it is just worth less than this morning's.
+5. **Fallback defaults aligned to 50** in yt_source.py, 
+ews_source.py and un_daily.py. Live
+   runs read settings.json and were already correct; a fresh clone missing that file would have
+   fallen back to 26 and quietly reproduced bug 3.
+6. **Schedule replaced**: sch_mvrykw11eot (daily:03:00) removed, sch_mvs3tk2f0cb
+   (days:2@03:00) armed, next fire 2026-10-30 03:00.
+
+The scheduler needed a new format for this (days:N@HH:MM), verified by
+
+ode scripts/test_scheduler_formats.mjs -> 71/71 ALL FORMATS PASS.

@@ -11,7 +11,7 @@ feeds I actually care about. It writes itself, builds itself, and publishes itse
 
 An OpenCode session fires and works through `docs/AGENTS.md`:
 
-1. `run_daily.py collect` pulls the last 50 hours of uploads (77 channels) and RSS items (37 feeds),
+1. `run_daily.py collect` pulls the last 50 hours of uploads (48 enabled channels) and RSS items (38 feeds),
    filters out anything already covered, fetches transcripts for the best videos, downloads images,
    and writes `state/workpack/<date>/packet.md` - one readable briefing instead of raw JSON.
 2. The agent reads that packet, reads 3-8 transcripts, and judges what is worth printing using

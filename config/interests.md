@@ -106,14 +106,16 @@ two penalties. Nothing here needs a second look at the item.
 | Component | Range | Rule |
 |---|---|---|
 | **T — tier / source weight** | 0-30 | YouTube tier 1 = 30, tier 2 = 20, tier 3 = 10. News = 8 x feed weight (weight 3 -> 24, 2 -> 16, 1 -> 8). |
-| **F — freshness** | 0-15 | published < 6h = 15, < 12h = 12, < 18h = 8, < 26h = 5, older = 0. |
+| **F — freshness** | 0-15 | published < 6h = 15, < 12h = 12, < 18h = 8, < 30h = 5, < 50h = 3, older = 0. The window is 50 hours because the run is every second day, so a two-day-old story still scores — it is simply worth less than this morning's. |
 | **N — novelty vs memory** | -25..15 | never covered = 15; last covered > 60 days = 12; 21-60 days = 6; inside 21 days = -25. |
 | **V — format value** | 0-25 | See format table below. |
 | **M — personal multiplier** | -15..15 | LOVES topic = +15, LIKES = +8, NEUTRAL = 0, DISLIKES = -15, NEVER = excluded entirely. |
 
 Format value table (V): a creator's take on a big event = 25; a trailer / reveal / first-look reaction = 22;
 a documentary or long-form essay = 25; a review or analysis = 20; a plain news article = 15; a podcast or
-interview clip = 10; a routine let's play = 5; a stream VOD over 3 hours = 0. The ordering is the point:
+interview clip = 10. **Gameplay and let's-play uploads are not scored at all** - CHANNEL POLICY
+excludes them, so they never reach the ranking table. A stream VOD over 3 hours is likewise 0 and
+never leads. The ordering is the point:
 commentary and documentary outrank gameplay because that is what he respects (memory.md L1745-1747);
 nothing in memory says he dislikes long gameplay, so it is ranked last rather than removed.
 

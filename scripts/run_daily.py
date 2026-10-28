@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """run_daily.py - the one command the 03:00 agent runs first.
 
-    python scripts/run_daily.py collect [--date YYYY-MM-DD] [--hours 26] [--limit-transcripts N]
+    python scripts/run_daily.py collect [--date YYYY-MM-DD] [--hours 50] [--limit-transcripts N]
 
 Chains the deterministic steps and writes state/workpack/<date>/packet.md, the file the 03:00
 agent reads instead of raw JSON.
@@ -54,7 +54,7 @@ UA = (
 HEADERS = {"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9"}
 
 DEFAULTS = {
-    "lookback_hours": 26,
+    "lookback_hours": 50,
     "max_videos_per_channel": 3,
     "max_videos_total": 40,
     "max_news_items": 60,
@@ -739,7 +739,7 @@ def build_parser() -> argparse.ArgumentParser:
     col = sub.add_parser("collect", help="run the whole collection into state/workpack/<date>/")
     col.add_argument("--date", default=None, help="workpack date YYYY-MM-DD (default: today local)")
     col.add_argument("--hours", type=int, default=None,
-                     help="lookback hours (default: settings lookback_hours = 26)")
+                     help="lookback hours (default: settings lookback_hours = 50)")
     col.add_argument("--limit-transcripts", type=int, default=None,
                      help="cap transcripts (default: min(12, max_videos_total))")
     col.add_argument("--skip-images", action="store_true", help="do not download thumbnails/images")

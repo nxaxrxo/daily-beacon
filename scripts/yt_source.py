@@ -45,7 +45,7 @@ HEADERS = {"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9"}
 INVIDIOUS = ["https://yt.chocolatemoo53.com", "https://inv.nadeko.net"]
 RSS = "https://www.youtube.com/feeds/videos.xml?channel_id={cid}"
 TIMEOUT = 20
-DEFAULT_HOURS = 26
+DEFAULT_HOURS = 50
 DEFAULT_SHORT_MAX = 90
 
 

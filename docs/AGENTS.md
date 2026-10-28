@@ -37,7 +37,8 @@ python scripts/run_daily.py collect --date YYYY-MM-DD
 ```
 
 Observed flags: `--date`, `--hours`, `--limit-transcripts`, `--skip-images`, `--reuse-source`,
-`--root`; defaults from `config/settings.json` (`lookback_hours` = 26). Add `--reuse-source` only when
+`--root`; defaults from `config/settings.json` (`lookback_hours` = 50, because the run is every
+second day - the window must cover the off day or half of the news is silently lost). Add `--reuse-source` only when
 resuming a run that died after fetching sources. Expected last line:
 `collect done: <v> videos, <a> articles, <t> transcripts, <r> repeats suppressed`.
 
@@ -94,11 +95,11 @@ One real-shaped morning, components in rubric order, penalties applied once each
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | Asmongold TV, 14 min take on a studio's botched reveal, 4h old, never covered | 30 | 15 | 15 | 25 | +15 | 0 | **100** | **lead** |
 | 2 | Tier-2 devlog, smooth voxel terrain in GDScript, 9h old, never covered | 20 | 12 | 15 | 25 | +15 | 0 | **87** | story (hero alt) |
-| 3 | MoistCr1TiKaL, full-game Castlevania playthrough, 8h old, never covered | 30 | 12 | 15 | 5 | +8 | 0 | **70** | story, later |
+| 3 | Skill Up, review of a game he was already following, 8h old, never covered | 30 | 12 | 15 | 20 | +8 | 0 | **85** | story, strong |
 | 4 | Eurogamer, GTA 6 is a 210GB download, 1h old, never covered | 16 | 15 | 15 | 15 | 0 | 0 | **61** | story |
 | 5 | PC Gamer, Warframe rifle buff in the new patch, 20h old, topic last covered 40d ago | 16 | 5 | 6 | 20 | +8 | 0 | **55** | quick section |
 | 6 | PC Gamer, Rockstar union vote over the GTA 6 launch, 26h old, never covered | 16 | 5 | 15 | 15 | 0 | 0 | **51** | quick hit |
-| - | Same #3 playthrough, but it shipped yesterday | 30 | 12 | -25 | 5 | +8 | -45 | **0** | suppressed |
+| - | Same #3 review, but it shipped yesterday | 30 | 12 | -25 | 20 | +8 | -45 | **0** | suppressed |
 
 Read the table as the rules, not as an example:
 
