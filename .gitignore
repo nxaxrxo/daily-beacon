@@ -1,14 +1,27 @@
-﻿# working state and caches - never published
-state/workpack/
-state/doctor-fixture/
-site/_fixture/
+# Python
 __pycache__/
 *.pyc
+*.pyo
+
+# Working state and caches - never published
+state/workpack/
+state/doctor-fixture/
+state/_feedcheck/
+site/_fixture/
 site/assets/*/tmp*
+
+# Local scratch and backups
+*.bak
 *.bak-*
+
+# Environments and deps
 .venv/
 node_modules/
+
+# OS
 Thumbs.db
+desktop.ini
 .DS_Store
 
-# tracked on purpose: state/seen.sqlite (memory) and editions/*.json (content)
+# Tracked on purpose: state/seen.sqlite (memory) and editions/*.json (content)
+!state/seen.sqlite
