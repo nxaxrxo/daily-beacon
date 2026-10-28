@@ -84,10 +84,11 @@ One line each. Newest decisions at the bottom of their section.
 - `run_daily.py collect` degrades: a failed producer, filter or transcript batch is a WARN and the run continues to `packet.md`; only an unwritable `candidates.json` exits non-zero.
 - `run_daily.py` keeps `candidates.json` immutable after the caps and writes the image map to `images.json`, patching `thumb_local` into `filtered.json` only.
 
-### Verification
-- `node scripts/test_scheduler_formats.mjs` -> 71 assertions, `ALL FORMATS PASS`, exit 0 (both old and new kinds, valid/reject/catch-up).
-- `python scripts/memory.py selftest` -> `SELFTEST PASS`.
-- `python scripts/yt_source.py` live -> `yt_source done: 34 videos from 77/77 channels (0 failed)`.
-- `python scripts/news_source.py` live -> `news_source done: 60 articles from 21/21 feeds (0 failed)`.
-- `python scripts/transcripts.py --ids ...` -> cached path proven, trim marker proven.
-- `python scripts/run_daily.py collect` -> summary line and `packet.md` (recorded in docs/_parts/u5b-rundaily.md).
+### Verification (all four runs executed, output captured)
+- `node scripts/test_scheduler_formats.mjs` -> 71 assertions, `ALL FORMATS PASS`, exit 0 (old and new kinds: valid parse, invalid rejection, catch-up maths).
+- `python scripts/memory.py selftest` -> `SELFTEST PASS`; separate fixture round trip proved mark is idempotent (`marked: 5 new items` then `marked: 0 new items, 0 topics`) and filter returns `2 seen / 1 fresh` with `reasons video + url`.
+- `python scripts/yt_source.py` live -> `yt_source done: 34 videos from 79/79 channels (0 failed)`.
+- `python scripts/news_source.py` live -> `news_source done: 60 articles from 24/24 feeds (0 failed)`.
+- `python scripts/transcripts.py` -> cache hit path, fetch path, and the `[... trimmed N chars ...]` marker all proven against real videos.
+- `python scripts/run_daily.py collect --date 2026-10-28` -> exit 0, `collect done: 34 videos, 60 articles, 14 transcripts, 0 repeats suppressed`, `state/workpack/2026-10-28/packet.md` with all six required headings and 40 real candidate lines.
+- A later `--reuse-source` run on a marked edition printed `collect done: 29 videos, 60 articles, 20 transcripts, 17 repeats suppressed`, proving the anti-repeat path suppresses real, previously covered stories.

@@ -17,8 +17,10 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from datetime import date
 from pathlib import Path
@@ -35,7 +37,8 @@ except (AttributeError, ValueError):
 
 ROOT = Path(__file__).resolve().parents[1]
 SETTINGS = ROOT / "config" / "settings.json"
-SITE_INDEX = ROOT / "site" / "index.html"
+SITE_DIR = ROOT / "site"
+SITE_INDEX = SITE_DIR / "index.html"
 EDITIONS = ROOT / "editions"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
@@ -148,6 +151,11 @@ def live_url() -> str:
     return settings_url() or derived_pages_url()
 
 
+def pages_branch() -> str:
+    """Branch the live site is served from; an empty value disables the mirror."""
+    return str(load_settings().get("pages_branch", "gh-pages") or "").strip()
+
+
 def newest_edition_date() -> str:
     """Newest editions/YYYY-MM-DD.json stem, falling back to today."""
     best = None
@@ -190,6 +198,112 @@ def secret_hits(files: list) -> list:
 def unstage(name: str) -> None:
     if git("restore", "--staged", "--", name).returncode != 0:
         git("rm", "--cached", "-q", "--", name)
+
+# - pages mirror
+
+def _git_in(cwd: Path, *args: str) -> subprocess.CompletedProcess:
+    """Run git inside another worktree; never raises."""
+    return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True,
+                          text=True, encoding="utf-8", errors="replace")
+
+
+def _identity_args() -> list:
+    """-c overrides for a clone with no committer configured (a fresh machine)."""
+    args = []
+    for key in ("user.name", "user.email"):
+        res = subprocess.run(["git", "config", "--get", key], cwd=str(ROOT),
+                             capture_output=True, text=True)
+        if res.returncode == 0 and (res.stdout or "").strip():
+            continue
+        if key == "user.name":
+            args += ["-c", "user.name=daily-beacon"]
+        else:
+            m = re.search(r"github\.com[:/]+([^/]+)/", remote_url())
+            owner = m.group(1) if m else "daily-beacon"
+            args += ["-c", f"user.email={owner}@users.noreply.github.com"]
+    return args
+
+
+def mirror_pages() -> int:
+    """Copy site/ onto the Pages branch so a branch-served site actually updates.
+
+    GitHub Pages here is served from a branch (build_type=legacy), not from the Actions
+    artifact, so pushing main alone leaves the live page frozen. The copy is built in a
+    temporary worktree of that branch and pushed as a fast-forward - no force, no history
+    rewrite, and a no-op run prints "already up to date" instead of an empty commit.
+    """
+    branch = pages_branch()
+    if not branch:
+        print("publish: pages mirror disabled (pages_branch is empty)")
+        return 0
+    if not SITE_INDEX.is_file():
+        warn("publish: site/index.html missing - pages mirror skipped")
+        return 1
+
+    remote_ref = f"refs/remotes/origin/{branch}"
+    fetched = git("fetch", "--quiet", "origin", f"+refs/heads/{branch}:{remote_ref}")
+    if fetched.returncode != 0:
+        print(f"publish: origin/{branch} not fetched (first publish of that branch)")
+    if git("rev-parse", "--verify", "--quiet", remote_ref).returncode == 0:
+        start = remote_ref
+    else:
+        start = "HEAD"
+
+    scratch = Path(tempfile.mkdtemp(prefix="daily-beacon-pages-"))
+    tree = scratch / "tree"
+    added = git("worktree", "add", "--force", "-B", branch, str(tree), start)
+    if added.returncode != 0:
+        shutil.rmtree(scratch, ignore_errors=True)
+        warn(f"publish: cannot open a worktree for branch {branch}")
+        warn(first_line(added.stderr or added.stdout))
+        return 1
+
+    try:
+        for entry in tree.iterdir():
+            if entry.name == ".git":
+                continue
+            if entry.is_dir() and not entry.is_symlink():
+                shutil.rmtree(entry)
+            else:
+                entry.unlink()
+        copied = 0
+        for entry in SITE_DIR.iterdir():
+            target = tree / entry.name
+            if entry.is_dir():
+                shutil.copytree(entry, target)
+            else:
+                shutil.copy2(entry, target)
+            copied += 1
+        (tree / ".nojekyll").write_bytes(b"")
+
+        staged_res = _git_in(tree, "add", "-A")
+        if staged_res.returncode != 0:
+            warn("publish: git add failed in the pages worktree")
+            warn(first_line(staged_res.stderr or staged_res.stdout))
+            return 1
+        changed = [ln for ln in _git_in(tree, "status", "--porcelain").stdout.splitlines()
+                   if ln.strip()]
+        if not changed:
+            print(f"publish: origin/{branch} already up to date")
+            return 0
+        commit = _git_in(tree, *_identity_args(), "commit", "-q", "-m",
+                         f"site: {newest_edition_date()}")
+        if commit.returncode != 0:
+            warn("publish: commit failed in the pages worktree")
+            warn(first_line(commit.stderr or commit.stdout))
+            return 1
+        pushed = _git_in(tree, "push", "origin", f"HEAD:refs/heads/{branch}")
+        if pushed.returncode != 0:
+            warn(f"publish: git push origin {branch} failed")
+            warn(first_line(pushed.stderr or pushed.stdout))
+            return 1
+        print(f"publish: mirrored site/ to origin/{branch} ({copied} entries, {len(changed)} changes)")
+        return 0
+    finally:
+        git("worktree", "remove", "--force", str(tree))
+        git("branch", "-D", branch)
+        shutil.rmtree(scratch, ignore_errors=True)
+
 
 # - --check
 
@@ -235,6 +349,13 @@ def cmd_check() -> int:
     else:
         print("check: site never committed")
     print(f"check: live url {live_url() or '(not set)'}")
+    pages = pages_branch()
+    if pages:
+        known = git("rev-parse", "--verify", "--quiet", f"refs/remotes/origin/{pages}")
+        state = "known locally" if known.returncode == 0 else "not fetched yet"
+        print(f"check: pages branch {pages} ({state})")
+    else:
+        print("check: pages mirror disabled")
     print("check: verdict would publish" if status else "check: verdict up to date")
     return 0
 
@@ -283,6 +404,11 @@ def cmd_publish() -> int:
         push = git("push", "-u", "origin", branch)
     if push.returncode != 0:
         return git_failure("git push", push)
+
+    if mirror_pages() != 0:
+        warn("publish: committed on main, but the Pages branch did not update - "
+             "the live site still shows the previous edition")
+        return 1
 
     url = live_url()
     if url:

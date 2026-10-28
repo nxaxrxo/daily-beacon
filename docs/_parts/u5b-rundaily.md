@@ -1,69 +1,80 @@
-﻿# u5b - run_daily.py (collect orchestrator)
+# u5b - run_daily.py (collect orchestrator)
 
 Delivered: `scripts/run_daily.py` - `collect` chains yt_source -> news_source -> merge+caps -> memory filter
--> transcripts -> images -> packet.md, and prints the contract summary line.
+-> transcripts -> images -> packet.md and prints the contract summary line.
 
-## Contract compliance
-- `python scripts/run_daily.py collect [--date YYYY-MM-DD] [--hours 26] [--limit-transcripts N] [--root PATH] [--skip-images] [--reuse-source]`, argparse `--help` on both the top level and the subcommand.
-- Last stdout line exactly `collect done: <v> videos, <a> articles, <t> transcripts, <r> repeats suppressed`; exit 1 only when candidates.json cannot be written.
-- Every producer/filter/transcript/image failure is a WARN in the packet, never an abort (spec section 5 failure rule: a short edition still ships).
-- `--reuse-source` reuses an existing yt.json/news.json so a killed run can resume without refetching 79 channels.
+## Contract compliance (CONTRACTS.md item 10)
+- `python scripts/run_daily.py collect [--date YYYY-MM-DD] [--hours 26] [--limit-transcripts N] [--root PATH] [--skip-images] [--reuse-source]`;
+  `--help` works at both levels.
+- Final stdout line exactly `collect done: <v> videos, <a> articles, <t> transcripts, <r> repeats suppressed`.
+- Exit non-zero only when `candidates.json` cannot be written; every producer/filter/transcript/image
+  failure is a WARN recorded in packet.md and the run continues (spec section 5: a short edition still ships).
+- `--reuse-source` reuses an existing yt.json/news.json, so an interrupted run does not pay for 79 channels twice.
 
-## What each step does
-1. Producers: `yt_source.py --out ... --hours H`, `news_source.py --out ... --hours H` as subprocesses with `PYTHONIOENCODING=utf-8`, 1800s each; their last line is regex-parsed for ok/total/failed counts.
-2. Merge: union, canonical object completed for every item, `score_hint` mechanical (youtube 4-tier, news weight), dedupe by `key`, then the CONTRACTS caps - youtube (tier asc, published desc) with max_videos_per_channel then max_videos_total; news (weight desc, published desc) with max_news_items and 4 per source.
-3. `memory.py filter` -> filtered.json + suppressed.json. If it fails, run_daily writes its own unfiltered filtered.json with `seen=false` and a WARN, so the pipeline never dies on the memory step.
-4. `transcripts.py --candidates filtered.json --out-dir transcripts --limit L`; fetched/cached/failed parsed from its last line.
-5. Images: up to 24 candidates, 10s timeout, browser UA, >8MB rejected by header AND by bytes, jpeg/png/webp sniffed with Pillow, all failures silent; written as `img/<sha1-16>.<ext>` with the relative path in images.json and patched into filtered.json's `thumb_local` (candidates.json stays immutable).
-6. packet.md with the six required headings in order.
+## Steps
+1. producers as subprocesses (`PYTHONIOENCODING=utf-8`, 1800s each); ok/total/failed parsed from their summary
+   line by `parse_producer_stats()`, which falls back to the file's own item count when the line is absent.
+2. merge to the canonical object, `score_hint` mechanical (youtube `4-tier`, news `float(weight)`), dedupe by
+   `key`, then the CONTRACTS caps: youtube (tier asc, published desc) with `max_videos_per_channel` then
+   `max_videos_total`; news (weight desc, published desc) with `max_news_items` and 4 per source.
+3. `memory.py filter` -> filtered.json + suppressed.json; on failure it writes an unfiltered filtered.json
+   with `seen=false` and a WARN instead of dying.
+4. `transcripts.py --candidates filtered.json --out-dir transcripts --limit L --max-chars 24000`.
+5. images: up to 24, 10s timeout, browser UA, >8MB rejected by header and by bytes, jpeg/png/webp verified
+   with Pillow, silent skip on failure; `img/<sha1-16>.<ext>` plus `images.json`, and `thumb_local` patched
+   into filtered.json (candidates.json stays immutable).
+6. packet.md with the six headings in the contract order.
 
-## Verification (real runs, 2026-10-28)
+## Verification (real captured runs, 2026-10-28)
 
-`python scripts/run_daily.py --help` -> usage, exit 2 (no subcommand) as designed; `collect --help` lists
-every flag.
-
-Full run:
+Full cold run (network):
 ```
-collect done: 31 videos, 60 articles, 9 transcripts, 0 repeats suppressed
+yt_source done: 34 videos from 79/79 channels (0 failed)
+news_source done: 60 articles from 21/21 feeds (0 failed)
+transcripts done: 2 fetched, 10 cached, 0 failed
+step4 images: 24 downloaded -> img/
+step5 packet: state/workpack/2026-10-28/packet.md
+collect done: 34 videos, 60 articles, 14 transcripts, 0 repeats suppressed
+EXIT=0
 ```
-(packet.md written; 24 images downloaded; memory filter produced 91 total / 0 seen / 91 fresh - a fresh DB
-means nothing is suppressed yet, which is correct on day one.)
+
+`--reuse-source` run (after the real edition was marked, so memory now suppresses):
+```
+transcripts done: 0 fetched, 12 cached, 0 failed
+collect done: 29 videos, 60 articles, 20 transcripts, 17 repeats suppressed
+EXIT=0
+```
+Memory correctly reports `89 total, 17 seen, 72 fresh` - the 17 are the stories the edition already
+covered, which is the whole point of the anti-repeat store.
 
 packet.md head:
 ```
 # DAILY BEACON - workpack 2026-10-28
-generated 2026-10-28T11:02:17+01:00 | lookback 26h | 31 videos, 60 articles | 0 repeats suppressed
+generated 2026-10-28T11:27:58+01:00 | lookback 26h | 29 videos, 60 articles | 17 repeats suppressed
 
 ## counts
-- youtube: 34 videos | 79/79 ok, 0 failed
-- news: 60 articles | 21/21 ok, 0 failed
-...
-## top videos
-- [T1|w1] I Befriended A Serial Killer... | MeatCanyon | 2026-10-28T10:46+01:00 | https://www.youtube.com/watch?v=DQJ3F4ZOkzk | transcript:yes
-...
+- youtube: 29 videos | reused from disk (--reuse-source)
+- news: 60 articles | reused from disk (--reuse-source)
+- candidates after caps: 29 videos, 60 articles (89 total)
+- memory filter: 89 total, 17 seen, 72 fresh
+- repeats suppressed: 17
+- transcripts: 0 fetched, 12 cached, 0 failed (20 files on disk)
+- images downloaded: 24
+- warnings: none
 ```
 
-## Structural validation
-Asserted by script: first line starts `# DAILY BEACON - workpack <date>`; all six `## ` headings present in
-the contract order (`counts`, `top videos`, `top articles`, `cooling down`, `next commands`); at least one
-`- [T` candidate line; every candidate line has the five ` | ` separated fields plus the transcript flag.
+## Structural validation (scripted)
+- first line `# DAILY BEACON - workpack 2026-10-28`
+- headings exactly `## counts`, `## top videos`, `## top articles`, `## cooling down`, `## next commands`, in that order
+- 40 candidate lines, every one `- [T<t>|w<w>] title | source | published | url | transcript:yes|no` (4 ` | ` separators)
+- whole file ASCII-only
 
-## Workpack on disk
-```
-state/workpack/2026-10-28/
-  yt.json          videos from 79 channels
-  news.json        60 articles from 21 feeds
-  candidates.json  91 after caps (31 videos + 60 articles)
-  filtered.json    memory-annotated, thumb_local patched
-  suppressed.json  0 seen items on a fresh DB
-  images.json      24 verified images
-  packet.md        the agent briefing
-  transcripts/     9 .txt + index.json
-  img/             24 files
-```
+## Workpack on disk (state/workpack/2026-10-28/)
+`yt.json`, `news.json`, `candidates.json`, `filtered.json`, `suppressed.json`, `images.json`, `packet.md`,
+`transcripts/` (20 .txt + index.json), `img/` (24 verified images).
 
-## Honest notes
-- The per-channel cap of 3 plus a 26h window yields 31-34 videos; that is the config working as specified, not a shortfall.
-- A second identical run overwrote packet.md and re-used the transcript cache; no duplicate images, no crash.
-- Two `collect` invocations were left running in parallel early in the session and were killed; the numbers
-  above come from a single clean run.
+## Notes
+- The per-channel cap of 3 with a 26h window yields 29-34 videos; that is the configured behaviour.
+- A second identical run rewrites packet.md and reuses the transcript cache: no duplicate images, no crash.
+- Several orphaned `collect` runs from earlier in the session were killed; the numbers above are from single
+  clean runs.

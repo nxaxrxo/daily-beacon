@@ -1,5 +1,12 @@
 name: pages
 
+# Two deployment paths exist for this repo and this workflow handles the
+# Actions-artifact one. If Pages is configured to serve the gh-pages branch
+# (build_type = legacy), scripts/publish.py already publishes there and this
+# workflow skips instead of failing: a red X on every push would hide a real
+# failure later. Flip Settings -> Pages -> Source to "GitHub Actions" and this
+# workflow takes over automatically on the next push, no edit required.
+
 on:
   push:
     branches: [main]
@@ -15,24 +22,39 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.probe.outputs.mode }}
+    steps:
+      - name: Read the current Pages build type
+        id: probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mode="$(gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null || echo none)"
+          echo "Pages build_type: $mode"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'workflow'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      # Pages must already exist. enablement:true fails here with `Resource not accessible
-      # by integration`: the workflow token cannot create a Pages site. The site is
-      # enabled once by pushing a gh-pages branch, which GitHub detects automatically.
-      # See docs/DECISIONS.md.
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
-    needs: build
+    needs: [preflight, build]
+    if: needs.preflight.outputs.mode == 'workflow'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
