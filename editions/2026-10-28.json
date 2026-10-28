@@ -4,7 +4,7 @@
   "generatedAt": "2026-10-28T03:14:00+01:00",
   "masthead": "THE DAILY BEACON",
   "tagline": "Your 3am briefing, slightly unhinged",
-  "weatherStrip": "Overcast with a chance of union votes. 91 items considered, 10 made the cut.",
+  "weatherStrip": "Overcast with a chance of union votes. Fourteen sections, six quick hits, and one very large download.",
   "sections": [
     {
       "id": "rockstar-union",
@@ -425,5 +425,5 @@
       "url": "https://www.youtube.com/watch?v=gNVj-FIxoe4"
     }
   ],
-  "signoff": "That is edition one. Eighty-one items were considered and politely declined. See you at three."
+  "signoff": "That is edition one. Everything above links to the piece it came from. See you at three."
 }
