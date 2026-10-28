@@ -5,6 +5,8 @@ question. Everything you need is here and in `config/interests.md`. Read this fi
 
 Project root: `C:\Users\MarciNaro\Documents\VSCODE-PROJECTS\daily-beacon`. Every command runs from there.
 
+**Operating skill:** load `daily-beacon` (`skill_search.py "daily-beacon"` -> skill-library\daily-beacon\SKILL.md) for any change to this project's config, taste rules, channels, feeds, schedule or an already-published edition. This runbook stays the authority on *how an edition is written*; the skill is the map of *where everything lives and how to change it*.
+
 ## 1. Where you are, and the one rule
 
 Today's edition is a pair: `editions/YYYY-MM-DD.json`, the content file you write for today's **local**
