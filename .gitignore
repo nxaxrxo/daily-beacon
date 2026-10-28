@@ -29,3 +29,8 @@ desktop.ini
 state/*.sqlite-wal
 state/*.sqlite-shm
 _run_detached.py
+
+# scratch output from rehearsals / dry runs
+state/_dryrun-site/
+state/checklist*.json
+
