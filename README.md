@@ -1,6 +1,6 @@
 ﻿# The Daily Beacon
 
-A personal newspaper, compiled every night at 03:00 from the YouTubers I actually watch and the news
+A personal newspaper, compiled every second night at 03:00 from the YouTubers I actually watch and the news
 feeds I actually care about. It writes itself, builds itself, and publishes itself.
 
 **Live site:** `https://nxaxrxo.github.io/daily-beacon/`
@@ -11,7 +11,7 @@ feeds I actually care about. It writes itself, builds itself, and publishes itse
 
 An OpenCode session fires and works through `docs/AGENTS.md`:
 
-1. `run_daily.py collect` pulls the last 26 hours of uploads (77 channels) and RSS items (37 feeds),
+1. `run_daily.py collect` pulls the last 50 hours of uploads (77 channels) and RSS items (37 feeds),
    filters out anything already covered, fetches transcripts for the best videos, downloads images,
    and writes `state/workpack/<date>/packet.md` - one readable briefing instead of raw JSON.
 2. The agent reads that packet, reads 3-8 transcripts, and judges what is worth printing using
@@ -72,8 +72,8 @@ local file and the builder downloads, resizes and embeds it.
 python "$env:USERPROFILE\.config\opencode\tools\schedule.py" list
 ```
 
-The live schedule is `daily:03:00`. Supported formats: `once:2026-10-30T09:00`, `every:30m`, `days:3@09:00`,
-`hourly:15`, `daily:03:00`, `weekly:mon@09:00`, `weekly:mon,wed,fri@09:00`, `monthly:1@09:00`.
+The live schedule is `days:2@03:00`. Supported formats: `once:2026-10-30T09:00`, `every:30m`, `days:3@09:00`,
+`hourly:15`, `days:2@03:00`, `weekly:mon@09:00`, `weekly:mon,wed,fri@09:00`, `monthly:1@09:00`.
 
 ## Scripts
 

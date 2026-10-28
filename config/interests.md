@@ -191,3 +191,28 @@ the repeat is dead regardless of how good it is.
 - Not an AI-hype letter. Model news is reported with the benchmark, the price and the catch.
 - Not a spoiler service. He is playing Warframe and building Hytale and Godot projects right now.
 - Not a place for a hot take the agent cannot source. One unsourced claim poisons the whole page.
+
+## CHANNEL POLICY (owner's direct instruction, 2026-10-28 - OUTRANKS the LOVES list above)
+
+The LOVES section was built from memory and still names comedy/animation channels (Papa Meat,
+Flashgitz, Viva La Dirt League) that the owner has since explicitly ruled out. **When this section
+conflicts with LOVES, this section wins.**
+
+**In scope - what he actually wants:**
+- Gaming news that changes something (releases, delays, prices, closures, patches, industry moves).
+- AI models and the AI industry.
+- MMORPGs - real changes to games he plays, not content updates.
+- Documentaries and long-form video essays on real subjects.
+
+**Out of scope - do not report, even from a creator he likes:**
+- Pure branded entertainment: spectacle, memes, shorts, clip channels, sketches, animation, podcasts.
+- Gameplay / let's-play uploads of any kind.
+- Music artists and music releases.
+- Art channels.
+
+31 of 79 subscribed channels are disabled in config/channels.json for exactly this reason. A video
+from a disabled channel should never appear. If a disabled creator covers something genuinely huge,
+the STORY can appear sourced from an outlet - but not as "a video from X".
+
+The distinction that survives: **he wants to know what happened, plus the take of someone who knows
+what they are talking about.** He does not want a digest of entertainment products.

@@ -8,7 +8,7 @@
       "reaction"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCq6VFHwMzcMXbuKyG7SQYIg",
@@ -19,7 +19,7 @@
       "comedy"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCxfr3b8IuHSzu22UHnAvHWg",
@@ -30,7 +30,7 @@
       "comedy"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCsgv2QHkT2ljEixyulzOnUQ",
@@ -41,7 +41,7 @@
       "movies"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCsvn_Po0SmunchJYOWpOxMg",
@@ -52,18 +52,18 @@
       "comedy"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UC7dF9qfBMXrSlaaFFDvV_Yg",
     "name": "Gigguk",
-    "tier": 1,
+    "tier": 3,
     "tags": [
       "animation",
       "movies"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCR1D15p_vdP3HkrH8wgjQRw",
@@ -74,7 +74,7 @@
       "comedy"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCDWIvJwLJsE4LG1Atne2blQ",
@@ -84,8 +84,8 @@
       "comedy",
       "podcast"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCtGoikgbxP4F3rgI9PldI9g",
@@ -96,7 +96,7 @@
       "animation"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCTSRIY3GLFYIpkR2QwyeklA",
@@ -106,8 +106,8 @@
       "comedy",
       "essay"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCSdma21fnJzgmPodhC9SJ3g",
@@ -118,7 +118,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCNJ1Ymd5yFuUPtn21xtRbbw",
@@ -129,7 +129,7 @@
       "tech"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UChpleBmo18P08aKCIgti38g",
@@ -140,7 +140,7 @@
       "tech"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCbfYPyITQ-7l4upoX8nvctg",
@@ -151,7 +151,7 @@
       "science"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCgfe2ooZD3VJPB6aJAnuQng",
@@ -162,7 +162,7 @@
       "tech"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCIgnGlGkVRhd4qNFcEwLL4A",
@@ -173,7 +173,7 @@
       "tech"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCweDKPSF65wRw5VHFUJYiow",
@@ -184,7 +184,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCpFFItkfZz1qz5PpHpqzYBw",
@@ -195,7 +195,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCU3oAyhHDXjgbxazqOEG2UA",
@@ -206,7 +206,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UC176GAQozKKjhz62H8u9vQQ",
@@ -217,7 +217,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCchBatdUMZoMfJ3rIzgV84g",
@@ -227,8 +227,8 @@
       "comedy",
       "gaming"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UC91V6D3nkhP89wUb9f_h17g",
@@ -238,8 +238,8 @@
       "animation",
       "horror"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCODHrzPMGbNv67e84WDZhQQ",
@@ -250,7 +250,7 @@
       "science"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCE1jXbVAGJQEORz9nZqb5bQ",
@@ -261,7 +261,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UC6nSFpj9HTCZ5t-N3Rm3-HA",
@@ -272,7 +272,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCX6OQ3DkcsbYNE6H8uQQuVA",
@@ -282,8 +282,8 @@
       "comedy",
       "shorts"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCzTdZz7z2sPRGCImodwOw0g",
@@ -293,8 +293,8 @@
       "music",
       "gaming"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCb9gttCzPcabOnq1nFYPwsw",
@@ -305,7 +305,7 @@
       "gaming-news"
     ],
     "enabled": true,
-    "note": "resolved live - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCsxS7yzZC9gKYcgL4pvN3rA",
@@ -315,7 +315,7 @@
       "gaming"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCNnKprAG-MWLsk-GsbsC2BA",
@@ -325,8 +325,8 @@
       "animation",
       "comedy"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCRVXfhLRsLWi3_IKnMDiI1Q",
@@ -337,28 +337,28 @@
       "horror"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCYmna5rFHIesFteksAvFOfg",
     "name": "Dr. Plants",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "science",
       "comedy"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCSz8X-JAmenxLH-uXlgVaCg",
     "name": "Odd Animal Specimens",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "science"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCNXvmGafmrtJ7VPSqjRRbwg",
@@ -369,7 +369,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCwYQXYfPHTZKANHzBHdYo2w",
@@ -379,19 +379,19 @@
       "comedy",
       "memes"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCcKSEzhtEkzfCT8_DzyMfpg",
     "name": "KiraTV",
-    "tier": 2,
+    "tier": 1,
     "tags": [
       "gaming-news",
       "essay"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCSpFnDQr88xCZ80N-X7t0nQ",
@@ -402,7 +402,7 @@
       "movies"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCsn6cjffsvyOZCZxvGoJxGg",
@@ -413,51 +413,51 @@
       "tech"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCxsQFG_8Dbt1sZhLReL2mUw",
     "name": "Nerd City",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "essay",
       "comedy"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCN5xN8gIljvWYnsj06V8WbQ",
     "name": "Pyrocynical",
-    "tier": 2,
+    "tier": 1,
     "tags": [
       "gaming",
       "essay"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCPnSoX7NkOBcOX0Gfw_yjAw",
     "name": "Tectone",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "gaming",
       "reaction"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCKr-aOmHkFUg6P9B8A_6jgQ",
     "name": "Josh Strife Says",
-    "tier": 2,
+    "tier": 1,
     "tags": [
       "gaming",
       "essay"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCJkMlOu7faDgqh4PfzbpLdg",
@@ -468,7 +468,7 @@
       "art"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCa8VCGFAY0yjDrexYFeVoYg",
@@ -479,7 +479,7 @@
       "essay"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UC5Wz4fFacYuON6IKbhSa7Zw",
@@ -490,7 +490,7 @@
       "tech"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCEAbqW0HFB_UxZoUDO0kJBw",
@@ -501,7 +501,7 @@
       "tech"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCnZx--LpG2spgmlxOcC-DRA",
@@ -511,8 +511,8 @@
       "comedy",
       "music"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCP0_k4INXrwPS6HhIyYqsTg",
@@ -522,8 +522,8 @@
       "comedy",
       "shorts"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCdC0An4ZPNr_YiFiYoVbwaw",
@@ -533,8 +533,8 @@
       "memes",
       "shorts"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCkzaJDHBKbcaNatH_T00ieg",
@@ -544,19 +544,19 @@
       "animation",
       "comedy"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UC0e3QhIYukixgh5VVpKHH9Q",
     "name": "Code Bullet",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "tech",
       "comedy"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCnwUjPK7dXety-AJ4fNw_RQ",
@@ -567,7 +567,7 @@
       "science"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCo8bcnLyZH8tBIH9V1mLgqQ",
@@ -577,8 +577,8 @@
       "animation",
       "comedy"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCWXCrItCF6ZgXrdozUS-Idw",
@@ -588,30 +588,30 @@
       "animation",
       "comedy"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UC1uug_uZrVmylfPVBLBvitQ",
     "name": "CarbotAnimations",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "animation",
       "gaming"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UChc-m3saf8K2oJHDSsnsj_A",
     "name": "Elvis The Alien",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "movies",
       "comedy"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCBNG0osIBAprVcZZ3ic84vw",
@@ -622,18 +622,18 @@
       "tech"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UC2ksme4hP4Nx97ilFTQ0K0Q",
     "name": "Threat Interactive",
-    "tier": 2,
+    "tier": 1,
     "tags": [
       "gaming-news",
       "tech"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UC9iy0bQd8OddxuHl1e3qkzw",
@@ -644,7 +644,7 @@
       "tech"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCKtu_JtQCY0yryIy6zK4ZCg",
@@ -653,8 +653,8 @@
     "tags": [
       "art"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCw1SQ6QRRtfAhrN_cjkrOgA",
@@ -664,8 +664,8 @@
       "gaming",
       "comedy"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UC-lHJZR3Gqxm24_Vd_AJ5Yw",
@@ -675,8 +675,8 @@
       "gaming",
       "comedy"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCJLZe_NoiG0hT7QCX_9vmqw",
@@ -686,8 +686,8 @@
       "comedy",
       "memes"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCJfJWct8jN1RpCuVWk3zHTA",
@@ -698,18 +698,18 @@
       "essay"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UC-btPIh4KalPw3hZxcB4zww",
     "name": "The Theorizer",
-    "tier": 2,
+    "tier": 3,
     "tags": [
       "essay",
       "horror"
     ],
     "enabled": true,
-    "note": "tier guessed - confirm"
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCkQ774ot9mhH3wWMsjzGq2g",
@@ -719,8 +719,8 @@
       "shorts",
       "gaming"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCMwJJL5FJFuTRT55ksbQ4GQ",
@@ -730,8 +730,8 @@
       "shorts",
       "gaming"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCYF1kiTFCcYPqGTqXKt3JJg",
@@ -741,19 +741,19 @@
       "comedy",
       "animation"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCt3JiNkefsfbA2N4SgEkoiQ",
     "name": "Visual Venture",
-    "tier": 3,
+    "tier": 1,
     "tags": [
       "essay",
       "horror"
     ],
     "enabled": true,
-    "note": ""
+    "note": "owner brief: news / AI / MMO / documentary"
   },
   {
     "id": "UCjnYCUIym8wNRjLtZCc6gNg",
@@ -763,8 +763,8 @@
       "horror",
       "shorts"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCfUzdRue-huCAV9FOn9a0pw",
@@ -774,8 +774,8 @@
       "horror",
       "shorts"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCvz84_Q0BbvZThy75mbd-Dg",
@@ -785,8 +785,8 @@
       "shorts",
       "memes"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCpnkp_D4FLPCiXOmDhoAeYA",
@@ -796,8 +796,8 @@
       "memes",
       "shorts"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCLonTAxE8cjkGUTnDLShaPw",
@@ -807,8 +807,8 @@
       "memes",
       "shorts"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCpoKdKVhH-jcr3Pu0auKjmw",
@@ -817,8 +817,8 @@
     "tags": [
       "music"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCc_bv_5nmxy2xnPNg9kP3Rg",
@@ -827,8 +827,8 @@
     "tags": [
       "music"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCkAsdQZolgJdKmZ3T3zn-dA",
@@ -838,8 +838,8 @@
       "podcast",
       "comedy"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UC9p9sOco6xAOibKsh9uWsRA",
@@ -849,8 +849,8 @@
       "podcast",
       "comedy"
     ],
-    "enabled": true,
-    "note": ""
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   },
   {
     "id": "UCnYZ1yBpH3BLWxe5Fj4xsWQ",
@@ -860,7 +860,7 @@
       "shorts",
       "memes"
     ],
-    "enabled": true,
-    "note": "tier guessed - confirm"
+    "enabled": false,
+    "note": "pure entertainment/gameplay/music/shorts - disabled by owner brief"
   }
 ]

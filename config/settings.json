@@ -1,9 +1,9 @@
 {
   "timezone_note": "all times local",
-  "lookback_hours": 26,
+  "lookback_hours": 50,
   "max_videos_per_channel": 3,
-  "max_videos_total": 40,
-  "max_news_items": 60,
+  "max_videos_total": 55,
+  "max_news_items": 90,
   "short_max_seconds": 90,
   "transcript_max_chars": 24000,
   "edition_max_stories": 14,
