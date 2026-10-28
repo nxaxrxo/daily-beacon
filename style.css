@@ -7,8 +7,13 @@
 
    1 tokens      2 reset       3 typography   4 masthead     5 toc
    6 lead        7 story       8 media        9 pullquote   10 quick hits
-   11 colophon  12 progress   13 density    14 responsive  15 print
-   16 hooks     17 reduced motion
+   11 colophon  12 progress   13 responsive  14 print      15 hooks
+   16 reduced motion
+
+   Every gradient in this file is a flat low-alpha wash on a background, a rule
+   or a border. No gradient text, no coloured glow shadow, no orb, nothing
+   animated: the day's colour still arrives only through [data-accent], so five
+   dates stay five different papers.
    ============================================================================= */
 
 /* ---------------------------------------------------------------- 1. TOKENS */
@@ -21,6 +26,11 @@
   --ink-muted:   #a8a29a;
   --rule:        #2b2b32;   /* hairline you feel more than see */
   --rule-strong: #4d4d57;
+
+  /* the sheet itself: a barely-lit head, a deep foot. Same hue family as
+     --paper, so nothing new enters the palette. */
+  --paper-top:   #0e0e12;
+  --paper-deep:  #08080a;
 
   /* overwritten wholesale by [data-accent="..."] below */
   --accent:      #e8a33d;
@@ -94,7 +104,21 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  /* One wash down the whole sheet instead of a flat hex: a breath of the day's
+     accent at the nameplate, then paper that deepens toward the colophon. It
+     lives on the body, not on .masthead, so it runs edge to edge - a wash on the
+     masthead box showed four hard corners on a wide screen and read as a panel. */
+  background-image:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--accent) 6%, transparent) 0,
+      transparent 26rem),
+    linear-gradient(180deg,
+      var(--paper-top) 0,
+      var(--paper) 30rem,
+      var(--paper-deep) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   color: var(--ink);
   font-family: var(--sans);
   font-size: clamp(1.0625rem, 1rem + 0.18vw, 1.125rem); /* 17 -> 18px, never 15 */
@@ -109,8 +133,8 @@ img { display: block; max-width: 100%; height: auto; }
 a { color: inherit; }
 button { font: inherit; color: inherit; }
 
-/* the sticky index is ~3rem tall; anchors must clear it */
-[id] { scroll-margin-top: 4.75rem; }
+/* nothing is pinned at the top any more: an anchor only needs a little air */
+[id] { scroll-margin-top: 1.5rem; }
 
 ::selection { background: var(--accent); color: var(--accent-ink); }
 
@@ -133,7 +157,8 @@ button { font: inherit; color: inherit; }
   flex: 0 0 auto;
   width: 1.4rem;
   height: 2px;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent) 0,
+    color-mix(in srgb, var(--accent) 45%, var(--paper)) 100%);
 }
 
 .lead__headline, .story__headline, .pullquote__text, .masthead__title {
@@ -150,9 +175,19 @@ button { font: inherit; color: inherit; }
   letter-spacing: var(--display-track);
 }
 .story__headline { font-size: var(--story-size); line-height: 1.12; letter-spacing: -0.004em; }
-.lead__headline a, .story__headline a { text-decoration: none; }
-.lead__headline a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
-.story__headline a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
+.lead__headline a, .story__headline a {
+  /* the underline is always laid out and merely invisible: hovering recolours it,
+     so nothing reflows on a phone tap */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.1em;
+  transition: text-decoration-color 150ms linear;
+}
+.lead__headline a:hover, .story__headline a:hover,
+.lead__headline a:focus-visible, .story__headline a:focus-visible {
+  text-decoration-color: var(--accent);
+}
 
 .standfirst {
   max-width: var(--story-measure);
@@ -182,7 +217,13 @@ button { font: inherit; color: inherit; }
   padding: 0.85rem 1.05rem;
   border-left: 3px solid var(--accent);
   border-radius: 2px;
-  background: var(--paper-2);
+  background-color: var(--paper-2);
+  /* the accent seeps in from the far end of the panel, where only body ink sits.
+     The tint deliberately never reaches the left edge: the "Why it matters"
+     label is accent-on-panel text and has to keep its 6.7:1 on --paper-2. */
+  background-image: linear-gradient(90deg,
+    var(--paper-2) 0 52%,
+    color-mix(in srgb, var(--accent) 9%, var(--paper-2)) 100%);
   font-size: 0.94rem;
   line-height: 1.55;
   overflow-wrap: anywhere;
@@ -238,14 +279,34 @@ button { font: inherit; color: inherit; }
   align-items: baseline;
   max-width: var(--shell);
   margin-inline: auto;
-  padding: clamp(1.4rem, 3.5vw, 2.6rem) var(--pad) clamp(1rem, 2.4vw, 1.6rem);
+  padding: clamp(1.15rem, 2.8vw, 2.2rem) var(--pad) clamp(0.9rem, 2vw, 1.4rem);
+  /* no background of its own: the accent breath belongs to the body, where it
+     can bleed to the edges instead of stopping at the shell */
   text-align: center;
 }
 
 /* four rules in DOM order: thick, hairline, hairline, thick */
-.masthead__rule { grid-column: 1 / -1; height: 1px; background: var(--rule-strong); }
+.masthead__rule {
+  grid-column: 1 / -1;
+  height: 1px;
+  /* hairlines dissolve at the margins: the nameplate sits in light, not a box */
+  background: linear-gradient(90deg,
+    transparent 0, var(--rule-strong) 16%,
+    var(--rule-strong) 84%, transparent 100%);
+}
 .masthead__rule + .masthead__rule { margin-top: 4px; }
-.masthead__rule--thick { height: 3px; background: var(--ink); }
+.masthead__rule--thick {
+  height: 3px;
+  background: linear-gradient(90deg, var(--ink) 0, var(--ink) 100%);
+}
+/* the closing rule is the edition's signature: the day's accent at the left ear
+   running into plain ink at the right one */
+.masthead > .masthead__rule--thick:last-of-type {
+  background: linear-gradient(90deg,
+    var(--accent) 0,
+    color-mix(in srgb, var(--accent) 34%, var(--rule-strong)) 38%,
+    var(--ink) 100%);
+}
 
 .masthead__ear {
   min-width: 0;
@@ -262,7 +323,7 @@ button { font: inherit; color: inherit; }
 
 .masthead__title {
   grid-column: 1 / -1;
-  margin: 0.3rem 0 0;
+  margin: 0.26rem 0 0;
   font-size: var(--masthead-size);
   line-height: 1;
   letter-spacing: var(--masthead-track);
@@ -271,7 +332,7 @@ button { font: inherit; color: inherit; }
 
 .masthead__tagline {
   grid-column: 1 / -1;
-  margin: 0.5rem 0 1.1rem;
+  margin: 0.42rem 0 0.85rem;
   font-family: var(--serif);
   font-style: italic;
   font-size: clamp(0.86rem, 0.8rem + 0.35vw, 1.02rem);
@@ -281,7 +342,7 @@ button { font: inherit; color: inherit; }
 
 .masthead__weather {
   grid-column: 1 / -1;
-  margin: 0.7rem 0 0;
+  margin: 0.6rem 0 0;
   font-family: var(--serif);
   font-style: italic;
   font-size: 0.82rem;
@@ -290,15 +351,20 @@ button { font: inherit; color: inherit; }
 }
 
 /* ------------------------------------------------------------------- 5. TOC */
+/* A jump strip, not a second nameplate - and it scrolls away with the page.
+   It used to be position:sticky and, from 760px up, it also wrapped, so 14 full
+   labels became a tall block pinned over the top of the viewport: that was the
+   "massive header taking up most of the screen". Now: static, one row at every
+   width, sideways scroll, never wrapped. */
 .toc {
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  position: static;
   display: flex;
   align-items: stretch;
   gap: 0.2rem;
   padding-inline: var(--pad);
-  background: var(--paper); /* solid colour, no translucency tricks */
+  background-color: var(--paper);
+  background-image: linear-gradient(180deg, var(--paper-2) 0, var(--paper) 100%);
+  border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -308,24 +374,43 @@ button { font: inherit; color: inherit; }
   min-width: 0;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  /* a jump bar, not a table of contents: on a phone a 14-item strip with
-     full headlines is four screens of swiping, so labels are dropped here
-     and the kicker becomes the whole chip. Desktop restores the labels. */
+  scroll-snap-type: x proximity;
+  /* a thin scrollbar is the honest affordance: the strip does scroll */
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+  /* on a phone a 14-item strip with full headlines is four screens of swiping,
+     so labels are dropped there and the kicker becomes the whole chip */
 }
-.toc__list::-webkit-scrollbar { display: none; }
+.toc__list::-webkit-scrollbar { height: 3px; }
+.toc__list::-webkit-scrollbar-track { background: transparent; }
+.toc__list::-webkit-scrollbar-thumb { background: var(--rule-strong); }
 .toc__list > li { flex: 0 0 auto; }
 
 /* phone: kicker-only chips, capped width, still a 44px tap target.
    display:block is required or text-overflow cannot clip cleanly. */
-.toc__label { display: none; }
 .toc__kicker {
   display: block;
   max-width: 9rem;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.toc__label {
+  display: none;
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  line-height: 1.2;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 18rem;
 }
 
 .toc__link {
@@ -338,50 +423,13 @@ button { font: inherit; color: inherit; }
   border-bottom: 2px solid transparent;
   text-decoration: none;
   scroll-snap-align: start;
+  transition: border-color 140ms linear, background-color 140ms linear;
 }
-.toc__link:hover { border-bottom-color: var(--accent); }
-.toc__kicker {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
-  white-space: nowrap;
+.toc__link:hover,
+.toc__link:focus-visible {
+  border-bottom-color: var(--accent);
+  background-color: rgba(255, 255, 255, 0.03);
 }
-.toc__label {
-  font-family: var(--serif);
-  font-size: 0.9rem;
-  line-height: 1.2;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 18rem;
-}
-
-.density-toggle {
-  flex: 0 0 auto;
-  align-self: center;
-  min-width: 44px;
-  min-height: 44px;
-  margin-left: 0.2rem;
-  padding: 0.4rem 0.9rem;
-  background: var(--paper-2);
-  border: 1px solid var(--rule-strong);
-  border-radius: 999px;
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  cursor: pointer;
-  transition: color 120ms linear, border-color 120ms linear;
-}
-.density-toggle:hover { color: var(--ink); border-color: var(--accent); }
-
-/* is-scrolled shrinks the index; app.js only toggles the class */
-body.is-scrolled .toc__link { padding-block: 0.25rem; }
-body.is-scrolled .toc__label { font-size: 0.84rem; }
 
 /* ------------------------------------------------------------------ 6. LEAD */
 .paper {
@@ -402,6 +450,9 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   border-bottom: 1px solid var(--rule);
   border-radius: 0;
 }
+/* the lead's kicker is the loudest label on the page: one longer, heavier dash */
+.lead > .kicker { font-size: 0.74rem; }
+.lead > .kicker::before { width: 2.1rem; height: 3px; }
 
 /* ----------------------------------------------------------------- 7. STORY */
 .story {
@@ -426,11 +477,34 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
 .media__box {
   position: relative;
   aspect-ratio: var(--ar, 16 / 9);
+  /* a min-height on the lead box used to win over the aspect ratio and push the
+     box wider than its column, over the text beside it. Never wider than the
+     column: the height cap below then applies on its own. */
+  max-width: 100%;
   overflow: hidden;
-  background: var(--paper-2);
+  background-color: var(--paper-2);
+  /* an empty box is lit from the top; a loaded photo covers it completely */
+  background-image: linear-gradient(180deg, #15151b 0, #09090c 100%);
+  border: 1px solid var(--rule);
   border-radius: 0;
+  /* a plain drop shadow, not a coloured glow: the sheet reads as paper */
+  box-shadow: 0 1.5rem 2.4rem -1.7rem rgba(0, 0, 0, 0.9);
 }
-.media__img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.media__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* bright thumbnails glare against near-black: take them down a notch */
+  filter: saturate(0.95) contrast(1.02) brightness(0.95);
+  transition: filter 220ms linear, transform 320ms ease;
+}
+@media (hover: hover) {
+  .media__box:hover .media__img {
+    filter: saturate(1) contrast(1.03) brightness(1);
+    transform: scale(1.012);
+  }
+}
 
 .media__credit {
   margin-top: 0.45rem;
@@ -487,6 +561,9 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   border-bottom: 1px solid var(--rule);
   border-left: 1px solid var(--rule);
   border-radius: 0;
+  /* a low wash from the left edge that is gone before the text ends */
+  background-image: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 8%, transparent) 0, transparent 58%);
   text-align: left;
 }
 .pullquote::before {
@@ -518,7 +595,13 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
 .quick-hits {
   align-self: start;
   padding-bottom: 0.35rem;
-  background: var(--paper-2);
+  background-color: var(--paper-2);
+  /* lit at the top edge, deepest at the foot: a panel, not a floating card */
+  background-image: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 7%, var(--paper-2)) 0,
+    var(--paper-2) 45%,
+    #0c0c10 100%);
+  box-shadow: 0 1.1rem 2.2rem -1.6rem rgba(0, 0, 0, 0.85);
   border: 1px solid var(--rule);
   border-top: 3px double var(--rule-strong);
   border-radius: 2px;
@@ -573,6 +656,10 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   margin-bottom: 1.1rem;
   border-top: 1px solid var(--rule-strong);
   border-bottom: 1px solid var(--rule-strong);
+  /* a last hatch mark of the day's colour, centred, before the small print */
+  background-image: linear-gradient(90deg,
+    transparent 0, color-mix(in srgb, var(--accent) 42%, transparent) 50%,
+    transparent 100%);
 }
 .colophon__meta {
   display: flex;
@@ -596,11 +683,17 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
 }
 .colophon__archive { font-size: 0.78rem; text-align: center; color: var(--ink-muted); }
 .colophon__archive a {
+  /* a lone call to action at the foot of the page, so it carries a real 44px
+     tap target; inline prose links elsewhere are text, not controls */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--ink);
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-underline-offset: 0.2em;
 }
+.colophon__archive a:hover { color: var(--accent); }
 .colophon__fine {
   margin-top: 1rem;
   padding-top: 0.9rem;
@@ -655,7 +748,9 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
   display: block;
   width: 0; /* app.js drives this inline */
   height: 100%;
-  background: var(--accent);
+  background-color: var(--accent);
+  background-image: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 55%, var(--paper)) 0, var(--accent) 100%);
   transition: width 90ms linear;
 }
 
@@ -687,16 +782,7 @@ body.is-scrolled .toc__label { font-size: 0.84rem; }
 .to-top:hover { color: var(--ink); border-color: var(--accent); }
 body.is-scrolled .to-top { opacity: 1; visibility: visible; transform: none; }
 
-/* ---------------------------------------------------------------- 13. DENSE */
-body.dense { --gap: clamp(1.8rem, 3.9vw, 2.7rem); --gap-s: clamp(0.8rem, 1.5vw, 1.1rem); }
-body.dense .lead__headline { font-size: calc(var(--lead-size) * 0.86); }
-body.dense .story__headline { font-size: calc(var(--story-size) * 0.92); }
-body.dense .body,
-body.dense .lead__body { font-size: 1rem; line-height: 1.55; }
-body.dense .media--lead .media__box { min-height: clamp(9rem, 22vh, 14rem); max-height: 16rem; }
-body.dense .masthead { padding-bottom: 0.8rem; }
-
-/* ----------------------------------------------------------- 14. RESPONSIVE */
+/* ----------------------------------------------------------- 13. RESPONSIVE */
 
 /* 760px: the story run goes to two columns */
 @media (min-width: 760px) {
@@ -713,9 +799,9 @@ body.dense .masthead { padding-bottom: 0.8rem; }
 
   .story__headline { font-size: var(--story-size-lg); }
 
-  .toc__list { flex-wrap: wrap; justify-content: center; overflow: visible; }
-  .toc__label { display: block; }
-  .toc__label { font-size: 0.95rem; }
+  /* labels come back, but the strip stays ONE row: it scrolls sideways rather
+     than stacking into a block that pushes the lead off the screen */
+  .toc__label { display: block; font-size: 0.92rem; max-width: 13rem; }
 
   .colophon__meta { font-size: 0.78rem; }
 }
@@ -806,8 +892,11 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .layout-hero-stacked .lead > .aside         { grid-area: aside; text-align: left; }
   .layout-hero-stacked .lead > .source-line   { grid-area: source; justify-content: center; }
   /* width drives the box; the inline aspect-ratio sets the height, so a wide
-     picture fills the column instead of being clamped into a letterbox strip */
-  .layout-hero-stacked .media--lead { max-width: 62rem; margin-inline: auto; }
+     picture fills the column instead of being clamped into a letterbox strip.
+     width:100% is required: with an auto inline margin on a stretched grid item
+     the figure collapsed to the image's natural 690px and the day's biggest
+     photo sat in the middle of a 1168px page. */
+  .layout-hero-stacked .media--lead { width: 100%; max-width: 62rem; margin-inline: auto; }
   .layout-hero-stacked .media--lead .media__box { min-height: 0; max-height: none; }
 
   .story__headline { font-size: var(--story-size-lg); }
@@ -829,12 +918,13 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   .layout-hero-stacked.order-rail .paper > .pullquote { grid-column: 1; }
   .layout-hero-stacked.order-rail .paper > .quick-hits {
     grid-column: 2;
+    /* it sticks inside its own column only; nothing is pinned above the page */
     position: sticky;
-    top: 4.5rem;
+    top: var(--gap-s);
   }
 }
 
-/* ----------------------------------------------------------------- 15. PRINT */
+/* ----------------------------------------------------------------- 14. PRINT */
 @media print {
   :root { color-scheme: light; }
 
@@ -848,15 +938,20 @@ body.dense .masthead { padding-bottom: 0.8rem; }
 
   #progress,
   .toc,
-  .to-top,
-  .density-toggle { display: none; }
+  .to-top { display: none; }
+
+  /* gradients are screen furniture: on paper every panel is flat white */
+  body, .media__box, .pullquote, .colophon__rule, .whymatters, .quick-hits,
+  .kicker::before, #progress-bar { background-image: none; }
+  .media__img { filter: none; }
 
   .masthead, .paper, .colophon { max-width: none; padding-inline: 0; }
   .masthead__ear,
   .masthead__tagline,
   .masthead__weather { color: #333; }
   .masthead__rule { background: #999; }
-  .masthead__rule--thick { background: #111; }
+  .masthead__rule--thick,
+  .masthead > .masthead__rule--thick:last-of-type { background: #111; }
 
   /* every grid collapses to plain flow on paper */
   .paper { display: block; }
@@ -898,7 +993,7 @@ body.dense .masthead { padding-bottom: 0.8rem; }
   p { orphans: 3; widows: 3; }
 }
 
-/* ------------------------------------------------- 16. PAGE + VARIANT HOOKS */
+/* ------------------------------------------------- 15. PAGE + VARIANT HOOKS */
 /* the archive index reuses the whole shell; only its list differs */
 body.page-archive .paper { padding-block: var(--gap); }
 
@@ -915,7 +1010,7 @@ body.page-edition .paper { padding-block: var(--gap) var(--gap); }
 .order-rail .quick-hits { border-top-width: 3px; }
 .order-lead .quick-hits { margin-top: var(--gap-s); }
 
-/* ------------------------------------------------------- 17. REDUCED MOTION */
+/* ------------------------------------------------------- 16. REDUCED MOTION */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

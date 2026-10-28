@@ -1,5 +1,5 @@
 /* THE DAILY BEACON - app.js
-   Zero dependencies, zero network, six behaviours. Everything here is an
+   Zero dependencies, zero network, five behaviours. Everything here is an
    enhancement: with JS off the page still reads as a complete newspaper. */
 (function () {
   "use strict";
@@ -9,7 +9,6 @@
   var root = doc.documentElement;
   var progress = doc.getElementById("progress");
   var bar = progress ? doc.getElementById("progress-bar") : null;
-  var toggle = doc.querySelector("button.density-toggle");
   var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
   var frame = 0;
 
@@ -97,41 +96,7 @@
     for (var i = 0; i < images.length; i++) watchImage(images[i]);
   }
 
-  /* 5. density toggle, persisted; a throwing store leaves the page working */
-  var KEY = "beacon.density";
-
-  function storedDensity() {
-    try {
-      return window.localStorage.getItem(KEY);
-    } catch (err) {
-      return null;
-    }
-  }
-
-  function saveDensity(value) {
-    try {
-      window.localStorage.setItem(KEY, value);
-    } catch (err) {
-      /* storage blocked: the toggle still applies for this page view */
-    }
-  }
-
-  function setDensity(dense) {
-    body.classList.toggle("dense", dense);
-    if (toggle) toggle.setAttribute("aria-pressed", dense ? "true" : "false");
-  }
-
-  setDensity(storedDensity() === "dense");
-
-  if (toggle) {
-    toggle.addEventListener("click", function () {
-      var dense = !body.classList.contains("dense");
-      setDensity(dense);
-      saveDensity(dense ? "dense" : "comfy");
-    });
-  }
-
-  /* 6. sticky masthead compaction is CSS-only: body.is-scrolled is the hook. */
+  /* 5. body.is-scrolled is the only scroll hook: CSS decides what it does. */
 
   window.addEventListener("scroll", queue, { passive: true });
   window.addEventListener("resize", queue, { passive: true });
