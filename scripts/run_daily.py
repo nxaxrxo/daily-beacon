@@ -72,11 +72,18 @@ TRACKING = {"fbclid", "gclid", "ref", "referrer", "source", "mc_cid", "mc_eid", 
             "cmpid", "si", "feature", "spm", "s", "share", "at_medium", "at_campaign"}
 
 _log_lock = threading.Lock()
+_log_path = None  # set by cmd_collect: every line also lands in the workpack's collect.log
 
 
 def log(msg: str = "") -> None:
     with _log_lock:
         print(msg, flush=True)
+        if _log_path is not None:
+            try:
+                with open(_log_path, "a", encoding="utf-8", errors="replace") as fh:
+                    fh.write(str(msg) + "\n")
+            except OSError:
+                pass
 
 
 def ascii_safe(value, limit: int | None = None) -> str:
@@ -515,6 +522,13 @@ def cmd_collect(args) -> int:
 
     workpack = root / "state" / "workpack" / date
     workpack.mkdir(parents=True, exist_ok=True)
+    global _log_path
+    try:
+        (root / "state" / "logs").mkdir(parents=True, exist_ok=True)
+        _log_path = root / "state" / "logs" / ("collect-" + date + ".log")
+        _log_path.write_text("", encoding="utf-8")
+    except OSError:
+        _log_path = None
     img_dir = workpack / "img"
     tx_dir = workpack / "transcripts"
     img_dir.mkdir(exist_ok=True)
@@ -709,8 +723,8 @@ def cmd_collect(args) -> int:
     except Exception as exc:  # noqa: BLE001
         log("WARN could not write packet.md: %s" % ascii_safe(exc))
 
-    print("collect done: %d videos, %d articles, %d transcripts, %d repeats suppressed"
-          % (len(videos), len(articles), tx_files, suppressed_n))
+    log("collect done: %d videos, %d articles, %d transcripts, %d repeats suppressed"
+        % (len(videos), len(articles), tx_files, suppressed_n))
     return 0
 
 

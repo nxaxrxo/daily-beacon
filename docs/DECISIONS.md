@@ -6,14 +6,19 @@ One line each. Newest decisions at the bottom of their section.
 
 - Wrote `docs/SITE-CONTRACT.md` as the binding HTML/CSS/JS interface, because `build_edition.py`,
   `style.css` and `app.js` are written in parallel and the spec fixes only the output, not the markup.
-- Accent palette is 8 named keys (`amber ember rust olive teal steel rose brass`), not 8 raw hexes:
-  the builder emits `data-accent="<key>"` so the CSS owns the actual value and cannot drift.
-- All accents pre-verified >= 4.5:1 against both `#0b0b0d` and `#111114`; accents never used for body prose.
-- `--open` exists for CLI compatibility but prints `open: skipped (headless-only policy)` — the owner may
-  be at the PC and a stolen window ruins a game.
+- Accent palette is 8 named keys (`amber coral rose sage teal sky gold clay`), not 8 raw hexes: the
+  builder emits `data-accent="<key>"` so the CSS owns the actual value and cannot drift.
+- Every accent measured against both page blacks rather than eyeballed; the lightest-scoring one (coral)
+  still clears AA for normal text, so no combination of date seed can make the page unreadable:
+  `amber 9.12:1 / ember 8.74`, `coral 7.03 / 6.74`, `rose 8.32 / 7.97`, `sage 10.19 / 9.77`,
+  `teal 9.54 / 9.15`, `sky 9.18 / 8.80`, `gold 11.31 / 10.84`, `clay 8.15 / 7.81` (vs `#0b0b0d` / `#111114`).
+  Body ink `#ece7dd` is 15.96:1. Accents still never carry body prose - they mark kickers, rules and links.
+- The builder has no `--open` flag and opens nothing: verification is exit code, byte size, `--check`, HTTP,
+  and headless screenshots into scratch. A stolen window while the owner is at the PC is not a trade worth
+  making for a convenience flag.
 - `--fixture` generates its own dark abstract images with Pillow under `state/workpack/_fixture/img/`, so
   the design can be verified with zero network.
-- Archived editions are `site/archive/YYYY-MM-DD.html` (spec §7 asks for `editions/<date>.html` in one
+- Archived editions are `site/archive/YYYY-MM-DD.html` (the spec asks for `editions/<date>.html` in one
   breath and `site/archive/<date>.html` in the next; the `site/` location wins because it must be inside
   the Pages artifact).
 - Fonts: system-stack serif display + Georgia body serif + system sans for labels + mono for numerals.
