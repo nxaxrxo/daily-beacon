@@ -20,12 +20,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # Pages must already exist. enablement:true fails here with `Resource not accessible
+      # by integration`: the workflow token cannot create a Pages site. The site is
+      # enabled once by pushing a gh-pages branch, which GitHub detects automatically.
+      # See docs/DECISIONS.md.
       - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          # Creates the Pages site if it does not exist yet. The repo token can do this even when
-          # the local PAT cannot, which is why enabling Pages lives here and not in publish.py.
-          enablement: true
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:

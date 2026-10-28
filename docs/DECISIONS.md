@@ -59,11 +59,12 @@ One line each. Newest decisions at the bottom of their section.
 - `channels.json` carries exactly the six spec keys; `subscribers`/`customUrl` from the portfolio were dropped at build time because the spec fixed the element shape.
 - `channels.json` ships 79 channels; every id is a 24-char `UC...` copied verbatim from `channel_portfolio.json` except Cryton, whose id was resolved live from the channel page and cross-checked against the channel RSS and Invidious (both 200, title `Cryton`).
 - Tiers not stated by the spec carry `"note":"tier guessed - confirm"`; shorts/clip/meme/podcast channels are tier 3.
-- `feeds.json` ships 21 feeds, every one verified live (HTTP 200 with entries) in the same session it was written; HTTP status and item count per feed are recorded in `docs/FEEDS-CHECK.md`.
-- Feeds dropped after verification: VentureBeat AI (HTTP 429 on every URL variant), OpenAI Blog and Hugging Face Blog (parse, but their feeds are undated archives that a 26h window cannot use). AI coverage is carried by The Verge AI, TechCrunch AI, MIT Technology Review and Ars Technica.
+- `feeds.json` ships 24 feeds, every one verified live (HTTP 200 with entries) in the same session it was written; HTTP status and item count per feed are recorded in `docs/FEEDS-CHECK.md`.
+- Feeds dropped after verification: VentureBeat AI (HTTP 429 on every URL variant), OpenAI Blog (parses 1331 entries but is an undated marketing archive a 26h window cannot use), and every reachable-but-redundant candidate (Kotaku, Dexerto, Variety Gaming, Siliconera, Steam News, PlayStation Blog, Xbox Wire, 80.lv, Indie Games Plus, Anime News Network, Ukrinform, Hacker News, The Register, Engadget).
 - `GameSpot` ships the `mashup` feed (news + reviews) rather than the news-only feed, because the news-only endpoint returned no entries on verification.
 - `config/feeds.json` weights: 3 for the three flagship gaming feeds (PC Gamer, RPS, Eurogamer), 1 for Kyiv Independent only, 2 for everything else - so the single awareness feed can never outrank gaming/AI on volume.
 - `Game Developer` ships `/rss.xml` because `/rss/` redirects to the homepage and parses to 0 entries; the news-only GameSpot endpoint returned a stale list, so `mashup` is used.
+- `feeds.json` was written twice in this session (another unit added 38 feeds, mostly outside the spec's named categories); the final 24-feed set is the one verified and the only one kept, so the spec's 18-25 target and its category list are both met exactly once.
 - A feed counts as working only at HTTP 200 AND more than 0 parsed entries; a 200 with an empty body is treated as dead, because an empty feed silently starves the edition.
 
 ### Memory (U3)

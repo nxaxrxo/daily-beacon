@@ -15,13 +15,11 @@ import argparse, importlib, json, os, re, shutil, sqlite3, subprocess, sys, temp
 import urllib.error, urllib.request
 from pathlib import Path
 
-try:
-    if sys.stdout is not None:
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    if sys.stderr is not None:
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:
-    pass
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 PASS, FAIL, WARN = "PASS", "FAIL", "WARN"
 VOID = frozenset("area base br col embed hr img input link meta param source track wbr".split())
@@ -35,8 +33,7 @@ REQUIRED_TABLES = ("items", "topics", "editions")
 CHANNEL_ID_RE = re.compile(r"^UC[A-Za-z0-9_-]{20,}$")
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
-NET_TIMEOUT, FIXTURE_TIMEOUT, MAX_HTML_BYTES = 15, 90, 3 * 1024 * 1024
-FIXTURE_DIR = "doctor-fixture"
+NET_TIMEOUT, FIXTURE_TIMEOUT, MAX_HTML_BYTES, FIXTURE_DIR = 15, 90, 3 << 20, "doctor-fixture"
 COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
 SCRIPT_RE = re.compile(r"(<script\b[^<>]*>)(.*?)(</script\s*>)", re.S | re.I)
 STYLE_RE = re.compile(r"(<style\b[^<>]*>)(.*?)(</style\s*>)", re.S | re.I)
@@ -86,6 +83,7 @@ class Doctor:
 
     def failed(self, name, detail):
         self._record(FAIL, name, detail)
+
 
     def _fail_many(self, name, problems):
         self.failed(name, "%d problem(s): %s"
@@ -269,9 +267,9 @@ class Doctor:
         name, bad, sizes = "site static assets", [], []
         for rel in ("site/style.css", "site/app.js"):
             path = self.root / rel
-            if path.is_file() and path.stat().st_size:
-                sizes.append(path.stat().st_size)
-            else:
+            ok = path.is_file() and path.stat().st_size > 0
+            sizes.append(path.stat().st_size if ok else 0)
+            if not ok:
                 bad.append(rel + (" is empty" if path.is_file() else " missing"))
         if bad:
             return self._fail_many(name, bad)
