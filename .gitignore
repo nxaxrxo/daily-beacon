@@ -1,5 +1,7 @@
-# working state and caches - never published
+﻿# working state and caches - never published
 state/workpack/
+state/doctor-fixture/
+site/_fixture/
 __pycache__/
 *.pyc
 site/assets/*/tmp*
