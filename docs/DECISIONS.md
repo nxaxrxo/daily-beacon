@@ -337,3 +337,22 @@ Also corrected the LOVES list, which still priced MrBeast / Anatoly / Dr Insanit
 at +8 while `channels.json` disables them - three documents were giving three answers. The row now
 points at CHANNEL POLICY, and the Papa Meat / Flashgitz / Viva La Dirt League row is struck out.
 A channel being loved is not a licence to report its product.
+
+
+## 2026-10-28 - category vs subject: the cooldown's real rule
+
+The first umbrella fix covered `gaming`/`ai`/`tech`/`hardware`/`industry`/`pc`/`world`. Checking the
+result against the packet found one item still suppressed by `anime` - a medium, not a subject. A
+21-day cooldown on a medium mutes an entire interest (he follows anime), which is the same class of
+error as the original deadlock, just quieter.
+
+\`GENERIC_TOPICS\` now also holds the category-level media words: \`anime\`, \`music\`, \`indie\`,
+\`apps\`, \`movies\`, \`film\`, \`animation\`, \`comedy\`, \`drama\`.
+
+The rule, stated plainly: **a topic may gate only if it names a THING, not a KIND of thing.**
+- `gta6`, `rockstar`, `ps5`, `zelda` -> gate (a repeat here is a repeated story)
+- `anime`, `gaming`, `music`, `indie` -> never gate (they describe a section)
+
+Measured after the change: the topic index is **24 specific subjects**, and a literal reading of the
+cooling list now suppresses **0 of 113** candidates instead of 110 of 113, while \`filter\` still
+correctly reports 8 items already seen.

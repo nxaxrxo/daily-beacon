@@ -296,6 +296,8 @@ GENERIC_TOPICS = {
     # umbrella tags: they sit on 110 of 113 candidates, so a cooldown on any of them would forbid
     # the entire edition. They describe a section, never a story.
     "gaming", "ai", "hardware", "tech", "technology", "industry", "pc", "world", "dev",
+    # media/genre broad enough that a 21-day cooldown would mute a whole interest he follows
+    "anime", "music", "indie", "apps", "movies", "film", "animation", "comedy", "drama",
     "development", "entertainment", "business", "culture", "media", "software", "games", "game",
     "news", "review", "reviews", "release", "released", "research", "update", "updates",
     "report", "reports", "video", "videos", "feature", "features", "analysis", "opinion",
