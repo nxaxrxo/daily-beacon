@@ -416,6 +416,24 @@ http(s); `image` is optional but all three of `src`/`alt`/`credit` are required 
 `src` local (`../state/workpack/<date>/img/<hash>.jpg`) or http(s) for the builder to download,
 optimise and rewrite; `tags` are topic slugs and are what the 21-day cooldown keys on.
 
+### 4.0 The page never forces a click (owner's instruction, 2026-10-28)
+
+Every section must be complete on the page. He reads the Beacon so he does *not* have to open the
+video, the article or the store page - a source link is provenance and a route to more, never the
+place the facts live.
+
+- **Put the substance in the prose:** numbers, names, dates, prices, consequences. "The video explains
+  why" is a failure.
+- **Summarise a creator's take in their own voice**, attributed: what they argued and why. Name-dropping
+  that a video exists is not a take.
+- **Never write:** "watch the full video", "read the full report", "see the source for more", "details
+  in the video", "click through".
+- **The test before you publish:** delete every source link. Each section must still be a complete,
+  useful paragraph.
+
+This is enforced by `test_taste_contract.py` against the `SELF-CONTAINED WRITING` section of
+`config/interests.md` - if the rule is deleted there, the suite fails.
+
 ### 4.1 `lead` - fully filled
 
 ```json

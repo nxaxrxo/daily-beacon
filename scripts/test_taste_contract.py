@@ -109,7 +109,19 @@ for rule, pattern in {
 }.items():
     check("tone rule survives: " + rule, re.search(pattern, text, re.I) is not None)
 
-total = len(sections) + 3 + len(NEVER_RULES) + 2 + 7 + 8 + 4
+# --- self-contained writing rule (owner 2026-10-28: never force a click for the news) ---------
+SELF_TEXT = section_of("## SELF-CONTAINED WRITING", text)
+check("SELF-CONTAINED WRITING section present", len(SELF_TEXT.strip()) > 200, "len=%d" % len(SELF_TEXT))
+for rule, pattern in {
+    "states the page must never force a click": r"never force a click",
+    "source link is provenance, not homework": r"provenance",
+    "creator take summarised in prose": r"in their voice|the take|summarise",
+    "banned pointer phrasings listed": r"watch the full video",
+    "delete-the-link test stated": r"delete the source link",
+}.items():
+    check("self-contained rule: " + rule, re.search(pattern, SELF_TEXT, re.I) is not None)
+
+total = len(sections) + 3 + len(NEVER_RULES) + 2 + 7 + 8 + 4 + 6
 if fails:
     print("\nTASTE CONTRACT FAIL: %d of %d" % (len(fails), total))
     sys.exit(1)

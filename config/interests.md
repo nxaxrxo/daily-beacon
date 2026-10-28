@@ -258,6 +258,25 @@ a merely ordinary one - and the repeat is dead regardless of how good it is.
 - **Never cruel, never smug.** No "imagine caring about", no dunking on fans of a game he does not play.
 - **Second person is allowed once per edition**, not once per section.
 
+## SELF-CONTAINED WRITING (owner's direct instruction, 2026-10-28 - non-negotiable)
+
+**The page must never force a click.** Every section stands on its own: after reading the paragraph he
+knows the whole story, without opening the video, the article or the store page. He asked for this
+explicitly and it applies to every section of every edition.
+
+- **Say the actual thing.** Numbers, names, dates, prices, consequences, in the body. Not "the video
+  explains why", not "the article has the details".
+- **A source link is provenance, never homework.** It sits at the end so he can check a claim or go
+  deeper if he wants to. It is not where the information lives.
+- **Summarise the take in the prose.** What the creator argued and why, in their voice, attributed by
+  name. "Asmongold discusses the layoffs" is a failure; "Asmongold's read is that the studio was
+  already dead the moment the publisher moved to a franchise model" is the job.
+- **Banned phrasings:** "watch the full video", "read the full report", "see the source for more",
+  "details in the video", "click through". The only permitted pointer is an explicitly optional
+  deeper dive, and it never carries facts the body needed.
+- **The test:** delete the source link. The section must still be a complete, useful paragraph. If it
+  is not, the writing is unfinished.
+
 ## COOLDOWN
 
 - **Topic rule: 21 days.** `repeat_topic_cooldown_days` in `config/settings.json`. A topic covered inside
