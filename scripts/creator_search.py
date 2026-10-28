@@ -22,6 +22,12 @@ Two modes, and the difference matters:
 Output is JSON (for run_daily / a workpack) or a plain text table (for a human reading a terminal).
 A row whose term appears only in the video DESCRIPTION, not the title, is marked `title_match: false` /
 "(desc match)" - the channel index searches both, and a passing mention is not a story.
+
+DATE PRECISION, measured 2026-10-28: Invidious derives `published` from the rounded relative label it
+scrapes ("3 days ago", "1 year ago"), not from the real upload time - three consecutive results came back
+as exactly 72.0h / 120.0h / 144.0h old. So `--hours` is a rough window: the error is up to ~24h at day
+scale and much larger at "1 year" scale. Never write this tool's date as fact in an edition; open the
+video and use the real date.
 Read-only: it never writes into editions or memory.
 
 Usage

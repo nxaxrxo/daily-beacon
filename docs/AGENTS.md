@@ -313,7 +313,7 @@ the tier ordering: a tier-3 feed reporting a studio closure outranks a tier-1 ch
   `python scripts\test_business_events.py` pins the detector at 19/19 including the real
   "EA CLOSES BIOWARE" headline; run it if you doubt the block.
 - **Framing:** report the event plainly and attribute the claim ("EA confirmed", "the studio said"), then
-  give the creator's take. Do not soften a closure into a rumour to keep the tone light - the TONE RULES
+  give the creator's take - section 3.3 is how you find out whether a followed creator made one. Do not soften a closure into a rumour to keep the tone light - the TONE RULES
   ask for optimism about the *mechanism* (what happens to the people, where they go next), never about
   the fact.
 
@@ -347,6 +347,14 @@ retry. That means **"no coverage found" only for the channels it actually reache
 about YouTube as a whole. If the run matters and the list of unreachable channels is long, re-run it once;
 do not conclude "nobody covered this" from one throttled pass. A row marked `(desc match)` / `title_match:
 false` has the term only in the description - a passing mention, not a take worth quoting.
+
+One more precision caveat, measured rather than assumed: the `published` value it prints is not the real
+publish time. The instance derives it from the rounded relative text ("3 days ago", "1 year ago"), which
+is why three consecutive results came back as exactly 72.0h, 120.0h and 144.0h old. The error is therefore
+**up to ~24 hours at day scale** ("1 day ago" can be anywhere from 24 to 48 hours), and much larger at
+"1 year ago" scale. So `--hours 72` means "roughly three days", not "exactly 72 hours": a hit just outside
+the window may still be inside it. Treat a hit as "recent enough to check", then read the real date on the
+video page before writing it as today's. Do not put the tool's date in a sentence as fact.
 
 `--scope global` is the fast alternative (one query, then filtered to followed channels) but it ranks by
 popularity, so a small channel's video about the topic can simply not appear - use it for a broad read,
