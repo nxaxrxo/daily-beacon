@@ -67,13 +67,20 @@ Then:
 1. **Read `state/workpack/<date>/packet.md` in full.** Counts, top videos, top articles, what is
    cooling down, next commands. Trust its ordering, not its judgement - you judge.
 2. **Read 3-8 transcripts, in slices.** Each `transcripts/<videoId>.txt` is trimmed head+tail, so the
-   argument and conclusion sit at the ends and the middle is filler. Read `offset`/`limit` slices of
-   about 150 lines and never load a whole 24,000-character transcript in one read. **Budget: at most 8
-   transcripts**, and only ones you intend to use.
+   argument and conclusion sit at the ends and the middle is filler. **These files are effectively
+   ONE LINE** - the prose arrives with almost no newlines (measured: 24,032 characters, 1-3 newlines),
+   so line-based slicing gives you the whole file at once. Slice by CHARACTER instead: read roughly
+   the first 1,800 and the last 1,200 characters of each file, which is where the thesis and the
+   payoff sit. **Budget: at most 8 transcripts**, and only ones you intend to use.
 3. **Judge everything else from title + channel/source + thumbnail + length.** You do not need a
    transcript to know that a 14-minute video called "the patch that broke everything" is worth a look.
-4. **Use image paths verbatim** from the packet or `images.json`, into `state/workpack/<date>/img/`.
-   Never invent one; a missing image is a legal text-only section, a broken path is not.
+4. **Image paths need one transform, not a copy.** `images.json` stores paths relative to the
+   PROJECT ROOT (`state/workpack/<date>/img/<hash>.jpg`), but the builder resolves `image.src`
+   relative to the EDITION file, which lives in `editions/`. So the value that works is
+   `../state/workpack/<date>/img/<hash>.jpg` - prefix `../`. Copying verbatim produces a broken
+   image that only WARNS (`image skipped: local file not found`) and still passes `--check`, so an
+   unattended run would ship a text-only page believing it had images. Never invent a path; a
+   missing image is a legal text-only section, a broken path is not.
 
 > NOTE: a healthy run can still print `youtube: 0 videos | producer did not report a summary` and
 > `warnings: yt_source exit 4294967295` - that is the producer's summary channel failing on Windows
@@ -134,7 +141,18 @@ Read the table as the rules, not as an example:
   comeback exception in `config/interests.md` holds on all three counts, and then you say in one clause
   that the earlier beat was covered. **Never repeat what memory says was covered**: `packet.md`,
   `filtered.json` and `suppressed.json` carry the evidence, and `python scripts/memory.py query --topic
-  <slug>` answers "when did we last run this". A `seen: true` item is out.
+  <slug>` answers "when did we last run this".
+
+  **`seen: true` means OUT - it is not a score.** The -45 in the rubric is bookkeeping for the
+  suppressed row, never a way for a repeat to survive: an item already shipped is removed from
+  consideration entirely, however good it is.
+
+  **Cooldown applies to SUBJECTS, not categories.** The packet's cooling list is generated from the
+  topic index, and umbrella tags (`gaming`, `ai`, `tech`, `hardware`, `industry`, `pc`, `world`) tag
+  110 of 113 candidates. Those words are now filtered out of the index on purpose (`GENERIC_TOPICS`
+  in `scripts/memory.py`), so if one still appears in a cooling list, ignore it - the real gate is the
+  specific topic (`bioware`, `ff14`, `gta6`, `where-winds-meet`). Reading the cooldown literally
+  would forbid the whole edition; reading it as "same subject twice" is the intent.
   `python scripts/memory.py digest` is the wide view: most-covered topics, everything
   currently cooling down, and what has been quiet 30+ days. Anything on that last list may
   come back - but only with a genuinely new development, written as a follow-up, never as

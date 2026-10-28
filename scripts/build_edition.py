@@ -51,6 +51,8 @@ RAW_TEXT_TAGS = frozenset(("script", "style"))
 RESERVED_IDS = frozenset( {"top", "masthead", "paper", "progress", "progress-bar", "quick-hits", "quick-hits-title"}
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# No leading/trailing dash and no doubled dash, as the pattern enforces - the old error message
+# quoted "[a-z0-9-]+", which told an agent its invalid id was valid and left no way to see why.
 ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 MAX_IMAGE_BYTES, MAX_IMAGE_WIDTH, JPEG_QUALITY = 8 * 1024 * 1024, 1400, 82
 MAX_HTML_BYTES, TOC_LABEL_MAX, ARCHIVE_HEAD_MAX, REQUEST_TIMEOUT = 3 * 1024 * 1024, 42, 120, 20
@@ -343,6 +345,15 @@ def _check_image(section: dict[str, Any], label: str, out: list[Issue]) -> None:
     src = image.get("src")
     if not isinstance(src, str) or not src.strip():
         out.append(Issue(True, f"{label}: image.src is empty"))
+        return
+    # `config/interests.md` lists an uncredited image under NEVER, and the docs require all three,
+    # but the validator only ever looked at src - so an uncredited image passed --check cleanly.
+    alt = image.get("alt")
+    if not isinstance(alt, str) or not alt.strip():
+        out.append(Issue(False, f"{label}: image.alt is missing (accessibility + docs require it)"))
+    credit = image.get("credit")
+    if not isinstance(credit, str) or not credit.strip():
+        out.append(Issue(False, f"{label}: image.credit is missing (an uncredited image is a NEVER item)"))
 
 def _check_quick_hits(edition: dict[str, Any], issues: list[Issue]) -> None:
     hits = edition.get("quickHits")
@@ -1073,8 +1084,13 @@ def resolve_targets(args: argparse.Namespace) -> tuple[Path, Path, str] | None:
 
 def run_check(edition: dict[str, Any], issues: Sequence[Issue], notes: Sequence[str]) -> int:
     hard = [issue for issue in issues if issue.hard]
+    soft = [issue for issue in issues if not issue.hard]
     for issue in hard:
         print(f"CHECK FAIL: {ascii_safe(issue.message)}")
+    # soft issues used to be collected and then dropped on the floor, so a missing image credit
+    # passed silently. They do not fail the build, but the agent has to be able to see them.
+    for issue in soft:
+        print(f"CHECK WARN: {ascii_safe(issue.message)}")
     for note in notes:
         print(f"WARN: {ascii_safe(note)}")
     if hard:

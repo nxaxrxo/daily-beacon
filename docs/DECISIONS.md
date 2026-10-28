@@ -290,3 +290,36 @@ Implementation note: the first attempt shadowed \print\ inside \cmd_digest\, whi
 \UnboundLocalError\ - the wrapper printed nothing at all. Capturing \sys.stdout\ instead keeps the
 human-readable output on screen and gives the file the exact same text, so there is no second
 rendering path to drift.
+
+
+## 2026-10-28 - unattended rehearsal: a fresh agent wrote an edition, and found the holes
+
+The writing step had only ever been done by hand. A fresh-context agent was given nothing but
+`docs/AGENTS.md`, `config/interests.md` and the real packet, and asked to produce a valid edition
+without publishing. It succeeded (9 sections, one lead, 5 images, all credited, `CHECK OK`) - but
+its friction report exposed defects that would have bitten the first unattended run:
+
+1. **The cooldown, read literally, forbade the entire paper.** The cooling list contained `gaming`,
+   `ai`, `hardware`, `tech`, `industry`, `pc` - and those umbrella tags sit on **110 of 113**
+   candidates. `GENERIC_TOPICS` excluded `news`/`review`/`release` but not the umbrellas, so the
+   index was gating on words that describe a section rather than a subject. Fixed in
+   `memory.py`; the index rebuilt to **28 specific topics with zero umbrella tags**. Dedup still
+   works (8 seen preserved), and a strict-reading agent would previously have suppressed 110 of 113.
+2. **The transcript instruction was physically impossible.** It said "read `offset`/`limit` slices
+   of about 150 lines". The files have **1-3 newlines in 24,032 characters** - they are one line, so
+   line-slicing returns the whole file, which is the exact thing the rule forbade. Now says to slice
+   by character: first ~1,800 and last ~1,200.
+3. **`images.json` paths are relative to the project root, the builder resolves them relative to
+   `editions/`.** Following "use paths verbatim" produced a broken image that only WARNS and still
+   passes `--check` - an unattended run would ship a textless page believing it had images. The
+   required `../` prefix is now documented.
+4. **An uncredited image passed validation silently.** Credit is a NEVER-list item in
+   `config/interests.md`, but `_check_image` only tested `src`. Now `alt` and `credit` are checked,
+   and **soft issues are printed** - they were collected and then dropped, so nothing ever surfaced.
+   Proved: stripping a credit from the real edition now prints a `CHECK WARN` naming the section.
+5. **`seen: true` was defined twice, differently** - "is out" four lines above "seen set, -45".
+   Resolved explicitly: out means out, the -45 is bookkeeping for the suppressed row.
+
+Docs also corrected where they were stricter than the code (`--check --edition` was never in the
+pre-flight table; the documented `id` regex was looser than the enforced one, so the error message
+told an agent its invalid id was valid).

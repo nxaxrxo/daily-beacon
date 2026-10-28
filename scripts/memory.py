@@ -293,6 +293,10 @@ KICKER_SPLIT_RE = re.compile(r"[\u00b7|/\u2014\u2013\u2192,;:()\[\]]+")
 # Tags this broad would each shut down a whole section for three weeks ("review" appears in half
 # of everything). They stay on the item record, but never become cooldown topics.
 GENERIC_TOPICS = {
+    # umbrella tags: they sit on 110 of 113 candidates, so a cooldown on any of them would forbid
+    # the entire edition. They describe a section, never a story.
+    "gaming", "ai", "hardware", "tech", "technology", "industry", "pc", "world", "dev",
+    "development", "entertainment", "business", "culture", "media", "software", "games", "game",
     "news", "review", "reviews", "release", "released", "research", "update", "updates",
     "report", "reports", "video", "videos", "feature", "features", "analysis", "opinion",
     "business", "rumour", "rumor", "leak", "leaks", "trailer", "preview", "editorial",
