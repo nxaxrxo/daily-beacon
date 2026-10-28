@@ -1,6 +1,11 @@
 {
- "state": "working",
- "updated": "2026-10-28T10:47:27+01:00",
- "files": [],
+ "state": "done",
+ "updated": "2026-10-28T12:19:21+01:00",
+ "files": [
+  "C:/Users/MarciNaro/Documents/VSCODE-PROJECTS/daily-beacon/scripts/transcripts.py",
+  "C:/Users/MarciNaro/Documents/VSCODE-PROJECTS/daily-beacon/scripts/run_daily.py",
+  "C:/Users/MarciNaro/Documents/VSCODE-PROJECTS/daily-beacon/state/workpack/2026-10-28/packet.md",
+  "C:/Users/MarciNaro/Documents/VSCODE-PROJECTS/daily-beacon/docs/_parts/u5-run-daily.md"
+ ],
  "blocker": null
 }

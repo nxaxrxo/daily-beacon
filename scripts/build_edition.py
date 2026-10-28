@@ -255,22 +255,30 @@ def load_edition(path: Path) -> tuple[dict[str, Any] | None, str | None]:
         return None, f"edition root must be a JSON object: {path}"
     return payload, None
 
-def read_memory_stats(root: Path) -> dict[str, int]:
-    """Best-effort counts from state/seen.sqlite; never fatal."""
-    db = root / "state" / "seen.sqlite"
+def read_memory_stats(root: Path, date_str: str = "") -> dict[str, int]:
+    """Best-effort counts for the small print; never fatal."""
     stats = {"covered": 0, "suppressed": 0}
-    if not db.exists():
-        return stats
-    try:
-        import sqlite3
+    db = root / "state" / "seen.sqlite"
+    if db.exists():
+        try:
+            import sqlite3
 
-        with sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True, timeout=2) as conn:
-            row = conn.execute("SELECT COUNT(*) FROM items").fetchone()
-            stats["covered"] = int(row[0]) if row else 0
-            row = conn.execute("SELECT COUNT(*) FROM editions").fetchone()
-            stats["suppressed"] = int(row[0]) if row else 0
-    except Exception:
-        return {"covered": 0, "suppressed": 0}
+            with sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True, timeout=2) as conn:
+                row = conn.execute("SELECT COUNT(*) FROM items").fetchone()
+                stats["covered"] = int(row[0]) if row else 0
+        except Exception:
+            stats["covered"] = 0
+    # "suppressed today" means the day's dropped candidates, not the number of editions on file:
+    # collect writes them to suppressed.json, the only honest source for that phrase.
+    if date_str:
+        path = root / "state" / "workpack" / date_str / "suppressed.json"
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            items = payload.get("items") if isinstance(payload, dict) else None
+            if isinstance(items, list):
+                stats["suppressed"] = len(items)
+        except (OSError, ValueError):
+            pass
     return stats
 
 # ---------------------------------------------------------------- validation
@@ -1055,7 +1063,7 @@ def make_context( root: Path,
         quiet=args.quiet, )
     ctx.css_q = asset_query(out_dir / "style.css")
     ctx.js_q = asset_query(out_dir / "app.js")
-    ctx.stats = read_memory_stats(root)
+    ctx.stats = read_memory_stats(root, date_str)
     return ctx
 
 def report(ctx: Context, markup: str, archived: int) -> int:

@@ -29,6 +29,12 @@ One line each. Newest decisions at the bottom of their section.
   across rebuilds and citable in the archive.
 - Reading progress, masthead compaction, image fallback and density are the only JS. No analytics, no fetch.
 
+- The colophon's "suppressed today" counts the items in `state/workpack/<date>/suppressed.json`, not
+  the number of editions in the memory DB. The earlier query counted `editions` rows and printed `1
+  suppressed today` on a morning where 15 candidates were actually dropped - a small-print number the
+  owner reads on a phone, so it has to be the real one. `items` still comes from the DB for the
+  "tracked" half of the line.
+
 ## Publishing (U7)
 
 - Repo `nxaxrxo/daily-beacon`, public, default branch `main`.
@@ -91,7 +97,7 @@ One line each. Newest decisions at the bottom of their section.
 - `scripts/test_scheduler_formats.mjs` imports the real plugin through `file:///...index.ts` (node 24 strips types) rather than a re-export shim, so the test cannot pass against a stale copy.
 
 ### Config (U2/U3)
-- `settings.json` is the spec object verbatim, 13 keys, `site_base_url` left empty until the first deploy fills it.
+- `settings.json` was seeded as the spec object verbatim, 13 keys in spec order, `site_base_url` empty. The publish unit later filled `site_base_url` with the live Pages URL and added one key, `pages_branch`, for the branch-deploy path it chose (see the Publishing section); the 13 spec keys and their values are otherwise untouched, and every consumer reads a missing key as its documented default rather than crashing.
 - `channels.json` carries exactly the six spec keys; `subscribers`/`customUrl` from the portfolio were dropped at build time because the spec fixed the element shape.
 - `channels.json` ships 79 channels; every id is a 24-char `UC...` copied verbatim from `channel_portfolio.json` except Cryton, whose id was resolved live from the channel page and cross-checked against the channel RSS and Invidious (both 200, title `Cryton`).
 - Tiers not stated by the spec carry `"note":"tier guessed - confirm"`; shorts/clip/meme/podcast channels are tier 3.
@@ -100,7 +106,7 @@ One line each. Newest decisions at the bottom of their section.
 - `GameSpot` ships the `mashup` feed (news + reviews) rather than the news-only feed, because the news-only endpoint returned no entries on verification.
 - `config/feeds.json` weights: 3 for the three flagship gaming feeds (PC Gamer, RPS, Eurogamer), 1 for Kyiv Independent only, 2 for everything else - so the single awareness feed can never outrank gaming/AI on volume.
 - `Game Developer` ships `/rss.xml` because `/rss/` redirects to the homepage and parses to 0 entries; the news-only GameSpot endpoint returned a stale list, so `mashup` is used.
-- `feeds.json` was written twice in this session (another unit added 38 feeds, mostly outside the spec's named categories); the final 24-feed set is the one verified and the only one kept, so the spec's 18-25 target and its category list are both met exactly once.
+- `feeds.json` was written by more than one unit during this session (variants reached 21 and 38 entries, the latter mostly outside the spec's named categories); the final 24-feed set is the one verified line-by-line and the only one kept, so the spec's 18-25 target and its category list are both met exactly once.
 - A feed counts as working only at HTTP 200 AND more than 0 parsed entries; a 200 with an empty body is treated as dead, because an empty feed silently starves the edition.
 
 ### Memory (U3)
@@ -110,7 +116,7 @@ One line each. Newest decisions at the bottom of their section.
 - `prune` never touches rows referenced by a kept edition, even past the cutoff.
 
 ### Sources (U4/U5)
-- `yt_source.py` prefers Invidious (it returns `lengthSeconds` + views in one call) and falls back to channel RSS; a channel that fails both is counted failed and never fatal. Live run: 34 videos from 79/79 channels, 0 failed (then 29 videos in the final 26h run once the edition had been marked and repeats were suppressed).
+- `yt_source.py` prefers Invidious (it returns `lengthSeconds` + views in one call) and falls back to channel RSS; a channel that fails both is counted failed and never fatal. Live run: 34 videos from 79/79 channels, 0 failed (later 26h runs gave 30-32 as the window moved; 0 failures throughout).
 - Invidious reports `viewCount` as 0 for very fresh uploads; the value is stored as-is (0 is a real reading there, not "unknown"), while a genuinely absent field stays `null`.
 - `yt_source.py` applies `max_videos_per_channel` from settings (3) as the per-channel cap, and `short_max_seconds` for the shorts classification.
 - An RSS entry with no `<published>` is kept with `publishedAt: null` rather than dropped - hiding real content because of missing metadata is worse than an unsortable row.
@@ -122,11 +128,38 @@ One line each. Newest decisions at the bottom of their section.
 - `run_daily.py` parses the producers' summary lines through one tolerant helper (`parse_producer_stats`) and falls back to the file's own item count when a line is missing, so a producer whose output was reformatted can never make the packet report `0/0 ok` while real data sits on disk.
 - Transcripts default to `min(12, max_videos_total)`; `--limit-transcripts` overrides it, and a cached hit still counts toward the packet's `transcript:yes` flag because the file exists either way.
 
-### Verification (all four runs executed, output captured)
-- `node scripts/test_scheduler_formats.mjs` -> 83 PASS lines, `ALL FORMATS PASS`, exit 0 (old and new kinds: valid parse, invalid rejection, catch-up maths).
-- `python scripts/memory.py selftest` -> `SELFTEST PASS`; separate fixture round trip proved mark is idempotent (`marked: 5 new items` then `marked: 0 new items, 0 topics`) and filter returns `2 seen / 1 fresh` with `reasons video + url`.
-- `python scripts/yt_source.py` live -> `yt_source done: 34 videos from 79/79 channels (0 failed)`.
-- `python scripts/news_source.py` live -> `news_source done: 60 articles from 24/24 feeds (0 failed)` (281 items inside the 26h window, 181 dropped by the 4-per-source cap, 40 by the overall 60 cap).
-- `python scripts/transcripts.py` -> cache hit path, fetch path, and the `[... trimmed N chars ...]` marker all proven against real videos.
-- `python scripts/run_daily.py collect --date 2026-10-28` -> exit 0, `collect done: 34 videos, 60 articles, 14 transcripts, 0 repeats suppressed`, `state/workpack/2026-10-28/packet.md` with all six required headings and 40 real candidate lines.
-- A later `--reuse-source` run on a marked edition printed `collect done: 29 videos, 60 articles, 20 transcripts, 17 repeats suppressed`, proving the anti-repeat path suppresses real, previously covered stories.
+### Verification - every required run executed for real, output captured
+- `node scripts/test_scheduler_formats.mjs` -> exit 0, 83 `PASS` lines and a final `ALL FORMATS PASS`
+  (valid parse, invalid rejection and catch-up maths for once, every, daily, weekly-single, weekly-multi,
+  days, hourly, monthly). Re-run after the last plugin edit.
+- `python scripts/memory.py selftest` -> `SELFTEST PASS`, exit 0. A separate fixture round trip proved
+  `mark` idempotency (`marked: 5 new items` then `marked: 0 new items, 0 topics`) and `filter` reporting
+  `2 seen / 1 fresh` with reasons `video` and `url`.
+- `python scripts/yt_source.py` live -> `yt_source done: 34 videos from 79/79 channels (0 failed)`; later
+  26h runs gave 30-32 videos as the window moved. 0 channels failed in every run.
+- `python scripts/news_source.py` live -> `news_source done: 60 articles from 24/24 feeds (0 failed)`
+  (281 items inside 26h, 181 dropped by the 4-per-source cap, 40 by the overall 60 cap).
+- `python scripts/transcripts.py` -> cache-hit path, fetch path and the `[... trimmed N chars ...]` marker
+  all proven against real videos; 22 `.txt` files in the current workpack.
+- `python scripts/run_daily.py collect --date 2026-10-28` -> exit 0. Cold run:
+  `collect done: 34 videos, 60 articles, 14 transcripts, 0 repeats suppressed`. Final run on the marked
+  edition (the workpack on disk now): `collect done: 32 videos, 60 articles, 22 transcripts, 15 repeats
+  suppressed`, with `packet.md` carrying all six contract headings in order and 40 real candidate lines.
+- The anti-repeat path is proven on real data: the 15 suppressed items are stories the edition marked
+  earlier today already covered, and `filter` reports `92 total, 15 seen, 77 fresh`.
+- `docs/FEEDS-CHECK.md` was regenerated from a live re-measurement after the final feeds.json was fixed:
+  24 feeds, 24x HTTP 200, 24x entries > 0, 0 dead.
+
+### Build notes worth knowing
+- `run_daily.py` parses each producer's summary from the whole captured output, not just the last line:
+  the producers write progress to stderr, which used to hide the `... done:` line and print
+  "producer did not report a summary".
+- `--reuse-source` reports what the files on disk actually hold (and says "reused from disk") instead of
+  claiming zero, so a resumed run cannot look like an empty collection.
+- A foreground producer run on this machine is killed at ~50s by the shell lane; verification runs were
+  therefore started detached with a done-marker and polled, which is also how the 03:00 agent should run
+  a long collect if it ever needs to.
+- `config/feeds.json` was written twice during the build (one unit added 38 feeds, several outside the
+  spec's named categories). The final file is the 24-feed set that was verified live, which is the only
+  version kept and the one all numbers above refer to.
+

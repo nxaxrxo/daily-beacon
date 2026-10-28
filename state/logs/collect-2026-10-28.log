@@ -1,1 +1,66 @@
-yt_source done: 34 videos from 79/79 channels (0 failed)
+yt_source done: 32 videos from 79/79 channels (0 failed)
+news_source: 24 feeds, window 26h, cap 60 (max 4 per source)
+  ok   PC Gamer                 50 entries, 22 in window, 28 older
+  ok   Rock Paper Shotgun       100 entries, 17 in window, 83 older
+  ok   Eurogamer                100 entries, 12 in window, 88 older
+  ok   GamesIndustry.biz        100 entries, 8 in window, 92 older
+  ok   VGC                      10 entries, 10 in window
+  ok   GameSpot                 15 entries, 13 in window, 2 older
+  ok   IGN Games                20 entries, 20 in window
+  ok   PCGamesN                 75 entries, 5 in window, 70 older
+  ok   GamesRadar               50 entries, 47 in window, 3 older
+  ok   Nintendo Life            25 entries, 15 in window, 10 older
+  ok   Digital Foundry          15 entries, 0 in window, 15 older
+  ok   Tom's Hardware           50 entries, 22 in window, 28 older
+  ok   Wccftech                 20 entries, 20 in window
+  ok   Ars Technica Gaming      20 entries, 0 in window, 20 older
+  ok   Game Developer           50 entries, 6 in window, 44 older
+  ok   The Verge AI             10 entries, 7 in window, 3 older
+  ok   TechCrunch AI            20 entries, 13 in window, 7 older
+  ok   Ars Technica             20 entries, 16 in window, 4 older
+  ok   MIT Technology Review    10 entries, 2 in window, 8 older
+  ok   Google AI Blog           20 entries, 0 in window, 20 older
+  ok   Hugging Face             891 entries, 2 in window, 889 older
+  ok   Godot Blog               15 entries, 0 in window, 15 older
+  ok   Unreal Engine            10 entries, 0 in window, 10 older
+  ok   Kyiv Independent         100 entries, 28 in window, 72 older
+  window: 285 items in 26h (0 undated kept)
+  dedupe: 285 -> 285 stories (0 merged, also_on recorded)
+  caps: 4/source dropped 184, overall cap 60 dropped 41
+  images: 60/60 items have one (og:image fetches 8/10)
+  wrote C:\Users\MarciNaro\Documents\VSCODE-PROJECTS\daily-beacon\state\workpack\2026-10-28\news.json
+news_source done: 60 articles from 24/24 feeds (0 failed)
+C:\Users\MarciNaro\Documents\VSCODE-PROJECTS\daily-beacon\scripts\news_source.py:176: MarkupResemblesLocatorWarning: The input passed in on this line looks more like a filename than HTML or XML.
+
+If you meant to use Beautiful Soup to parse the contents of a file on disk, then something has gone wrong. You should open the file first, using code like this:
+
+    filehandle = open(your filename)
+
+You can then feed the open filehandle into Beautiful Soup instead of using the filename.
+
+However, if you want to parse some data that happens to look like a filename, then nothing has gone wrong: you are using Beautiful Soup correctly, and this warning is spurious and can be filtered. To make this warning go away, run this code before calling the BeautifulSoup constructor:
+
+    from bs4 import MarkupResemblesLocatorWarning
+    import warnings
+
+    warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
+    
+  txt = BeautifulSoup(txt, "html.parser").get_text(" ")
+step1 merged: 92 candidates (32 videos, 60 articles) -> candidates.json
+filter done: 92 total, 15 seen, 77 fresh, 46 cooling topics
+[1/12] WjmL7yBTObE cached 9101 chars
+[2/12] Gzzhg_QGluw cached 24032 chars
+[3/12] M0ri49SozG4 cached 1648 chars
+[4/12] 4FOOKUfUWzg cached 12767 chars
+[5/12] XEOzMFZHdcU cached 11895 chars
+[6/12] JcPC-WXqY38 cached 9659 chars
+[7/12] U3jj7XjsS0k cached 24030 chars
+[8/12] z6a1QrGho0k cached 12690 chars
+[9/12] ubpXEv4lF0k cached 23104 chars
+[10/12] _NecoHLsKPk cached 24031 chars
+[11/12] 1Ln4IFA0POk cached 24031 chars
+[12/12] 17djB82ImkQ cached 24031 chars
+transcripts done: 0 fetched, 12 cached, 0 failed
+step4 images: 24 downloaded -> img/
+step5 packet: state/workpack/2026-10-28/packet.md
+collect done: 32 videos, 60 articles, 22 transcripts, 15 repeats suppressed
