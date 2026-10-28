@@ -33,21 +33,22 @@ Result: 41 of 42 required entries present. Only Cryton is absent (accepted per b
 
 ## Gaps / omissions
 
-- **Cryton** - not in the portfolio (no title or customUrl match across all 152). One headless GET of
-  `https://www.youtube.com/@Cryton` returned HTTP 200 but no machine-readable channel page (no
-  `"channelId":"UC..."` in the HTML), so it did not resolve in the single allowed attempt => OMITTED.
-  No invented id substituted. Effect: the collector never sees Cryton; re-add when a real id exists.
+- **Cryton** - not in the portfolio (no title or customUrl match across all 152). Resolved LIVE and
+  shipped: `GET https://www.youtube.com/@Cryton` returns HTTP 200 with `"externalId":"UCb9gttCzPcabOnq1nFYPwsw"`,
+  and the id was cross-checked twice - channel RSS `feeds/videos.xml?channel_id=UCb9gttCzPcabOnq1nFYPwsw`
+  returns 200 with 15 entries titled `Cryton`, and Invidious `/api/v1/channels/UCb9gttCzPcabOnq1nFYPwsw/videos`
+  returns 200 with author `Cryton`. Shipped tier 1, tags `gaming`+`gaming-news`, note `resolved live - confirm`.
 - `Holo` (gameplay), `Fillion`, `Joss Drive Hayes`, `Tech Tone` from the memory watch list - not in the
   portfolio and not on the spec list => omitted.
 - No politics-dominant or news-desk channel exists in the portfolio under a matching title, so nothing
   had to be filtered for that rule; the file holds creators only.
 - Excluded from the 152 by design: asmr (Asmr Lucky Girl), dead/placeholder (Invictus 190 subs,
   Gen Nova 18 subs, `??????` 9.6k), Topic/auto-generated music (TIRELESS - Topic), duplicate second
-  channels with no original output (Cryy+), regional channels. Kept 78, inside the 55-90 range.
+  channels with no original output (Cryy+), regional channels. Kept 78 from the portfolio + Cryton resolved live = 79, inside the 55-90 range.
 
 ## How tiers were assigned
 
-- **tier 1 (27)** - exactly the names the brief marks must-check daily: Asmongold TV, penguinz0,
+- **tier 1 (28)** - exactly the names the brief marks must-check daily: Asmongold TV, penguinz0,
   MoistCr1TiKaL Gaming, AngryJoeShow, videogamedunkey, Gigguk, Internet Historian, h3h3Productions,
   Super Eyepatch Wolf, Drew Gooden, NakeyJakey, AI Explained, Matt Wolfe, Two Minute Papers, bycloud,
   AI Search, Curious Archive, Nexpo, blameitonjorge, Real Science, Viva La Dirt League, MeatCanyon,
