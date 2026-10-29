@@ -25,6 +25,14 @@ An OpenCode session fires and works through `docs/AGENTS.md`:
 If the PC was off at 3am, the scheduler's catch-up fires the run as soon as OpenCode next loads.
 One run, not seven.
 
+## Copy any story with one click
+
+Every story carries a **Share** button at the end of its source line. It is not a social share: one click
+puts the whole thing on the clipboard as plain text - kicker, headline, standfirst, every paragraph,
+why-it-matters, the aside, the source name with its link, and the story's own URL. Paste it into a chat to
+discuss it or forward it, and nothing is missing. It works on archived editions too, and it is hidden when
+you print.
+
 ## Why it never repeats itself
 
 `state/seen.sqlite` tracks every story and topic ever printed. A news item is stored under both a

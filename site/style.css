@@ -272,6 +272,45 @@ button { font: inherit; color: inherit; }
 }
 .source:hover { color: var(--accent); }
 
+/* Share: one click copies the whole story as plain text. Sits at the end of the source line,
+   styled as a quiet button rather than a link so it never reads as another destination. */
+.share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-left: 0.35rem;
+  padding: 0 0.85rem;
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  color: var(--ink-muted);
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.share:hover,
+.share:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.share:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.share[data-state="copied"] {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .share { transition: none; }
+}
+
 /* -------------------------------------------------------------- 4. MASTHEAD */
 .masthead {
   display: grid;
@@ -938,7 +977,8 @@ body.is-scrolled .to-top { opacity: 1; visibility: visible; transform: none; }
 
   #progress,
   .toc,
-  .to-top { display: none; }
+  .to-top,
+  .share { display: none; }
 
   /* gradients are screen furniture: on paper every panel is flat white */
   body, .media__box, .pullquote, .colophon__rule, .whymatters, .quick-hits,

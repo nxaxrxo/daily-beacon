@@ -697,6 +697,122 @@ def render_tail(section: dict[str, Any], body_class: str = "body") -> list[str]:
         out.append(source)
     return out
 
+# One click copies the whole section as plain text: headline, standfirst, body, why-it-matters,
+# the aside and the source link, plus this article's canonical URL. Read from the DOM, never from a
+# parallel copy of the data, so the text can never drift from what the page shows. Inline on purpose:
+# it survives a stale app.js, works on archive pages, needs no cache-busting of its own.
+SHARE_JS = """
+(function () {
+  "use strict";
+  var doc = document;
+
+  function flat(node) {
+    if (!node) return "";
+    var value = node.textContent || "";
+    return value.replace(/\\s+/g, " ").trim();
+  }
+
+  function label(node, selector) {
+    var sub = node ? node.querySelector(selector) : null;
+    return sub ? flat(sub) : "";
+  }
+
+  function canonical(id) {
+    var base = location.origin + location.pathname;
+    return id ? base + "#" + id : base;
+  }
+
+  function compose(article) {
+    var out = [];
+    var kicker = flat(article.querySelector(".kicker"));
+    var headline = flat(article.querySelector(".story__headline, .lead__headline"));
+    if (kicker) out.push(kicker);
+    if (headline) out.push(headline);
+
+    var standfirst = flat(article.querySelector(".standfirst"));
+    if (standfirst) out.push(standfirst);
+
+    var body = article.querySelector(".body");
+    if (body) {
+      for (var i = 0; i < body.children.length; i++) {
+        var para = flat(body.children[i]);
+        if (para) out.push(para);
+      }
+    }
+
+    var why = article.querySelector(".whymatters");
+    if (why) {
+      var whyText = flat(why);
+      var whyLabel = label(why, ".whymatters__label");
+      if (whyLabel && whyText.indexOf(whyLabel) === 0) whyText = whyText.slice(whyLabel.length).trim();
+      if (whyText) out.push("Why it matters: " + whyText);
+    }
+
+    var aside = flat(article.querySelector(".aside"));
+    if (aside) out.push(aside);
+
+    var source = article.querySelector(".source");
+    if (source && source.getAttribute("href")) {
+      out.push("Source: " + flat(source) + " - " + source.href);
+    }
+
+    var date = flat(doc.querySelector(".masthead__ear--right"));
+    var paper = flat(doc.querySelector(".masthead__title")) || "THE DAILY BEACON";
+    out.push(paper + (date ? ", " + date : "") + " - " + canonical(article.id));
+
+    return out.join("\\n\\n");
+  }
+
+  function legacyCopy(node) {
+    var area = doc.createElement("textarea");
+    area.value = node;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    doc.body.appendChild(area);
+    area.select();
+    var ok = false;
+    try { ok = doc.execCommand("copy"); } catch (err) { ok = false; }
+    doc.body.removeChild(area);
+    return ok;
+  }
+
+  function flash(button, message) {
+    var original = button.getAttribute("data-label") || button.textContent;
+    button.setAttribute("data-label", original);
+    button.setAttribute("data-state", "copied");
+    button.textContent = message;
+    window.clearTimeout(button._beaconTimer);
+    button._beaconTimer = window.setTimeout(function () {
+      button.removeAttribute("data-state");
+      button.textContent = original;
+    }, 1800);
+  }
+
+  function copy(article, button) {
+    var text = compose(article);
+    if (!text) return;
+    function done(ok) { flash(button, ok ? "Copied" : "Press Ctrl+C"); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () {
+        done(legacyCopy(text));
+      });
+    } else {
+      done(legacyCopy(text));
+    }
+  }
+
+  doc.addEventListener("click", function (event) {
+    var button = event.target && event.target.closest ? event.target.closest("button.share") : null;
+    if (!button) return;
+    var article = button.closest("article");
+    if (!article) return;
+    event.preventDefault();
+    copy(article, button);
+  });
+})();
+"""
+
 def render_source_line(section: dict[str, Any]) -> str:
     source = section.get("source") if isinstance(section.get("source"), dict) else {}
     url = source.get("url")
@@ -705,8 +821,11 @@ def render_source_line(section: dict[str, Any]) -> str:
     label = source.get("label")
     if not isinstance(label, str) or not label.strip():
         label = host_of(url) or "Source"
+    share = ( '<button type="button" class="share" aria-label="Copy this story as text">'
+              'Share</button>'
+              if section.get("kind") != "quote" else "" )
     return ( f'<p class="source-line"><a class="source" href="{attr(url)}" '
-        f'target="_blank" rel="noopener">{text(label)}</a></p>'
+        f'target="_blank" rel="noopener">{text(label)}</a>{share}</p>'
     )
 
 def _kicker(section: dict[str, Any]) -> str:
@@ -879,6 +998,7 @@ def document( *,
         "", colophon,
         "",
         '<a class="to-top" href="#top" aria-label="Back to top">Top</a>',
+        f'<script>{SHARE_JS}</script>',
         f'<script src="{attr(js_url)}" defer></script>', "</body>",
         "</html>", "",
     ]

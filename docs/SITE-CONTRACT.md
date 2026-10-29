@@ -71,7 +71,7 @@ never reads or writes `editions/` or `state/`.
       </div>
       <p class="whymatters"><span class="whymatters__label">Why it matters</span> {whyItMatters}</p>
       <p class="aside">{aside}</p>
-      <p class="source-line"><a class="source" href="{url}" target="_blank" rel="noopener">{label}</a></p>
+      <p class="source-line"><a class="source" href="{url}" target="_blank" rel="noopener">{label}</a><button type="button" class="share" aria-label="Copy this story as text">Share</button></p>
     </article>
 
     <!-- everything else, in `order` sequence -->
@@ -152,7 +152,14 @@ gold #dcc36e | clay #de9670
 4. `body.is-scrolled` past 80px (a class toggle only; CSS decides what it does - today it reveals the
    back-to-top control). The masthead and TOC are NOT pinned: they scroll away with the page. There is
    deliberately no density/comfy toggle and no localStorage dependency left.
-5. Nothing else. No analytics, no fetches, no external URLs.
+5. Section copy: the `button.share` handler and its composer are emitted **inline** by the builder
+   (`SHARE_JS` in `build_edition.py`), not in `app.js`. Reasons: it survives a stale/cached `app.js`,
+   it works on archive snapshots for free, and it keeps `app.js` inside its 160-line budget. The
+   composer reads the article from the DOM (never a parallel data copy, so the text cannot drift),
+   writes to `navigator.clipboard` with a `document.execCommand` fallback, and appends the article's
+   canonical URL *without* the fragment for the page line. One click copies headline, standfirst,
+   body, why-it-matters, aside, source label + URL: the whole story as plain text.
+6. Nothing else. No analytics, no fetches, no external URLs.
 
 ## 6. Hard design constraints (both sides)
 
@@ -161,5 +168,5 @@ gold #dcc36e | clay #de9670
   no glow shadows, no gradient text, no animated gradients, no gradient orbs).
 - Mobile first: single column below 760px, no horizontal scroll at 320px, tap targets >= 44px,
   fluid type via clamp() only.
-- Print: `@media print` -> white paper, black ink, hide `#progress`, `.toc`, `.to-top`;
+- Print: `@media print` -> white paper, black ink, hide `#progress`, `.toc`, `.to-top`, `.share`;
   show link URLs for `.source` in `::after`.

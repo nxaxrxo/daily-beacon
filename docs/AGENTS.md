@@ -541,6 +541,20 @@ This is enforced by `test_taste_contract.py` against the `SELF-CONTAINED WRITING
 }
 ```
 
+### 4.6 Every section gets a one-click copy button - automatically
+
+Nothing to write. `build_edition.py` appends `<button class="share">` to every non-quote section's
+source line, and an inline script composes the section from the DOM: kicker, headline, standfirst,
+every body paragraph, why-it-matters, the aside, the source name and URL, and the article's canonical
+URL. One click puts the whole story on the clipboard as plain text - the owner pastes it into a chat to
+discuss or forward it, which is why it must always be self-sufficient.
+
+Consequences for you: write every section so it **stands alone as pasted text** (4.0 already demands
+this), and never add markup that only makes sense on the page - a table, a "see above", or a link whose
+label carries the fact. If you add a new `kind`, it inherits the button for free; a new kind that
+renders its own source line must call `render_source_line` rather than rebuilding it.
+`python scripts\test_share_button.py` pins all of this (18/18).
+
 ## 5. Build, publish, mark
 
 These four, in this exact order, one at a time, reading the last line of each.

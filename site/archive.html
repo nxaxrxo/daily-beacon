@@ -9,7 +9,7 @@
 <meta name="description" content="Every archived Daily Beacon edition, newest first.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="favicon.svg">
-<link rel="stylesheet" href="style.css?v=f690685f">
+<link rel="stylesheet" href="style.css?v=8684878a">
 <meta property="og:title" content="THE DAILY BEACON - Archive">
 <meta property="og:description" content="Every archived Daily Beacon edition, newest first.">
 <meta property="og:type" content="website">
@@ -37,13 +37,124 @@
 <li>Edition 1</li>
 <li>Generated 28 October 2026, 21:40</li>
 <li>24 stories, 8 quick hits</li>
-<li>37 items tracked, 4 suppressed today</li>
+<li>117 items tracked, 4 suppressed today</li>
 </ul>
 <p class="colophon__signoff">That is two months in one paper: an epoch ended at BioWare, the price of intelligence fell another 15x, and Godot walked into beta. Everything above links to the piece it came from. See you at three.</p>
 <p class="colophon__archive">Previous 60 editions are archived at <a href="archive.html">archive.html</a>.</p>
 <p class="colophon__fine">Compiled automatically at 03:00 from public feeds and creators' uploads. No story is invented; every item links to its source.</p>
 </footer>
 <a class="to-top" href="#top" aria-label="Back to top">Top</a>
+<script>
+(function () {
+  "use strict";
+  var doc = document;
+
+  function flat(node) {
+    if (!node) return "";
+    var value = node.textContent || "";
+    return value.replace(/\s+/g, " ").trim();
+  }
+
+  function label(node, selector) {
+    var sub = node ? node.querySelector(selector) : null;
+    return sub ? flat(sub) : "";
+  }
+
+  function canonical(id) {
+    var base = location.origin + location.pathname;
+    return id ? base + "#" + id : base;
+  }
+
+  function compose(article) {
+    var out = [];
+    var kicker = flat(article.querySelector(".kicker"));
+    var headline = flat(article.querySelector(".story__headline, .lead__headline"));
+    if (kicker) out.push(kicker);
+    if (headline) out.push(headline);
+
+    var standfirst = flat(article.querySelector(".standfirst"));
+    if (standfirst) out.push(standfirst);
+
+    var body = article.querySelector(".body");
+    if (body) {
+      for (var i = 0; i < body.children.length; i++) {
+        var para = flat(body.children[i]);
+        if (para) out.push(para);
+      }
+    }
+
+    var why = article.querySelector(".whymatters");
+    if (why) {
+      var whyText = flat(why);
+      var whyLabel = label(why, ".whymatters__label");
+      if (whyLabel && whyText.indexOf(whyLabel) === 0) whyText = whyText.slice(whyLabel.length).trim();
+      if (whyText) out.push("Why it matters: " + whyText);
+    }
+
+    var aside = flat(article.querySelector(".aside"));
+    if (aside) out.push(aside);
+
+    var source = article.querySelector(".source");
+    if (source && source.getAttribute("href")) {
+      out.push("Source: " + flat(source) + " - " + source.href);
+    }
+
+    var date = flat(doc.querySelector(".masthead__ear--right"));
+    var paper = flat(doc.querySelector(".masthead__title")) || "THE DAILY BEACON";
+    out.push(paper + (date ? ", " + date : "") + " - " + canonical(article.id));
+
+    return out.join("\n\n");
+  }
+
+  function legacyCopy(node) {
+    var area = doc.createElement("textarea");
+    area.value = node;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    doc.body.appendChild(area);
+    area.select();
+    var ok = false;
+    try { ok = doc.execCommand("copy"); } catch (err) { ok = false; }
+    doc.body.removeChild(area);
+    return ok;
+  }
+
+  function flash(button, message) {
+    var original = button.getAttribute("data-label") || button.textContent;
+    button.setAttribute("data-label", original);
+    button.setAttribute("data-state", "copied");
+    button.textContent = message;
+    window.clearTimeout(button._beaconTimer);
+    button._beaconTimer = window.setTimeout(function () {
+      button.removeAttribute("data-state");
+      button.textContent = original;
+    }, 1800);
+  }
+
+  function copy(article, button) {
+    var text = compose(article);
+    if (!text) return;
+    function done(ok) { flash(button, ok ? "Copied" : "Press Ctrl+C"); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () {
+        done(legacyCopy(text));
+      });
+    } else {
+      done(legacyCopy(text));
+    }
+  }
+
+  doc.addEventListener("click", function (event) {
+    var button = event.target && event.target.closest ? event.target.closest("button.share") : null;
+    if (!button) return;
+    var article = button.closest("article");
+    if (!article) return;
+    event.preventDefault();
+    copy(article, button);
+  });
+})();
+</script>
 <script src="app.js?v=6ea17455" defer></script>
 </body>
 </html>
