@@ -454,3 +454,32 @@ Measured: 1.00 MB of images per edition, ~60 KB of HTML. At 60 editions that is 
 current two-day cadence that is roughly two and a half years before the archive is even a rounding error.
 The IE11-style advice to "keep archives small" does not apply. `keep_editions` raised to 60 accordingly,
 and the colophon text is already derived from that setting rather than hard-coded.
+
+## 2026-10-30 - the owner read edition two and named the writing failures
+
+Seven complaints, all about *how* it is written rather than *what* was covered. Recorded here because
+five of them were rules that existed in spirit and were not mechanical enough to survive a 3am run.
+
+- **Context was assumed, not given.** The ADT lead opened with an enterprise value for a company he had
+  never been told the function of. New rule: every section says what the subject *is* in one clause
+  before the detail, and why it is a big deal. `docs/AGENTS.md` 4.0.1 and the context rules in
+  `SELF-CONTAINED WRITING`. He also stated plainly that length is not the problem - "no worries about
+  large text blocks, its worse when its short and doesn't tell me everything i need to know" - so the
+  2-sentence paragraph habit is explicitly not a reason to cut setup.
+- **Advanced vocabulary is banned.** New `## PLAIN ENGLISH` section in `config/interests.md`. Quotes are
+  the one exception and must be explained in the next sentence. Pinned by 4 assertions.
+- **Headlines were generic or meaningless.** Pinned to TONE RULES: must work with zero prior knowledge
+  (the Reddit example), wire phrasing ("staff describe", "reportedly", "amid") banned, the weird detail
+  is the headline. Pinned by 3 assertions.
+- **Layoff follow-ups are dead.** DISLIKES: one layoff story per edition, the biggest, new event only.
+  The next-day inside story is not a slot. Note the interaction with 3.2.1 - the biggest layoff is still
+  a business event and still ranks high; what is banned is the round-up and the second pass.
+- **WoW updates are dead.** DISLIKES, with his pirate-software-drama threshold for the exception.
+- **Art-craft video essays are dead.** DISLIKES. The essay lane survives for plain-hook documentaries;
+  palette and cinematography breakdowns do not.
+- **`quickHits` was being used as a bin.** Two of the most interesting items of the edition were buried in
+  the rail. New tests: "would he tell somebody about this" decides a section, and sections are placed
+  first with the rail filled from what is left - never the other way round.
+
+Nothing was changed in the published 2026-10-30 edition; he said explicitly not to fix it. These are input
+changes for 2026-11-01 onward.

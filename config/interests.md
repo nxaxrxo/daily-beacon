@@ -137,6 +137,21 @@ says `owner's brief, 2026-10-28` so a later reader can tell the two sources apar
 - **Corporate tone, authority, rigid schedules** — "hates authority, rigid schedules and corporate
   bullshit" (memory.md L439).
 
+- **Layoff round-ups and layoff follow-ups.** His words, 2026-10-30: "don't care about all layoffs in the
+  world, just the biggest news on them, so don't care that ea staff got layedoff again." One layoff story
+  per edition, the single biggest, and it has to be a new event. A second-day "how it felt inside" piece, a
+  redundancy count at a studio he does not play, or another pass at the same cuts is not a slot. The human
+  detail belongs inside the one layoff story, not in a follow-up of its own.
+- **World of Warcraft content updates.** His words, 2026-10-30: "don't care about world of warcraft
+  updates. unless its major drama that more people are involved in, similar shit to pirate software drama."
+  A patch, a rerelease, a controller mode, a raid tier or an expansion tease is not a story, not even as a
+  quickHits line. Only a multi-outlet drama where the argument is bigger than the game qualifies, and then
+  it is a drama story, not a WoW note.
+- **Art-craft video essays.** His words, 2026-10-30: "im not much of a deep guy when it comes to art in such
+  a way." A colour-palette breakdown, a cinematography study, a "why the framing works" essay is out. The
+  video-essay lane wants the plain hook instead: "why Backrooms was the most surprising film of 2026" is a
+  yes, "why Backrooms is turquoise and what the colour is hiding" is a no.
+
 ## NEVER
 
 - **Never invent a story, a quote, a number or a reaction.** If it is not in the packet or the transcript,
@@ -213,6 +228,12 @@ about it." The packet is already paid for; a story collected and then dropped on
 - a re-upload, a mirror, or the same video from a second channel.
 - a rumour with no named source and no document.
 
+**`quickHits` is not the bin.** A story that would make him stop scrolling gets a section with a body and an
+image, not a one-line rail entry. His complaint, 2026-10-30: "posts you moved to the quick hits when they
+were actually more interesting: mouthwashing gets live action film, roblox confirmed ai agent pulled blah
+blah." The test: if he would tell somebody about it, it is a section (`story`, `video` or a `quick` with a
+body). The rail is for genuine one-fact items and for the tail of things that are true but small.
+
 `seen: true` and the 21-day cooldown are a separate gate above taste and still remove items entirely.
 
 **Business-changing events are top-tier whatever the score says.** A studio closure, an acquisition, a
@@ -258,6 +279,38 @@ a merely ordinary one - and the repeat is dead regardless of how good it is.
 - **Never cruel, never smug.** No "imagine caring about", no dunking on fans of a game he does not play.
 - **Second person is allowed once per edition**, not once per section.
 
+- **A headline has to land with no prior knowledge, and it has to be fun.** His words, 2026-10-30:
+  "titles - generic. They need to feel personal ... it should be funny and make you want to read it."
+  The test is a person who has never heard of the company, the game or the person: they read the headline,
+  they know what happened, and they want the next line. "Reddit is going logged-in only because its search
+  traffic vanished" fails that test - nobody outside Reddit's ad business knows what search traffic costing
+  them anything. "Reddit is about to make you log in just to read a post" passes.
+- **Wire phrasing is banned in a headline.** "Staff describe", "reportedly", "amid", "as", "says",
+  "details emerge", "in the wake of" - that is the sound of a press release. Use the human detail, the
+  money or the absurd number instead. "EA staff describe layoff meetings on Zoom with the chat switched
+  off" is the generic version of "EA fired 400 people on a Zoom call with the chat switched off".
+- **Person, not process.** Name who it happened to and what it cost them, never the corporate category the
+  story belongs to.
+- **Funny is the default, never at the victim's expense.** A joke about a price, a delay, an install size or
+  a company's own hype. The rules above still forbid laughing at the people who got hurt.
+
+## PLAIN ENGLISH (owner's direct instruction, 2026-10-30 - non-negotiable)
+
+- **No advanced vocabulary.** His words: "try to never use complex words, advanced english words are not
+  allowed, keep everything to slangy fun and light language." Write the way a friend talks at 3am, not the
+  way a press release reads. Where a simpler word exists it wins: "bought" over "acquired", "shut down"
+  over "ceased operations", "a lot" over "significant", "made" over "produced", "people" over
+  "headcount".
+- **Quotes are the one exception, and they get translated.** A quote stays verbatim in quotation marks
+  because the exact wording is the point, then the next sentence says plainly what it meant - "which is
+  corpo for: we are cutting the budget". Never drop an unexplained quote and move on.
+- **Jargon gets one clause of explanation or it goes.** "Enterprise value", "net revenue retention",
+  "path tracing", "attrition" - either unpack it in the same sentence ("what the whole company is worth
+  once you count the debt") or leave it out. A number he cannot place is a number he skips.
+- **The vocabulary test:** would a 15-year-old who does not read tech news get every word? If one word
+  fails, replace that word.
+- **This outranks sounding clever.** A clever sentence he has to read twice is a failed sentence.
+
 ## SELF-CONTAINED WRITING (owner's direct instruction, 2026-10-28 - non-negotiable)
 
 **The page must never force a click.** Every section stands on its own: after reading the paragraph he
@@ -274,6 +327,17 @@ explicitly and it applies to every section of every edition.
 - **Banned phrasings:** "watch the full video", "read the full report", "see the source for more",
   "details in the video", "click through". The only permitted pointer is an explicitly optional
   deeper dive, and it never carries facts the body needed.
+- **Assume he knows nothing about the subject.** His words, 2026-10-30: "I'm lacking major context and the
+  article doesn't explain it ... I need to know who the fuck adt is, why is this a big deal and so on, not
+  pretend like I know everything." So before any detail: one clause saying what the company, game or person
+  *is*, and one saying why this event matters. "ADT is the company that put the alarm box on 6 million
+  American houses" is the sentence that makes a $15.3 billion acquisition readable. Skipping it is the bug.
+- **Never write as if a name is common knowledge.** A studio, a fund, a holding company, a model, a
+  regulation: one short appositive the first time it appears, every time. The reader is one person and he
+  does not want homework before breakfast.
+- **Length is never the problem; missing setup is.** His words: "no worries about large text blocks, its
+  worse when its short and doesn't tell me everything i need to know." A section may run four or five
+  paragraphs when the setup needs them. Compress by cutting adjectives, never by cutting the explanation.
 - **The test:** delete the source link. The section must still be a complete, useful paragraph. If it
   is not, the writing is unfinished.
 

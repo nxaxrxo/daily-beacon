@@ -189,6 +189,24 @@ again, it goes into `## NEVER` in `config/interests.md` *and* gets one concrete 
 - that is what makes the ban actually bite, because nothing in the collector filters by keyword. A NEVER
   item and a worthless item are both dropped before scoring.
 
+**The owner's taste-bans, added 2026-10-30 - these are live and they bite tonight.**
+
+- **One layoff story per edition, and only the biggest.** His words: "don't care about all layoffs in the
+  world, just the biggest news on them, so don't care that ea staff got layedoff again." The next-day
+  "how it felt inside" piece, a second studio's redundancy count, another pass at yesterday's cuts - none
+  of them get a slot or a quickHits line. Pick the single largest layoff in the window, put the human
+  detail inside it, and leave the rest. Layoffs are still a business event under 3.2.1, so the *biggest*
+  one still earns its place near the top - the ban is on the round-up, not on the biggest cut.
+- **World of Warcraft updates are out.** His words: "don't care about world of warcraft updates. unless
+  its major drama that more people are involved in, similar shit to pirate software drama." Patches,
+  rereleases, controller support, raids, expansion teases: no section, no quickHits line. Only a
+  multi-outlet drama where the argument escaped the game qualifies - and then the section is the drama,
+  not a WoW note.
+- **Art-craft video essays are out.** His words: "im not much of a deep guy when it comes to art in such a
+  way." Colour-palette breakdowns, cinematography studies, "why the framing works". The documentary and
+  essay lane still exists - it wants the plain hook, the surprising claim, the thing that actually happened.
+  "Why Backrooms was the most surprising film of 2026" ships; "why Backrooms is turquoise" does not.
+
 ### 3.1 Worked ranking, eight candidates
 
 One real-shaped morning, components in rubric order, penalties applied once each.
@@ -280,6 +298,15 @@ Read the table as the rules, not as an example:
   tidy - if you write 24, all 24 must be real.
 - **Ties** break: (1) does it change something for him, (2) does it have an image, (3) is it a creator
   he actually watches.
+- **`quickHits` is not the bin, and reaching for it is the failure mode.** His complaint, 2026-10-30:
+  "posts you moved to the quick hits when they were actually more interesting: mouthwashing gets live
+  action film, roblox confirmed ai agent pulled blah blah." The test is one question: would he tell
+  somebody about this? If yes it is a section - `story`, `video`, or a `quick` with a real body - with an
+  image where the image exists. The rail is for one-fact items and for the genuine tail. When in doubt,
+  promote it; a wasted rail slot is cheap, a buried good story is the thing he actually notices.
+- **Give the promising item the section, then fill the rail.** Sort by score, place the top of the list as
+  sections first, and only then distribute what is left into `quickHits`. Never write the sections and
+  then dump everything else into the rail by default.
 
 #### 3.2.1 Business-changing events outrank everything
 
@@ -441,6 +468,67 @@ place the facts live.
 
 This is enforced by `test_taste_contract.py` against the `SELF-CONTAINED WRITING` section of
 `config/interests.md` - if the rule is deleted there, the suite fails.
+
+### 4.0.1 Assume he knows nothing (owner's instruction, 2026-10-30)
+
+His words on the ADT lead: *"I'm lacking major context and the article doesn't explain it. No worries
+about large text blocks, its worse when its short and doesn't tell me everything i need to know. I need to
+know who the fuck adt is, why is this a big deal and so on, not pretend like I know everything."*
+
+This is the single most common way a section fails him, and it fails quietly: the facts are all true and
+still unreadable, because they assume three things he does not know. **Every section answers three
+questions before it gets to the detail:**
+
+1. **What is this thing?** One clause, the first time it appears. "ADT, the company whose alarm box is in
+   6 million American homes." "Thrive Holdings, an OpenAI-backed fund that buys companies and points
+   models at them." "Sentinel, both a kingdom and a city in Hammerfell." A reader who needs the appositive
+   is every reader.
+2. **Why is it a big deal?** The consequence, not the category. Not "a $15.3 billion enterprise value"
+   alone - what that buys, and who ends up owning what he already pays for monthly.
+3. **Who is affected, and how?** The people, the wallet, the games he plays, the machine on his desk.
+
+**Length follows the setup, not a quota.** A section that needs five paragraphs because the subject is
+foreign gets five. Compress by cutting adjectives and hedging - never by cutting the explanation. If the
+choice is a tight paragraph he cannot follow or a longer one he can, ship the longer one every time.
+
+**The test:** hand the section to someone who did not read the packet. If their first question is "what is
+ADT", the section is unfinished.
+
+Enforced by `test_taste_contract.py` against the `SELF-CONTAINED WRITING` context rules in
+`config/interests.md`.
+
+### 4.0.2 Plain English, and headlines that are fun (owner's instruction, 2026-10-30)
+
+His words: *"try to never use complex words, advanced english words are not allowed, keep everything to
+slangy fun and light language. unless you quote shit (which you explain afterward)."*
+
+- **Simple words, always.** "Bought" not "acquired". "Shut down" not "ceased operations". "People"
+  not "headcount". "A lot" not "significant". If a simpler word says the same thing, the fancy one is a
+  mistake.
+- **Quotes stay verbatim, then get translated.** The exact wording is the evidence, so it keeps its
+  quotation marks - and the next sentence says plainly what it means. Never leave a quote unexplained.
+- **Jargon is explained in the same breath or dropped.** "Enterprise value (what the company is worth once
+  you count the debt)". A term he cannot place is a term he skips.
+- **The 15-year-old test:** every word in the sentence has to be a word a teenager who does not read tech
+  news would know.
+
+**Headlines.** His words: *"titles - generic. They need to feel personal ... it should be funny and make
+you want to read it."* A headline is a reason to keep reading, not a label on a folder.
+
+- **It has to work with no prior knowledge.** "Reddit is going logged-in only because its search traffic
+  vanished" means nothing to him - he does not know what search traffic does to a company. "Reddit is
+  about to make you log in just to read a post" needs no education at all.
+- **Ban the wire voice.** "Staff describe", "reportedly", "amid", "as", "in the wake of", "details
+  emerge" - that is a press release with the life taken out. Use the human detail or the absurd number.
+  "EA fired 400 people on a Zoom call with the chat switched off" beats "EA staff describe layoff
+  meetings on Zoom with the chat switched off" by a mile, and it is the same fact.
+- **The weird detail is the headline.** The 300GB temporary install, the error messages left in, the card
+  that now costs more than the one above it. Find the bit you would repeat out loud and put that on top.
+- **Never cruel.** Funny about a price, a delay, an install size, a company's own hype. Never funny about
+  a person who lost a job, a death, or a private individual.
+
+This is enforced by `test_taste_contract.py` against the `PLAIN ENGLISH` and `TONE RULES` sections of
+`config/interests.md`.
 
 ### 4.1 `lead` - fully filled
 

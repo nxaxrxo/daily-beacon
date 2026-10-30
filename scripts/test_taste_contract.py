@@ -121,7 +121,43 @@ for rule, pattern in {
 }.items():
     check("self-contained rule: " + rule, re.search(pattern, SELF_TEXT, re.I) is not None)
 
-total = len(sections) + 3 + len(NEVER_RULES) + 2 + 7 + 8 + 4 + 6
+# --- owner's 2026-10-30 feedback: plain English, context, and three taste bans -----------------
+PLAIN_TEXT = section_of("## PLAIN ENGLISH", text)
+check("PLAIN ENGLISH section present", len(PLAIN_TEXT.strip()) > 400, "len=%d" % len(PLAIN_TEXT))
+for rule, pattern in {
+    "states advanced vocabulary is banned": r"advanced vocabulary|complex words",
+    "quotes are the exception and get explained": r"quote",
+    "jargon-explained-in-the-same-breath rule": r"jargon",
+    "15-year-old vocabulary test": r"15-year-old",
+}.items():
+    check("plain English rule: " + rule, re.search(pattern, PLAIN_TEXT, re.I) is not None)
+
+TONE_TEXT = section_of("## TONE RULES", text)
+for rule, pattern in {
+    "headline must work with no prior knowledge": r"no prior knowledge",
+    "wire phrasing banned in headlines": r"wire|press release",
+    "headline is a reason to read, not a label": r"reason to (keep )?read|fun",
+}.items():
+    check("headline rule: " + rule, re.search(pattern, TONE_TEXT, re.I) is not None)
+
+for rule, pattern in {
+    "assume he knows nothing": r"knows nothing|assume",
+    "one clause saying what the company/game/person is": r"company, game or person|what is this thing|appositive",
+    "length is never the problem": r"length is never the problem|large text blocks",
+}.items():
+    check("context rule: " + rule, re.search(pattern, SELF_TEXT, re.I) is not None)
+
+for ban, pattern in {
+    "one layoff story per edition": r"one layoff story\s+per edition",
+    "world of warcraft updates are out": r"world of warcraft",
+    "art-craft video essays are out": r"art-craft|art craft",
+}.items():
+    check("taste ban present: " + ban, re.search(pattern, DISLIKE_TEXT, re.I) is not None)
+
+check("quickHits is not the bin",
+      re.search(r"quickHits`? is not the bin", text, re.I) is not None)
+
+total = len(sections) + 3 + len(NEVER_RULES) + 2 + 7 + 8 + 4 + 6 + 4 + 3 + 3 + 3 + 1
 if fails:
     print("\nTASTE CONTRACT FAIL: %d of %d" % (len(fails), total))
     sys.exit(1)
